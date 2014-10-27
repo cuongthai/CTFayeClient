@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <com.chatwing.whitelabel.views.DynamicTextLoginButton
+        android:id="@+id/btn_authenticate_fb"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/authenticate_button_text_size"
+        android:textStyle="bold"
+        style="@style/ButtonFacebook"
+        android:drawableLeft="@drawable/ic_facebook" />
+
+    <Button
+        android:id="@+id/btn_authenticate_google_plus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/authenticate_button_text_size"
+        android:textStyle="bold"
+        style="@style/ButtonGoogle"
+        android:drawableLeft="@drawable/ic_google" />
+
+    <Button
+        android:id="@+id/btn_authenticate_twitter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/authenticate_button_text_size"
+        android:textStyle="bold"
+        style="@style/ButtonTwitter"
+        android:drawableLeft="@drawable/ic_twitter" />
+
+    <Button
+        android:id="@+id/btn_authenticate_yahoo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/authenticate_button_text_size"
+        android:textStyle="bold"
+        style="@style/ButtonYahoo"
+        android:drawableLeft="@drawable/ic_yahoo"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/btn_authenticate_tumblr"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/authenticate_button_text_size"
+        android:textStyle="bold"
+        style="@style/ButtonTumblr"
+        android:drawableLeft="@drawable/ic_tumblr"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/btn_authenticate_guest"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/authenticate_button_text_size"
+        android:textStyle="bold"
+        style="@style/Buttonguest" />
+</LinearLayout>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/main_background_color"
+                android:clickable="true">
+    <EditText
+            android:id="@+id/guest_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:lines="1"
+            android:hint="@string/hint_guest_name"
+            android:inputType="text"
+            android:imeOptions="actionGo"
+            android:layout_alignParentTop="true"/>
+
+    <TextView
+            android:id="@+id/label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/title_choose_guest_avatar"
+            android:textColor="@android:color/black"
+            android:padding="@dimen/padding_small"
+            android:textStyle="bold"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_below="@id/guest_name"/>
+    <Button
+            android:id="@+id/btn_login_guest"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/title_login_guest"
+            android:textSize="@dimen/authenticate_button_text_size"
+            android:textStyle="bold"
+            android:layout_alignParentBottom="true"
+            style="@style/Buttonguest"/>
+
+    <com.chatwing.whitelabel.views.CompatibleGridView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/gridView"
+            android:layout_gravity="center_horizontal"
+            android:layout_above="@id/btn_login_guest"
+            android:numColumns="6"
+            android:stretchMode="columnWidth"
+            android:choiceMode="singleChoice"
+            android:layout_below="@id/label"/>
+
+</RelativeLayout>

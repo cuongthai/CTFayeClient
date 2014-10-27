@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">ChatWingWhiteLabel</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_login">"Log In"</string>
+    <string name="title_categories">"Lobby"</string>
+    <string name="title_activity_conversation">Conversations</string>
+    <string name="title_settings">"Settings"</string>
+    <string name="fragment_tag_left_drawer">"left-drawer-fragment"</string>
+    <string name="error_failed_to_update_user_profile">"Failed to update user profile."</string>
+    <string name="message_or">or</string>
+    <string name="fragment_tag_authenticate">"authenticate-fragment"</string>
+    <string name="title_login_chatwing">"Log In with Chatwing"</string>
+    <string name="title_login_fb">"Log In with Facebook"</string>
+    <string name="title_login_google_plus">"Log In with Google"</string>
+    <string name="title_login_tumblr">"Log In with Tumblr"</string>
+    <string name="title_login_twitter">"Log In with Twitter"</string>
+    <string name="title_login_yahoo">"Log In with Yahoo!"</string>
+    <string name="title_login_guest">"Log In as Guest"</string>
+
+    <string name="hint_email">"Email"</string>
+    <string name="hint_password">"Password"</string>
+    <string name="title_forgot_password">"Forgot password"</string>
+    <string name="error_invalid_email">"Email is invalid."</string>
+    <string name="error_invalid_password">"Password is invalid."</string>
+    <string name="fb_app_id">"397082167020375"</string>
+    <string name="progress_logging_in">"Logging in…"</string>
+    <string name="progress_getting_access_token">"Getting access token…"</string>
+    <string name="error_unavailable_google_plus_login">"Log in with Google is unavailable."</string>
+    <string name="error_invalid_guest_name">"Guest name must be filled"</string>
+    <string name="hint_guest_name">"Guest 123"</string>
+    <string name="title_choose_guest_avatar">Choose Guest Avatar</string>
+    <string name="progress_loading_url">"Loading…"</string>
+    <string name="progress_getting_request_token">"Getting request token…"</string>
+    <string name="title_reset_password">"Reset Password"</string>
+    <string name="title_register">Need an account?</string>
+    <string name="title_show_password">"Show password"</string>
+    <string name="title_auto_create_chatbox">"Automatically create the first chatbox after signing up"</string>
+    <string name="message_agree_conditions">"By creating an account, you are agreeing to our <a href="http://chatwing.com/site/tos">Terms of Service</a> and <a href="http://chatwing.com/site/privacy">Privacy Policy</a></string>
+    <string name="title_register_chatwing">"Sign Up for ChatWing"</string>
+    <string name="error_invalid_username_password">"Email or Password is invalid."</string>
+    <string name="progress_registering">"Signing up…"</string>
+    <string name="title_register_fb">"Sign Up using Facebook"</string>
+    <string name="title_register_google_plus">"Sign Up using Google"</string>
+    <string name="title_register_tumblr">"Sign Up using Tumblr"</string>
+    <string name="title_register_twitter">"Sign Up using Twitter"</string>
+    <string name="title_register_yahoo">"Sign Up using Yahoo"</string>
+    <string name="error_required_agree_conditions">"You must read and agree the Terms of Service and License"</string>
+    <string name="title_activity_login">"Log In"</string>
+    <string name="title_activity_register">"Sign Up"</string>
+
+</resources>

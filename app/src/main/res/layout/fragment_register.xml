@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical"
+              android:gravity="center_horizontal">
+
+    <TextView
+            android:id="@+id/ic_chatwing"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/ic_chatwing"
+            android:textColor="@color/chatwing_icon_color"
+            android:textSize="@dimen/chatwing_icon_text_size"/>
+
+    <AutoCompleteTextView
+            android:id="@+id/email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_email"
+            android:inputType="textEmailAddress"
+            android:imeOptions="actionNext"
+            android:selectAllOnFocus="true"/>
+
+    <EditText
+            android:id="@+id/password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_password"
+            android:inputType="textPassword"/>
+
+    <CheckBox
+            android:id="@+id/show_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/title_show_password"/>
+
+    <CheckBox
+            android:id="@+id/auto_create_chatbox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/title_auto_create_chatbox"/>
+
+    <TextView
+            android:id="@+id/agree_conditions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/message_agree_conditions"
+            android:gravity="center_horizontal"
+            android:paddingTop="@dimen/item_padding"
+            android:paddingBottom="@dimen/item_padding"/>
+
+    <Button
+            android:id="@+id/register"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/title_register_chatwing"
+            android:textSize="@dimen/authenticate_button_text_size"
+            android:textStyle="bold"
+            style="@style/ButtonChatWing"/>
+
+</LinearLayout>

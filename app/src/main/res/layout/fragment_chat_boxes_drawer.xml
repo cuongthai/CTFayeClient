@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/drawer_item_padding_top"
+            android:paddingBottom="@dimen/drawer_item_padding_bottom"
+            android:paddingLeft="@dimen/drawer_item_padding_left"
+            android:paddingRight="@dimen/drawer_item_padding_right"
+            android:background="@color/profile_drawer_bg_color"
+            android:orientation="horizontal"
+            android:id="@+id/user_info_layout">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <com.chatwing.whitelabel.views.CircleNetworkImageView
+                    android:id="@+id/avatar"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/chat_message_avatar_height"
+                    android:layout_marginRight="@dimen/chat_boxes_drawer_avatar_margin_right"
+                    android:layout_alignParentLeft="true"
+                    android:scaleType="fitCenter"
+                    android:layout_centerVertical="true" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/account"
+                    android:layout_toRightOf="@id/avatar"
+                    android:orientation="vertical"
+                    android:layout_centerVertical="true">
+
+                    <TextView
+                        android:id="@+id/username"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:gravity="left|center_vertical"
+                        android:ellipsize="end"
+                        android:textColor="@android:color/white"
+                        android:lines="1"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/account_type"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:gravity="left|center_vertical"
+                        android:ellipsize="end"
+                        android:textColor="@android:color/white"
+                        android:lines="1" />
+                </LinearLayout>
+            </RelativeLayout>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/title_login"
+            android:textSize="@dimen/authenticate_button_text_size"
+            android:textStyle="bold"
+            style="@style/ButtonChatWing" />
+
+
+        <LinearLayout
+            android:id="@+id/categories"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/item_selector"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:drawableLeft="@drawable/ic_action_group_light"
+                android:text="@string/title_categories"
+                style="@style/Theme.ChatWing.DrawerItemTitle" />
+
+            <TextView
+                android:id="@+id/categories_unread_count"
+                style="@style/Theme.ChatWing.DrawerItemCounter"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/conversation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/item_selector"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:drawableLeft="@drawable/ic_action_conversations_light"
+                android:text="@string/title_activity_conversation"
+                style="@style/Theme.ChatWing.DrawerItemTitle" />
+
+            <TextView
+                android:visibility="gone"
+                android:id="@+id/conversation_unread_count"
+                style="@style/Theme.ChatWing.DrawerItemCounter" />
+
+        </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/settings"
+            android:drawableLeft="@drawable/ic_action_settings_light"
+            android:text="@string/title_settings"
+            style="@style/Theme.ChatWing.DrawerItemTitle" />
+    </LinearLayout>
+</ScrollView>
