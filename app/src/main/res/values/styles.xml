@@ -2,7 +2,10 @@
 
     <!-- Base application theme. -->
     <style name="Theme.ChatWing" parent="@style/Theme.AppCompat.Light">
-        <!-- Customize your theme here. -->
+        <item name="actionBarStyle">@style/Theme.ChatWing.ActionBar</item>
+        <item name="android:actionBarStyle">@style/Theme.ChatWing.ActionBar</item>
+        <item name="actionMenuTextColor">@color/text_color</item>
+        <item name="android:actionMenuTextColor">@color/text_color</item>
     </style>
 
     <style name="Theme.ChatWing.DrawerItemTitle">
@@ -28,7 +31,31 @@
         <item name="android:gravity">center_vertical</item>
         <item name="android:textAppearance">?android:attr/textAppearanceListItemSmall</item>
         <item name="android:textColor">@android:color/white</item>
-        <item name="android:background">@color/main_color</item>
+        <item name="android:background">@color/primary_color</item>
+    </style>
+
+    <style name="Theme.ChatWing.ActionBar" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+        <item name="background">@color/primary_color</item>
+        <item name="android:background">@color/primary_color</item>
+        <item name="android:titleTextStyle">@style/Theme.ChatWing.ActionBar.TitleTextStyle</item>
+        <item name="titleTextStyle">@style/Theme.ChatWing.ActionBar.TitleTextStyle</item>
+
+    </style>
+    <style name="Theme.ChatWing.ActionBar.TitleTextStyle" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">
+        <item name="android:textColor">@color/text_color</item>
+    </style>
+
+    <style name="ButtonChatWing" parent="android:Widget.Button">
+        <item name="android:background">@color/action_color</item>
+        <item name="android:minHeight">48dip</item>
+        <item name="android:minWidth">64dip</item>
+        <item name="android:textColor">@color/text_action_color</item>
+    </style>
+
+    <style name="Theme.ChatWing.DrawerItemNavTitle" parent="Theme.ChatWing.DrawerItemTitle">
+        <item name="android:background">@color/action_color</item>
+        <item name="android:textColor">@color/text_action_color</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
 </resources>

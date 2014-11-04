@@ -1,3 +1,6 @@
+
+def app_name = 'Cuong'
+
 apply plugin: 'com.android.application'
 
 android {
@@ -18,17 +21,41 @@ android {
     buildToolsVersion "20.0.0"
 
     defaultConfig {
-        applicationId "com.chatwing.whitelabel"
+        applicationId PACKAGE_NAME
         minSdkVersion 14
         targetSdkVersion 20
         versionCode 1
         versionName "1.0"
     }
+
+    signingConfigs {
+        release {
+            storeFile file(RELEASE_STORE_FILE)
+            storePassword RELEASE_STORE_PASSWORD
+            keyAlias RELEASE_KEY_ALIAS
+            keyPassword RELEASE_KEY_PASSWORD
+        }
+    }
+
     buildTypes {
         release {
             runProguard false
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+
+    }
+
+    sourceSets {
+
+        // Move the build types to build-types/<type>
+        // For instance, build-types/debug/java, build-types/debug/AndroidManifest.xml, ...
+        // This moves them out of them default location under src/<type>/... which would
+        // conflict with src/ being used by the main source set.
+        // Adding new build types or product flavors should be accompanied
+        // by a similar customization.
+        debug.setRoot('build-types/debug')
+        release.setRoot('build-types/release')
     }
 }
 
@@ -47,10 +74,11 @@ dependencies {
         }
     }
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.github.chatwing:library:0.5.13-SNAPSHOT@aar'
+    compile 'com.github.chatwing:library:0.5.20-SNAPSHOT@aar'
     compile 'com.android.support:appcompat-v7:20.0.0'
     compile 'com.facebook:facebook-android-sdk:3.5.2@aar'
     compile 'com.google.android.gms:play-services:3.2.25'
     compile 'org.twitter4j:twitter4j-core:4.0.0'
     compile 'org.twitter4j:twitter4j-async:4.0.0'
+    compile 'com.github.matthewyork:ColoursLibrary:1.0.+@aar'
 }

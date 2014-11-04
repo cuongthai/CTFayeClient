@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="primary_color">#ff6666</color>
+    <color name="action_color">#7f3333</color>
+    <color name="text_color">#D9000000</color>
+    <color name="text_action_color">#D9FFFFFF</color>
+
     <color name="main_background_color">@android:color/white</color>
-    <color name="profile_drawer_bg_color">#ff373737</color>
-    <color name="holo_light_background">@android:color/transparent</color>
-    <color name="holo_light_selected">#ff7cc9e5</color>
-    <color name="main_color">#05b0ff</color>
+    <color name="profile_drawer_bg_color">@color/primary_color</color>
+    <color name="main_color">@color/primary_color</color>
     <color name="chatwing_icon_color">@android:color/darker_gray</color>
 
 </resources>

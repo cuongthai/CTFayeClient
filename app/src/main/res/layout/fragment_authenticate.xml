@@ -21,7 +21,8 @@
         android:textSize="@dimen/authenticate_button_text_size"
         android:textStyle="bold"
         style="@style/ButtonGoogle"
-        android:drawableLeft="@drawable/ic_google" />
+        android:drawableLeft="@drawable/ic_google"
+        android:visibility="gone"/>
 
     <Button
         android:id="@+id/btn_authenticate_twitter"
@@ -30,7 +31,8 @@
         android:textSize="@dimen/authenticate_button_text_size"
         android:textStyle="bold"
         style="@style/ButtonTwitter"
-        android:drawableLeft="@drawable/ic_twitter" />
+        android:drawableLeft="@drawable/ic_twitter"
+        android:visibility="gone"/>
 
     <Button
         android:id="@+id/btn_authenticate_yahoo"

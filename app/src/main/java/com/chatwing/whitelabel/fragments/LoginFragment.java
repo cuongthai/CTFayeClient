@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -76,8 +77,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 return handled;
             }
         });
-
-        v.findViewById(R.id.btn_login_chatwing).setOnClickListener(this);
+        Button viewById = (Button) v.findViewById(R.id.btn_login_chatwing);
+        viewById.setText(getString(R.string.title_login_chatwing, getString(R.string.app_name)));
+        viewById.setOnClickListener(this);
 
         TextView forgotPasswordTextView = (TextView) v.findViewById(R.id.forgot_password);
         forgotPasswordTextView.setPaintFlags(
@@ -90,7 +92,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         super.onActivityCreated(savedInstanceState);
         mDelegate.inject(this);
         mEmailEditText.setAdapter(mEmailsAdapterFactory.build());
-        ((TextView) getView().findViewById(R.id.ic_chatwing)).setTypeface(mIconTypefaceProvider.get());
     }
 
     @Override

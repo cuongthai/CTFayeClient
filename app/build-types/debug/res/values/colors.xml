@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<color name="primary_color">#f17008</color>
+<color name="action_color">#713403</color>
+<color name="text_color">#D9000000</color>
+<color name="text_action_color">#D9ffffff</color>
+</resources>

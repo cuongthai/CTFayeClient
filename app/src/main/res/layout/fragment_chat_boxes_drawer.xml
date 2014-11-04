@@ -118,12 +118,5 @@
                 style="@style/Theme.ChatWing.DrawerItemCounter" />
 
         </LinearLayout>
-
-
-        <TextView
-            android:id="@+id/settings"
-            android:drawableLeft="@drawable/ic_action_settings_light"
-            android:text="@string/title_settings"
-            style="@style/Theme.ChatWing.DrawerItemTitle" />
     </LinearLayout>
 </ScrollView>
