@@ -114,7 +114,8 @@ public class RegisterActivity extends AuthenticateActivity
         // session now.
         ChatwingOAuthParams params = new ChatwingOAuthParams(
                 task.getEmail(),
-                task.getPassword());
+                task.
+                        getPassword());
         startSession(params);
     }
 

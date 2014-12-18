@@ -7,6 +7,8 @@ import java.util.List;
  * Created by cuongthai on 26/10/2014.
  */
 public interface Constants extends com.chatwingsdk.Constants {
+    String FILTER_REPLACE_SEQUENCE = "*";
+
     /**
      * FB constants
      */
@@ -23,4 +25,5 @@ public interface Constants extends com.chatwingsdk.Constants {
     String TWITTER_CALLBACK_URL = "chatwing://abc";
     String TWITTER_CONSUMER_KEY = "UjGTlYTd1U6r0E4EoGUWHw";
     String TWITTER_CONSUMER_SECRET = "3nww1xsLJBlpya9fiCQ1hgqMWPMQTivyHzEmktkMw";
+    String FEEDBACK_EMAIL = "info@chatwing.com";
 }

@@ -1,16 +1,25 @@
 package com.chatwing.whitelabel.managers;
 
 import android.content.Context;
+import android.text.TextUtils;
 
+import com.chatwing.whitelabel.Constants;
 import com.chatwing.whitelabel.R;
+import com.chatwing.whitelabel.pojos.OnlineUser;
+import com.chatwing.whitelabel.pojos.params.OnlineUserParams;
 import com.chatwing.whitelabel.pojos.params.ResetPasswordParams;
+import com.chatwing.whitelabel.pojos.params.UpdateUserProfileParams;
+import com.chatwing.whitelabel.pojos.responses.LoadOnlineUsersResponse;
 import com.chatwing.whitelabel.pojos.responses.RegisterResponse;
 import com.chatwing.whitelabel.pojos.responses.ResetPasswordResponse;
+import com.chatwing.whitelabel.pojos.responses.UpdateUserProfileResponse;
 import com.chatwing.whitelabel.validators.EmailValidator;
 import com.chatwing.whitelabel.validators.PasswordValidator;
 import com.chatwingsdk.managers.ApiManagerImpl;
 import com.chatwingsdk.modules.ForApplication;
+import com.chatwingsdk.pojos.User;
 import com.chatwingsdk.pojos.params.RegisterParams;
+import com.chatwingsdk.validators.ChatBoxIdValidator;
 import com.github.kevinsawicki.http.HttpRequest;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -28,6 +37,8 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
     @Inject
     @ForApplication
     Context mContext;
+    @Inject
+    ChatBoxIdValidator mChatBoxIdValidator;
 
     @Override
     public ResetPasswordResponse resetPassword(String email)
@@ -98,5 +109,85 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
         } catch (InvalidAccessTokenException e) {
             throw ApiException.createException(e);
         }
+    }
+
+    @Override
+    public String getChatBoxUrl(String chatBoxKey) {
+        return Constants.CHATWING_BASE_URL + "/chatbox/" + chatBoxKey;
+    }
+
+    @Override
+    public LoadOnlineUsersResponse loadOnlineUsers(int chatBoxId)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            ChatBoxIdValidator.InvalidIdException {
+        mChatBoxIdValidator.validate(chatBoxId);
+
+        Gson gson = new Gson();
+        OnlineUserParams params = new OnlineUserParams(chatBoxId);
+
+        HttpRequest request = HttpRequest.get(CHAT_BOX_USER_LIST_URL + appendParams(params));
+        String responseString = null;
+
+        try {
+            responseString = validate(request);
+            return gson.fromJson(responseString, LoadOnlineUsersResponse.class);
+        } catch (JsonSyntaxException e) {
+            throw ApiException.createJsonSyntaxException(e, responseString);
+        } catch (InvalidIdentityException e) {
+            throw ApiException.createException(e);
+        } catch (InvalidAccessTokenException e) {
+            throw ApiException.createException(e);
+        } catch (ValidationException e) {
+            throw ApiException.createException(e);
+        }
+    }
+
+    @Override
+    public UpdateUserProfileResponse updateUserProfile(User user)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            UserUnauthenticatedException,
+            ValidationException,
+            InvalidAccessTokenException {
+        validate(user);
+
+        Gson gson = new Gson();
+        UpdateUserProfileParams params = new UpdateUserProfileParams(user.getProfile());
+        String paramsString = gson.toJson(params);
+
+        HttpRequest request = HttpRequest.post(USER_PROFILE_UPDATE_URL);
+        setUpRequest(request, user);
+        request.send(paramsString);
+        String responseString = null;
+
+        try {
+            responseString = validate(request);
+            return gson.fromJson(responseString, UpdateUserProfileResponse.class);
+        } catch (JsonSyntaxException e) {
+            throw ApiException.createJsonSyntaxException(e, responseString);
+        } catch (InvalidIdentityException e) {
+            throw ApiException.createException(e);
+        }
+    }
+
+    @Override
+    public int getLoginTypeImageResId(String type) {
+        if (TextUtils.isEmpty(type)) {
+            return 0;
+        }
+        if (type.equals(Constants.TYPE_CHATWING)) {
+            return R.drawable.ic_launcher;
+        }
+
+        return 0;
+    }
+
+    @Override
+    public String getAvatarUrl(OnlineUser user) {
+        if (user == null) {
+            return DEFAULT_AVATAR_URL;
+        }
+        return getAvatarUrl(user.getLoginType(), user.getLoginId());
     }
 }

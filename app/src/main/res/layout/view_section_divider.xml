@@ -1,27 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:orientation="horizontal"
-              android:gravity="center_vertical"
-              android:paddingTop="@dimen/item_padding"
-              android:paddingBottom="@dimen/item_padding">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingTop="@dimen/item_padding"
+    android:paddingBottom="@dimen/item_padding"
+    android:visibility="gone">
 
     <View
-            style="@style/Theme.ChatWing.VerticalDivider"
-            android:layout_weight="1"/>
+        style="@style/Theme.ChatWing.VerticalDivider"
+        android:layout_weight="1" />
 
     <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0"
-            android:lines="1"
-            android:text="@string/message_or"
-            android:textAppearance="@android:style/TextAppearance.Small"/>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:lines="1"
+        android:text="@string/message_or"
+        android:textAppearance="@android:style/TextAppearance.Small" />
 
     <View
-            style="@style/Theme.ChatWing.VerticalDivider"
-            android:layout_weight="1"/>
+        style="@style/Theme.ChatWing.VerticalDivider"
+        android:layout_weight="1" />
 
 </LinearLayout>

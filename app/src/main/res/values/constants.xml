@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="ic_chatwing">\ue600</string>
-
+    <string name="preference_category_chat_box">"preference_category_chat_box"</string>
+    <string name="preference_feedback">"feedback"</string>
+    <string name="preference_version">"version"</string>
 </resources>

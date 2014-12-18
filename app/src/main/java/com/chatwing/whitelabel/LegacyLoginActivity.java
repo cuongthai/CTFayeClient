@@ -283,7 +283,7 @@ public class LegacyLoginActivity extends AuthenticateActivity
                 R.string.title_login_tumblr,
                 R.string.title_login_twitter,
                 R.string.title_login_yahoo,
-                R.string.title_login_guest
+                0
         );
     }
 

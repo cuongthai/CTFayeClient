@@ -12,7 +12,8 @@
         android:textSize="@dimen/authenticate_button_text_size"
         android:textStyle="bold"
         style="@style/ButtonFacebook"
-        android:drawableLeft="@drawable/ic_facebook" />
+        android:drawableLeft="@drawable/ic_facebook"
+        android:visibility="gone"/>
 
     <Button
         android:id="@+id/btn_authenticate_google_plus"
@@ -60,5 +61,5 @@
         android:layout_height="wrap_content"
         android:textSize="@dimen/authenticate_button_text_size"
         android:textStyle="bold"
-        style="@style/Buttonguest" />
+        style="@style/Buttonguest"/>
 </LinearLayout>

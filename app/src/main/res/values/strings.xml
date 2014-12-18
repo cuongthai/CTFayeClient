@@ -7,11 +7,17 @@
     <string name="title_login">"Log In"</string>
     <string name="title_categories">"Lobby"</string>
     <string name="title_activity_conversation">Conversations</string>
+    <string name="title_activity_online_users">Online Users</string>
     <string name="title_settings">"Settings"</string>
     <string name="fragment_tag_left_drawer">"left-drawer-fragment"</string>
     <string name="error_failed_to_update_user_profile">"Failed to update user profile."</string>
+    <string name="error_cant_handle_email">"Your Email application can't handle this email. Did you set it up?"</string>
+    <string name="error_invalid_name_length">"Name must be a string from 3 to 32 characters"</string>
+
     <string name="message_or">or</string>
     <string name="fragment_tag_authenticate">"authenticate-fragment"</string>
+    <string name="fragment_tag_settings">"settings-fragment"</string>
+    <string name="fragment_tag_online_user">"online-user-fragment"</string>
     <string name="title_login_chatwing">"Log In with %s"</string>
     <string name="title_login_fb">"Log In with Facebook"</string>
     <string name="title_login_google_plus">"Log In with Google"</string>
@@ -39,6 +45,7 @@
     <string name="title_show_password">"Show password"</string>
     <string name="title_auto_create_chatbox">"Automatically create the first chatbox after signing up"</string>
     <string name="message_agree_conditions">"By creating an account, you are agreeing to our <a href="http://chatwing.com/site/tos">Terms of Service</a> and <a href="http://chatwing.com/site/privacy">Privacy Policy</a></string>
+    <string name="message_current_chat_box_alias_copied">"Alias Copied"</string>
     <string name="title_register_chatwing">"Sign Up for %s"</string>
     <string name="error_invalid_username_password">"Email or Password is invalid."</string>
     <string name="progress_registering">"Signing up…"</string>
@@ -50,5 +57,18 @@
     <string name="error_required_agree_conditions">"You must read and agree the Terms of Service and License"</string>
     <string name="title_activity_login">"Log In"</string>
     <string name="title_activity_register">"Sign Up"</string>
+    <string name="title_online_users">"Online users"</string>
+    <string name="title_share_chat_box">"Share chat box"</string>
+    <string name="title_copy_alias_current_chat_box">"Copy Alias Link"</string>
+    <string name="title_activity_user_profile_preference">"Settings"</string>
+    <string name="title_preference_category_chat_boxes">Chat boxes</string>
+    <string name="title_preference_category_extras">Extras</string>
+    <string name="title_preference_name">"Name"</string>
+    <string name="title_preference_feedback">Send feedback</string>
+    <string name="title_preference_version">Version</string>
+    <string name="summary_name">"Your name that is displayed in chat boxes."</string>
+
+    <string name="message_share_chat_box_subject">"Join me in this chat box"</string>
+    <string name="empty_online_users">"No online users found."</string>
 
 </resources>

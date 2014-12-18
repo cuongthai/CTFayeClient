@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="@string/title_preference_category_chat_boxes"
+        android:key="@string/preference_category_chat_box">
+        <EditTextPreference
+            android:key="@string/preference_name"
+            android:title="@string/title_preference_name"
+            android:summary="@string/summary_name" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/title_preference_category_extras">
+        <Preference
+            android:key="@string/preference_feedback"
+            android:title="@string/title_preference_feedback" />
+        <Preference
+            android:key="@string/preference_version"
+            android:title="@string/title_preference_version" />
+    </PreferenceCategory>
+</PreferenceScreen>

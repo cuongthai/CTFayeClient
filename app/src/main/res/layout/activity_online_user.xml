@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.chatwing.activities.AuthenticateActivity">
+
+    <fragment
+        class="com.chatwing.whitelabel.fragments.OnlineUsersFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:tag="@string/fragment_tag_online_user" />
+</merge>

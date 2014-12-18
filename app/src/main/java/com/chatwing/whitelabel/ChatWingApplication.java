@@ -3,6 +3,7 @@ package com.chatwing.whitelabel;
 import android.app.Application;
 
 import com.chatwingsdk.ChatWing;
+import com.chatwingsdk.interfaces.JSInterfaceImpl;
 import com.chatwingsdk.modules.ChatWingModule;
 
 import java.util.Arrays;
@@ -14,13 +15,14 @@ import dagger.ObjectGraph;
  * Created by cuongthai on 21/10/2014.
  */
 public class ChatWingApplication extends Application {
-    private ObjectGraph applicationGraph;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        applicationGraph = ObjectGraph.create(getModules().toArray());
+        //Currently support only one chatbox enter from client, it should be loaded from server
         ChatWing.initialize(this, "android", "", new String[]{"1873"}, LegacyLoginActivity.class);
+        ChatWing.instance(this).setJSDelegateClass(new JSInterfaceImpl());
+        ChatWing.instance(this).getChatwingGraph().plus(getModules().toArray());
     }
 
     /**
@@ -32,6 +34,6 @@ public class ChatWingApplication extends Application {
     }
 
     public ObjectGraph getApplicationGraph() {
-        return applicationGraph;
+        return ChatWing.instance(this).getChatwingGraph();
     }
 }

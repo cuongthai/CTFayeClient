@@ -32,7 +32,8 @@
             android:id="@+id/auto_create_chatbox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/title_auto_create_chatbox"/>
+            android:text="@string/title_auto_create_chatbox"
+            android:visibility="gone"/>
 
     <TextView
             android:id="@+id/agree_conditions"
