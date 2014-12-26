@@ -24,7 +24,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <com.chatwing.whitelabel.views.CircleNetworkImageView
+                <com.chatwingsdk.views.CircleNetworkImageView
                     android:id="@+id/avatar"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/chat_message_avatar_height"
@@ -125,5 +125,21 @@
             android:text="@string/title_settings"
             android:background="@drawable/item_selector"
             style="@style/Theme.ChatWing.DrawerItemTitle"/>
+
+        <LinearLayout
+            android:id="@+id/logout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/item_selector"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:drawableLeft="@drawable/ic_action_exit"
+                android:text="@string/action_logout"
+                style="@style/Theme.ChatWing.DrawerItemTitle" />
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>

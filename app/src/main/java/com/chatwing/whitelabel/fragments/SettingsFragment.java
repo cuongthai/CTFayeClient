@@ -37,7 +37,7 @@ import javax.inject.Inject;
 public class SettingsFragment extends PreferenceFragment
         implements Preference.OnPreferenceClickListener,
         SharedPreferences.OnSharedPreferenceChangeListener,
-        Preference.OnPreferenceChangeListener{
+        Preference.OnPreferenceChangeListener {
 
     private EditTextPreference mNamePreference;
     private Preference mFeedbackPreference;
@@ -45,6 +45,7 @@ public class SettingsFragment extends PreferenceFragment
     private boolean mIsProfileChanged;
     private String mVersion;
     private UserProfile mOldUserProfile;
+    private Preference mClearPreference;
 
     @Inject
     Bus mBus;
@@ -77,12 +78,14 @@ public class SettingsFragment extends PreferenceFragment
         mFeedbackPreference = findPreference(getString(R.string.preference_feedback));
         mChatBoxCategoryPreference = (PreferenceCategory) findPreference(getString(R.string.preference_category_chat_box));
 
+        mClearPreference = findPreference(getString(R.string.preference_clear_previous_style));
         String name = mNamePreference.getSharedPreferences().getString(
                 mNamePreference.getKey(),
                 getString(R.string.summary_name));
         mNamePreference.setSummary(name);
         mFeedbackPreference.setOnPreferenceClickListener(this);
         mNamePreference.setOnPreferenceChangeListener(this);
+        mClearPreference.setOnPreferenceClickListener(this);
 
         String versionName;
         int versionCode;
@@ -120,7 +123,10 @@ public class SettingsFragment extends PreferenceFragment
     @Override
     public boolean onPreferenceClick(Preference preference) {
         String key = preference.getKey();
-        if (key.equals(mFeedbackPreference.getKey())) {
+        if (key.equals(mClearPreference.getKey())) {
+            mUserManager.removeStyle();
+            return true;
+        } else if (key.equals(mFeedbackPreference.getKey())) {
             Intent i = new Intent(Intent.ACTION_SEND);
             i.setType("message/rfc822");
             i.putExtra(Intent.EXTRA_EMAIL, new String[]{Constants.FEEDBACK_EMAIL});

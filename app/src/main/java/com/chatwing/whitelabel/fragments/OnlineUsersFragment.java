@@ -6,24 +6,36 @@ import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.adapters.OnlineUsersAdapter;
 import com.chatwing.whitelabel.events.LoadOnlineUsersSuccessEvent;
-import com.chatwing.whitelabel.managers.ApiManager;
+import com.chatwing.whitelabel.pojos.OnlineUser;
+import com.chatwing.whitelabel.pojos.OnlineUserProfile;
 import com.chatwingsdk.events.internal.CurrentChatBoxEvent;
+import com.chatwingsdk.events.internal.UserSelectedConversationEvent;
 import com.chatwingsdk.fragments.InjectableFragmentDelegate;
-import com.chatwingsdk.managers.VolleyManager;
+import com.chatwingsdk.managers.UserManager;
+import com.chatwingsdk.pojos.BaseUser;
 import com.chatwingsdk.pojos.ChatBox;
 import com.chatwingsdk.pojos.CommunicationBoxJson;
 import com.chatwingsdk.pojos.Filter;
+import com.chatwingsdk.pojos.User;
+import com.chatwingsdk.pojos.params.CreateConversationParams;
+import com.chatwingsdk.tables.ConversationTable;
+import com.chatwingsdk.views.QuickMessageView;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.inject.Inject;
 
@@ -32,13 +44,21 @@ import javax.inject.Inject;
  * Date: 7/25/13
  * Time: 9:29 AM
  */
-public class OnlineUsersFragment extends ListFragment {
+public class OnlineUsersFragment extends ListFragment implements AdapterView.OnItemClickListener {
+    public static interface OnlineUsersFragmentDelegate extends InjectableFragmentDelegate {
+        public void createConversation(CreateConversationParams.SimpleUser simpleUser);
+    }
 
-    private InjectableFragmentDelegate mDelegate;
+    private OnlineUsersFragmentDelegate mDelegate;
     @Inject
     OnlineUsersAdapter mListAdapter;
     @Inject
     Bus mBus;
+    @Inject
+    UserManager mUserManager;
+    @Inject
+    QuickMessageView mQuickMessageView;
+
     private FrameLayout mRootView;
     private TextView mEmptyTextView;
 
@@ -48,7 +68,7 @@ public class OnlineUsersFragment extends ListFragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mDelegate = (InjectableFragmentDelegate) activity;
+        mDelegate = (OnlineUsersFragmentDelegate) activity;
     }
 
     @Override
@@ -69,6 +89,7 @@ public class OnlineUsersFragment extends ListFragment {
         super.onActivityCreated(savedInstanceState);
         mDelegate.inject(this);
         setListAdapter(mListAdapter);
+        getListView().setOnItemClickListener(this);
     }
 
     @Override
@@ -130,9 +151,44 @@ public class OnlineUsersFragment extends ListFragment {
 
     @Subscribe
     public void onLoadOnlineUsersSuccess(LoadOnlineUsersSuccessEvent event) {
+        Set<OnlineUser> onlineUsers = event.getOnlineUsers();
+        addYourSelf(onlineUsers);
         mListAdapter.setNotifyOnChange(false);
         mListAdapter.clear();
-        mListAdapter.addAllData(event.getOnlineUsers());
+        mListAdapter.addAllData(onlineUsers);
         mListAdapter.notifyDataSetChanged();
+    }
+
+    private void addYourSelf(Set<OnlineUser> onlineUsers) {
+        User currentUser = mUserManager.getCurrentUser();
+        if (currentUser == null) return;
+
+        onlineUsers.add(new OnlineUser(
+                true,
+                currentUser.getId(),
+                currentUser.getLoginId(),
+                currentUser.getLoginType(),
+                new OnlineUserProfile(currentUser.getProfile().getName())));
+
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int pos, long l) {
+        User currentUser = mUserManager.getCurrentUser();
+        OnlineUser onlineUser = mListAdapter.getItem(pos);
+        if (currentUser == null) {
+            mQuickMessageView.show(R.string.error_required_login);
+            return;
+        }
+        if (!onlineUser.isAuthenticated()) {
+            return;
+        }
+
+        if (BaseUser.computeIdentifier(onlineUser.getLoginId(), onlineUser.getLoginType()).equals(currentUser.getIdentifier())) {
+            //Click on myself
+            return;
+        }
+
+        mDelegate.createConversation(new CreateConversationParams.SimpleUser(onlineUser.getLoginId(), onlineUser.getLoginType()));
     }
 }

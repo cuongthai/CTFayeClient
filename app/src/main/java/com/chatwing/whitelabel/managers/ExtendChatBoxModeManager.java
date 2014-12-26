@@ -127,6 +127,12 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
     }
 
     @Override
+    public void activate() {
+        super.activate();
+        setTitle(getString(R.string.title_chat_boxes));
+    }
+
+    @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         boolean chatBoxesDrawerOpened = mActivityDelegate.getDrawerLayout().isDrawerOpen(DRAWER_GRAVITY_CHAT_BOXES);
 

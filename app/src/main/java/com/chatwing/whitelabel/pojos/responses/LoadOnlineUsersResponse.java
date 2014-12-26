@@ -4,6 +4,7 @@ import com.chatwing.whitelabel.pojos.OnlineUser;
 import com.chatwingsdk.pojos.responses.BaseResponse;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Author: Huy Nguyen
@@ -19,13 +20,13 @@ public class LoadOnlineUsersResponse extends BaseResponse {
 
     public static class Data {
         private int count;
-        private List<OnlineUser> list;
+        private Set<OnlineUser> list;
 
         public int getCount() {
             return count;
         }
 
-        public List<OnlineUser> getList() {
+        public Set<OnlineUser> getList() {
             return list;
         }
     }

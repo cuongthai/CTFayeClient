@@ -8,6 +8,14 @@
             android:key="@string/preference_name"
             android:title="@string/title_preference_name"
             android:summary="@string/summary_name" />
+        <CheckBoxPreference
+            android:key="@string/preference_remember_previous_style"
+            android:title="@string/title_preference_remember_previous_style"
+            android:summary="@string/summary_remember_previous_style"
+            android:defaultValue="@bool/default_remember_previous_style" />
+        <Preference
+            android:key="@string/preference_clear_previous_style"
+            android:title="@string/title_preference_clear_previous_style" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/title_preference_category_extras">

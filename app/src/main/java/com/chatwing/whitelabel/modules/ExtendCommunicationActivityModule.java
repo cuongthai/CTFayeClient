@@ -3,6 +3,7 @@ package com.chatwing.whitelabel.modules;
 import com.chatwing.whitelabel.activities.ExtendCommunicationActivity;
 import com.chatwing.whitelabel.fragments.ExtendCommunicationDrawerFragment;
 import com.chatwing.whitelabel.fragments.OnlineUsersFragment;
+import com.chatwing.whitelabel.fragments.PhotoPickerDialogFragment;
 import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.managers.ExtendChatBoxModeManager;
 import com.chatwing.whitelabel.managers.ExtendConversationModeManager;
@@ -34,7 +35,8 @@ import dagger.Provides;
         injects = {
                 ExtendCommunicationActivity.class,
                 ExtendCommunicationDrawerFragment.class,
-                OnlineUsersFragment.class
+                OnlineUsersFragment.class,
+                PhotoPickerDialogFragment.class
         },
 
         addsTo = CommunicationActivityModule.class,

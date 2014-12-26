@@ -28,7 +28,5 @@
         android:title="@string/title_copy_alias_current_chat_box"
         android:icon="@drawable/ic_action_copy_holo_dark"
         app:showAsAction="never"/>
-    <item
-        android:id="@+id/action_logout"
-        android:title="@string/action_logout" />
+
 </menu>

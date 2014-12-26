@@ -11,4 +11,8 @@ public class OnlineUserProfile {
     public String getName() {
         return name;
     }
+
+    public OnlineUserProfile(String name) {
+        this.name = name;
+    }
 }

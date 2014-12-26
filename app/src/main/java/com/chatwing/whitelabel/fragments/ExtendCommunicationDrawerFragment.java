@@ -22,6 +22,12 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
                 mListener.showSettings();
             }
         });
+        mUserAvatarView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mListener.updateAvatar();
+            }
+        });
     }
 
     @Override
@@ -29,6 +35,7 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
         super.onAttach(activity);
         mListener = (Listener) activity;
     }
+
     @Override
     public void onDetach() {
         super.onDetach();
@@ -42,6 +49,8 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
 
     public static interface Listener extends CommunicationDrawerFragment.Listener {
         void showSettings();
+
+        void updateAvatar();
     }
 
 }

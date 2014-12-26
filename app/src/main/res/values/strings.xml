@@ -18,6 +18,8 @@
     <string name="fragment_tag_authenticate">"authenticate-fragment"</string>
     <string name="fragment_tag_settings">"settings-fragment"</string>
     <string name="fragment_tag_online_user">"online-user-fragment"</string>
+    <string name="title_from_camera">"Take a photo"</string>
+    <string name="title_from_gallery">"Choose from library"</string>
     <string name="title_login_chatwing">"Log In with %s"</string>
     <string name="title_login_fb">"Log In with Facebook"</string>
     <string name="title_login_google_plus">"Log In with Google"</string>
@@ -46,6 +48,7 @@
     <string name="title_auto_create_chatbox">"Automatically create the first chatbox after signing up"</string>
     <string name="message_agree_conditions">"By creating an account, you are agreeing to our <a href="http://chatwing.com/site/tos">Terms of Service</a> and <a href="http://chatwing.com/site/privacy">Privacy Policy</a></string>
     <string name="message_current_chat_box_alias_copied">"Alias Copied"</string>
+    <string name="message_avatar_picker">Avatar Picker</string>
     <string name="title_register_chatwing">"Sign Up for %s"</string>
     <string name="error_invalid_username_password">"Email or Password is invalid."</string>
     <string name="progress_registering">"Signing up…"</string>
@@ -54,6 +57,8 @@
     <string name="title_register_tumblr">"Sign Up using Tumblr"</string>
     <string name="title_register_twitter">"Sign Up using Twitter"</string>
     <string name="title_register_yahoo">"Sign Up using Yahoo"</string>
+    <string name="title_cancel">Cancel</string>
+
     <string name="error_required_agree_conditions">"You must read and agree the Terms of Service and License"</string>
     <string name="title_activity_login">"Log In"</string>
     <string name="title_activity_register">"Sign Up"</string>
@@ -66,9 +71,13 @@
     <string name="title_preference_name">"Name"</string>
     <string name="title_preference_feedback">Send feedback</string>
     <string name="title_preference_version">Version</string>
+    <string name="title_preference_remember_previous_style">"Remember previous style"</string>
+    <string name="title_preference_clear_previous_style">"Clear previous style"</string>
+    <string name="summary_remember_previous_style">"Remember style of previous chat and apply to new ones."</string>
     <string name="summary_name">"Your name that is displayed in chat boxes."</string>
 
     <string name="message_share_chat_box_subject">"Join me in this chat box"</string>
     <string name="empty_online_users">"No online users found."</string>
+    <string name="preference_clear_previous_style">"clear_previous_style"</string>
 
 </resources>

@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.chatwing.whitelabel"
     xmlns:tools="http://schemas.android.com/tools">
+    <!-- Upload avatar from sd card-->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
     <application
         tools:replace="icon, label, theme"
@@ -36,6 +38,9 @@
             android:theme="@style/Theme.ChatWing"
             android:label="@string/title_activity_user_profile_preference"
             android:icon="@drawable/ic_launcher"/>
+        <activity android:name="com.soundcloud.android.crop.CropImageActivity" />
+
+        <service android:name=".services.UpdateAvatarIntentService"/>
         <service android:name=".services.UpdateUserProfileService" />
 
 

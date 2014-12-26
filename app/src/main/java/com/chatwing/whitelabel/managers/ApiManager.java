@@ -9,6 +9,7 @@ import com.chatwing.whitelabel.validators.EmailValidator;
 import com.chatwing.whitelabel.validators.PasswordValidator;
 import com.chatwingsdk.Constants;
 import com.chatwingsdk.pojos.User;
+import com.chatwingsdk.pojos.jspojos.UserResponse;
 import com.chatwingsdk.validators.ChatBoxIdValidator;
 import com.github.kevinsawicki.http.HttpRequest;
 
@@ -22,6 +23,7 @@ public interface ApiManager extends com.chatwingsdk.managers.ApiManager {
     String RESET_PASSWORD_URL = URL_END_POINT + "/user/password/reset";
     String CHAT_BOX_USER_LIST_URL = URL_END_POINT + "/chatbox/user/list";
     String USER_PROFILE_UPDATE_URL = URL_END_POINT + "/chat-user/profile/update";
+    String UPLOAD_AVATAR = URL_END_POINT + "/chat-user/avatar/upload";
 
 
     ResetPasswordResponse resetPassword(String email)
@@ -58,4 +60,9 @@ public interface ApiManager extends com.chatwingsdk.managers.ApiManager {
             ValidationException,
             InvalidAccessTokenException;
 
+    UserResponse updateAvatar(User currentUser,
+                              String path)
+            throws UserUnauthenticatedException,
+            HttpRequest.HttpRequestException,
+            ApiException;
 }

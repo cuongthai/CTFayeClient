@@ -15,14 +15,18 @@ import com.chatwing.whitelabel.pojos.responses.ResetPasswordResponse;
 import com.chatwing.whitelabel.pojos.responses.UpdateUserProfileResponse;
 import com.chatwing.whitelabel.validators.EmailValidator;
 import com.chatwing.whitelabel.validators.PasswordValidator;
+import com.chatwingsdk.ChatWing;
 import com.chatwingsdk.managers.ApiManagerImpl;
 import com.chatwingsdk.modules.ForApplication;
 import com.chatwingsdk.pojos.User;
+import com.chatwingsdk.pojos.jspojos.UserResponse;
 import com.chatwingsdk.pojos.params.RegisterParams;
 import com.chatwingsdk.validators.ChatBoxIdValidator;
 import com.github.kevinsawicki.http.HttpRequest;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+
+import java.io.File;
 
 import javax.inject.Inject;
 
@@ -189,5 +193,33 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
             return DEFAULT_AVATAR_URL;
         }
         return getAvatarUrl(user.getLoginType(), user.getLoginId());
+    }
+
+    @Override
+    public UserResponse updateAvatar(User user,
+                                     String path)
+            throws UserUnauthenticatedException,
+            HttpRequest.HttpRequestException,
+            ApiException {
+        validate(user);
+
+        HttpRequest request = HttpRequest.post(UPLOAD_AVATAR);
+        setUpRequest(request, user);
+        //We have to specify this temp_avatar.jpg in order to upload the file...
+        //https://github.com/kevinsawicki/http-request/issues/22
+        request.part("avatar", "temp_avatar.jpg", new File(path));
+        request.part("client_id", ChatWing.getAppId());
+        String responseString;
+
+        try {
+            responseString = validate(request);
+            return new Gson().fromJson(responseString, UserResponse.class);
+        } catch (InvalidAccessTokenException e) {
+            throw ApiException.createException(e);
+        } catch (InvalidIdentityException e) {
+            throw ApiException.createException(e);
+        } catch (ValidationException e) {
+            throw ApiException.createException(e);
+        }
     }
 }

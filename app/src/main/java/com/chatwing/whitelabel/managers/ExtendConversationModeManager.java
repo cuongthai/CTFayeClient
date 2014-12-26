@@ -26,6 +26,7 @@ public class ExtendConversationModeManager extends ConversationModeManager {
     @Override
     public void activate() {
         super.activate();
+        setTitle(mTitle.toString());
         mActivityDelegate.getDrawerLayout().setDrawerLockMode(
                 DrawerLayout.LOCK_MODE_LOCKED_CLOSED, DRAWER_GRAVITY_UNUSED_SECONDARY);
     }
