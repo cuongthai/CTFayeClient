@@ -30,7 +30,7 @@
         <item name="android:paddingRight">@dimen/drawer_item_counter_padding_right</item>
         <item name="android:gravity">center_vertical</item>
         <item name="android:textAppearance">?android:attr/textAppearanceListItemSmall</item>
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColor">@color/text_color</item>
         <item name="android:background">@color/primary_color</item>
     </style>
 
@@ -46,14 +46,14 @@
     </style>
 
     <style name="ButtonChatWing" parent="android:Widget.Button">
-        <item name="android:background">@color/action_color</item>
+        <item name="android:background">@color/action_primary_color</item>
         <item name="android:minHeight">48dip</item>
         <item name="android:minWidth">64dip</item>
         <item name="android:textColor">@color/text_action_color</item>
     </style>
 
     <style name="Theme.ChatWing.DrawerItemNavTitle" parent="Theme.ChatWing.DrawerItemTitle">
-        <item name="android:background">@color/action_color</item>
+        <item name="android:background">@color/action_primary_color</item>
         <item name="android:textColor">@color/text_action_color</item>
         <item name="android:textStyle">bold</item>
     </style>

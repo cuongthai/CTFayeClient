@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary_color">#ff6666</color>
-    <color name="action_color">#7f3333</color>
+    <color name="primary_color">#f3f019</color>
+    <color name="action_primary_color">#e92754</color>
+    <color name="action_secondary_color">#3cb2e2</color>
     <color name="text_color">#D9000000</color>
     <color name="text_action_color">#D9FFFFFF</color>
 

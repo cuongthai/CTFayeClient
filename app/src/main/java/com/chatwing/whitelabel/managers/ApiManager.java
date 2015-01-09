@@ -1,13 +1,19 @@
 package com.chatwing.whitelabel.managers;
 
+import com.chatwing.whitelabel.fragments.ExtendChatMessagesFragment;
 import com.chatwing.whitelabel.pojos.OnlineUser;
+import com.chatwing.whitelabel.pojos.responses.BlackListResponse;
+import com.chatwing.whitelabel.pojos.responses.DeleteMessageResponse;
 import com.chatwing.whitelabel.pojos.responses.LoadOnlineUsersResponse;
 import com.chatwing.whitelabel.pojos.responses.RegisterResponse;
 import com.chatwing.whitelabel.pojos.responses.ResetPasswordResponse;
 import com.chatwing.whitelabel.pojos.responses.UpdateUserProfileResponse;
 import com.chatwing.whitelabel.validators.EmailValidator;
+import com.chatwing.whitelabel.validators.MessageIdValidator;
 import com.chatwing.whitelabel.validators.PasswordValidator;
+import com.chatwingsdk.ChatWing;
 import com.chatwingsdk.Constants;
+import com.chatwingsdk.pojos.Message;
 import com.chatwingsdk.pojos.User;
 import com.chatwingsdk.pojos.jspojos.UserResponse;
 import com.chatwingsdk.validators.ChatBoxIdValidator;
@@ -24,7 +30,35 @@ public interface ApiManager extends com.chatwingsdk.managers.ApiManager {
     String CHAT_BOX_USER_LIST_URL = URL_END_POINT + "/chatbox/user/list";
     String USER_PROFILE_UPDATE_URL = URL_END_POINT + "/chat-user/profile/update";
     String UPLOAD_AVATAR = URL_END_POINT + "/chat-user/avatar/upload";
+    String CHAT_BOX_DELETE_MESSAGE_URL = URL_END_POINT + "/chatbox/message/delete";
+    String BLACKLIST_CREATE_URL = URL_END_POINT + "/chatbox/blacklist/create";
+    String MANAGE_BLACKLIST_URL = Constants.CHATWING_BASE_URL + "/chatbox/%s/control?access_token=%s&client_id="
+            + ChatWing.getAppId();
 
+    DeleteMessageResponse deleteMessage(User user,
+                                        int chatBoxId,
+                                        String messageId)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            ChatBoxIdValidator.InvalidIdException,
+            MessageIdValidator.InvalidIdException,
+            UserUnauthenticatedException,
+            InvalidIdentityException,
+            InvalidAccessTokenException,
+            RequiredPermissionException;
+
+    BlackListResponse blockUser(User user,
+                                ExtendChatMessagesFragment.BLOCK block,
+                                Message message,
+                                boolean clearMessage,
+                                String reason,
+                                long duration)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            UserUnauthenticatedException,
+            ValidationException,
+            InvalidAccessTokenException,
+            RequiredPermissionException;
 
     ResetPasswordResponse resetPassword(String email)
             throws ApiException,
@@ -65,4 +99,7 @@ public interface ApiManager extends com.chatwingsdk.managers.ApiManager {
             throws UserUnauthenticatedException,
             HttpRequest.HttpRequestException,
             ApiException;
+
+    public static class RequiredPermissionException extends Exception {
+    }
 }

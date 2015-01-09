@@ -5,20 +5,28 @@ import android.text.TextUtils;
 
 import com.chatwing.whitelabel.Constants;
 import com.chatwing.whitelabel.R;
+import com.chatwing.whitelabel.fragments.ExtendChatMessagesFragment;
 import com.chatwing.whitelabel.pojos.OnlineUser;
+import com.chatwing.whitelabel.pojos.params.BlockUserParams;
+import com.chatwing.whitelabel.pojos.params.DeleteMessageParams;
 import com.chatwing.whitelabel.pojos.params.OnlineUserParams;
 import com.chatwing.whitelabel.pojos.params.ResetPasswordParams;
 import com.chatwing.whitelabel.pojos.params.UpdateUserProfileParams;
+import com.chatwing.whitelabel.pojos.responses.BlackListResponse;
+import com.chatwing.whitelabel.pojos.responses.DeleteMessageResponse;
 import com.chatwing.whitelabel.pojos.responses.LoadOnlineUsersResponse;
 import com.chatwing.whitelabel.pojos.responses.RegisterResponse;
 import com.chatwing.whitelabel.pojos.responses.ResetPasswordResponse;
 import com.chatwing.whitelabel.pojos.responses.UpdateUserProfileResponse;
 import com.chatwing.whitelabel.validators.EmailValidator;
+import com.chatwing.whitelabel.validators.MessageIdValidator;
 import com.chatwing.whitelabel.validators.PasswordValidator;
 import com.chatwingsdk.ChatWing;
 import com.chatwingsdk.managers.ApiManagerImpl;
 import com.chatwingsdk.modules.ForApplication;
+import com.chatwingsdk.pojos.Message;
 import com.chatwingsdk.pojos.User;
+import com.chatwingsdk.pojos.errors.ChatWingError;
 import com.chatwingsdk.pojos.jspojos.UserResponse;
 import com.chatwingsdk.pojos.params.RegisterParams;
 import com.chatwingsdk.validators.ChatBoxIdValidator;
@@ -43,6 +51,8 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
     Context mContext;
     @Inject
     ChatBoxIdValidator mChatBoxIdValidator;
+    @Inject
+    MessageIdValidator mMessageIdValidator;
 
     @Override
     public ResetPasswordResponse resetPassword(String email)
@@ -193,6 +203,98 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
             return DEFAULT_AVATAR_URL;
         }
         return getAvatarUrl(user.getLoginType(), user.getLoginId());
+    }
+
+    @Override
+    public DeleteMessageResponse deleteMessage(User user,
+                                               int chatBoxId,
+                                               String messageId)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            ChatBoxIdValidator.InvalidIdException,
+            MessageIdValidator.InvalidIdException,
+            UserUnauthenticatedException,
+            InvalidIdentityException,
+            InvalidAccessTokenException,
+            RequiredPermissionException {
+        validate(user);
+        mChatBoxIdValidator.validate(chatBoxId);
+        mMessageIdValidator.validate(messageId);
+
+        Gson gson = new Gson();
+        DeleteMessageParams params = new DeleteMessageParams(chatBoxId, messageId);
+        String paramsString = gson.toJson(params);
+
+        HttpRequest request = HttpRequest.post(CHAT_BOX_DELETE_MESSAGE_URL);
+        setUpRequest(request, user);
+        request.send(paramsString);
+        String responseString = null;
+
+        try {
+            responseString = validate(request);
+            DeleteMessageResponse deleteMessageResponse = gson.fromJson(responseString, DeleteMessageResponse.class);
+            if (ChatWingError.hasPermissionError(deleteMessageResponse.getError())){
+                throw new RequiredPermissionException();
+            }
+            return deleteMessageResponse;
+        } catch (JsonSyntaxException e) {
+            throw ApiException.createJsonSyntaxException(e, responseString);
+        } catch (ValidationException e) {
+            throw ApiException.createException(e);
+        }
+    }
+
+    @Override
+    public BlackListResponse blockUser(User user,
+                                       ExtendChatMessagesFragment.BLOCK block,
+                                       Message message,
+                                       boolean clearMessage,
+                                       String reason,
+                                       long duration)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            UserUnauthenticatedException,
+            ValidationException,
+            InvalidAccessTokenException,
+            RequiredPermissionException {
+        validate(user);
+        Gson gson = new Gson();
+
+        HttpRequest request = HttpRequest.post(BLACKLIST_CREATE_URL);
+        setUpRequest(request, user);
+        BlockUserParams params;
+        if (block == ExtendChatMessagesFragment.BLOCK.TYPE) {
+            params = new BlockUserParams(
+                    message.getUserId(),
+                    message.getUserType(),
+                    BlockUserParams.METHOD_SOCIAL,
+                    clearMessage,
+                    String.valueOf(message.getChatBoxId()),
+                    duration,
+                    reason);
+        } else {
+            params = new BlockUserParams(
+                    message.getId(),
+                    BlockUserParams.METHOD_IP,
+                    clearMessage,
+                    String.valueOf(message.getChatBoxId()),
+                    duration,
+                    reason);
+        }
+        request.send(gson.toJson(params));
+        String responseString = null;
+        try {
+            responseString = validate(request);
+            BlackListResponse blackListResponse = gson.fromJson(responseString, BlackListResponse.class);
+            if (ChatWingError.hasPermissionError(blackListResponse.getError())){
+                throw new RequiredPermissionException();
+            }
+            return blackListResponse;
+        } catch (JsonSyntaxException e) {
+            throw ApiException.createJsonSyntaxException(e, responseString);
+        }  catch (InvalidIdentityException e) {
+            throw ApiException.createException(e);
+        }
     }
 
     @Override

@@ -2,9 +2,11 @@ package com.chatwing.whitelabel;
 
 import android.app.Application;
 
+import com.chatwing.whitelabel.interfaces.WLJSInterfaceImpl;
 import com.chatwingsdk.ChatWing;
 import com.chatwingsdk.interfaces.JSInterfaceImpl;
 import com.chatwingsdk.modules.ChatWingModule;
+import com.crashlytics.android.Crashlytics;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,10 +21,11 @@ public class ChatWingApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Crashlytics.start(this);
+
         //Currently support only one chatbox enter from client, it should be loaded from server
         ChatWing.initialize(this, "android", "", new String[]{"1873"}, LegacyLoginActivity.class);
-        ChatWing.setIsDebugging(true);
-        ChatWing.instance(this).setJSDelegateClass(new JSInterfaceImpl());
+        ChatWing.setIsDebugging(false);
         ChatWing.instance(this).getChatwingGraph().plus(getModules().toArray());
     }
 

@@ -1,9 +1,12 @@
 package com.chatwing.whitelabel.modules;
 
 import com.chatwing.whitelabel.activities.ExtendCommunicationActivity;
+import com.chatwing.whitelabel.fragments.BlockUserDialogFragment;
+import com.chatwing.whitelabel.fragments.ExtendChatMessagesFragment;
 import com.chatwing.whitelabel.fragments.ExtendCommunicationDrawerFragment;
 import com.chatwing.whitelabel.fragments.OnlineUsersFragment;
 import com.chatwing.whitelabel.fragments.PhotoPickerDialogFragment;
+import com.chatwing.whitelabel.interfaces.WLJSInterfaceImpl;
 import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.managers.ExtendChatBoxModeManager;
 import com.chatwing.whitelabel.managers.ExtendConversationModeManager;
@@ -11,6 +14,8 @@ import com.chatwing.whitelabel.managers.ExtendCurrentChatboxManager;
 import com.chatwing.whitelabel.managers.WLApiManagerImpl;
 import com.chatwing.whitelabel.tasks.LoadOnlineUsersTask;
 import com.chatwingsdk.activities.CommunicationActivity;
+import com.chatwingsdk.interfaces.ChatWingJavaDelegate;
+import com.chatwingsdk.interfaces.JSInterfaceImpl;
 import com.chatwingsdk.managers.ApiManagerImpl;
 import com.chatwingsdk.managers.ChatboxModeManager;
 import com.chatwingsdk.managers.ConversationModeManager;
@@ -33,10 +38,13 @@ import dagger.Provides;
  */
 @Module(
         injects = {
+                ExtendChatMessagesFragment.class,
                 ExtendCommunicationActivity.class,
                 ExtendCommunicationDrawerFragment.class,
                 OnlineUsersFragment.class,
-                PhotoPickerDialogFragment.class
+                PhotoPickerDialogFragment.class,
+                BlockUserDialogFragment.class,
+                WLJSInterfaceImpl.class
         },
 
         addsTo = CommunicationActivityModule.class,
@@ -49,7 +57,11 @@ public class ExtendCommunicationActivityModule {
         mActivity = activity;
     }
 
-
+    @Provides
+    @Singleton
+    ChatWingJavaDelegate provideChatWingJavaDelegate(WLJSInterfaceImpl jsInterface){
+        return jsInterface;
+    }
 
     @Provides
     @Singleton

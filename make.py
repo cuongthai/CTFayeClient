@@ -70,17 +70,18 @@ def getTextColorHex(color):
 
 def write_color_theme():
     theme_main_color = colors.hex(get_value(config,"COLOR_THEME"))
-    color_rules =  colors.rule("monochrome", theme_main_color)
-    action_color = color_rules[len(color_rules)-1]
-    textColor= getTextColorHex(theme_main_color)
-    textActionColor= getTextColorHex(action_color)
+    action_primary_color = colors.hex(get_value(config,"COLOR_ACTION_PRIMARY"))
+    action_secondary_color = colors.hex(get_value(config,"COLOR_ACTION_SECONDARY"))
+    textColor= colors.hex(get_value(config,"COLOR_TEXT"))
+    textActionColor= colors.hex(get_value(config,"COLOR_ACTION_TEXT"))
 
     for type in ['/release','/debug']:
         f = open(types + type + src_package + "/colors.xml", "w")
         f.writelines("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n")
         f.writelines("<resources>\n")
         f.writelines("<color name=\"%s\">%s</color>\n" % ("primary_color",theme_main_color.hex))
-        f.writelines("<color name=\"%s\">%s</color>\n" % ("action_color",action_color.hex))
+        f.writelines("<color name=\"%s\">%s</color>\n" % ("action_primary_color",action_primary_color.hex))
+        f.writelines("<color name=\"%s\">%s</color>\n" % ("action_secondary_color",action_secondary_color.hex))
         f.writelines("<color name=\"%s\">#D9%s</color>\n" % ("text_color",textColor.hex[1:]))
         f.writelines("<color name=\"%s\">#D9%s</color>\n" % ("text_action_color",textActionColor.hex[1:]))
         f.writelines("</resources>\n")

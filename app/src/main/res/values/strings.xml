@@ -43,9 +43,11 @@
     <string name="progress_loading_url">"Loading…"</string>
     <string name="progress_getting_request_token">"Getting request token…"</string>
     <string name="title_reset_password">"Reset Password"</string>
-    <string name="title_register">Need an account?</string>
+    <string name="title_register">Register</string>
     <string name="title_show_password">"Show password"</string>
     <string name="title_auto_create_chatbox">"Automatically create the first chatbox after signing up"</string>
+    <string name="title_delete_chat_message">"Delete"</string>
+    <string name="title_block">"Block"</string>
     <string name="message_agree_conditions">"By creating an account, you are agreeing to our <a href="http://chatwing.com/site/tos">Terms of Service</a> and <a href="http://chatwing.com/site/privacy">Privacy Policy</a></string>
     <string name="message_current_chat_box_alias_copied">"Alias Copied"</string>
     <string name="message_avatar_picker">Avatar Picker</string>
@@ -60,6 +62,14 @@
     <string name="title_cancel">Cancel</string>
 
     <string name="error_required_agree_conditions">"You must read and agree the Terms of Service and License"</string>
+    <string name="error_block_user_no_permission">"You do not have permission to block user."</string>
+    <string name="error_delete_message_no_permission">"You do not have permission to delete messages."</string>
+    <string name="error_duration_cant_blank">"Duration must be numeric and greater than 0."</string>
+    <string name="error_invalid_chat_box_id">"Chat box id is invalid."</string>
+    <string name="error_require_permission_to_view_ip">"You dont have permission to block user"</string>
+    <string name="error_while_blocking_user">"There was an error while blocking user."</string>
+    <string name="title_block_type">"Block %s"</string>
+    <string name="title_block_ip">"Block IP"</string>
     <string name="title_activity_login">"Log In"</string>
     <string name="title_activity_register">"Sign Up"</string>
     <string name="title_online_users">"Online users"</string>
@@ -73,11 +83,39 @@
     <string name="title_preference_version">Version</string>
     <string name="title_preference_remember_previous_style">"Remember previous style"</string>
     <string name="title_preference_clear_previous_style">"Clear previous style"</string>
+    <string name="title_manage_blacklist">"Manage BlackList"</string>
+    <string name="title_refresh">"Refresh"</string>
+    <string name="title_open_in_browser">"Open in Browser"</string>
     <string name="summary_remember_previous_style">"Remember style of previous chat and apply to new ones."</string>
     <string name="summary_name">"Your name that is displayed in chat boxes."</string>
 
+    <string name="message_blocked">"Blocked"</string>
     <string name="message_share_chat_box_subject">"Join me in this chat box"</string>
+    <string name="message_hint_block_reason">"You have been banned"</string>
+    <string name="message_hint_block_duration">3600</string>
+    <string name="message_block_clear_message">"Clear messages"</string>
+    <string name="message_block_user">"Block User"</string>
+
     <string name="empty_online_users">"No online users found."</string>
     <string name="preference_clear_previous_style">"clear_previous_style"</string>
+    <string name="title_dialog_select_message">Select message</string>
+
+    <array name="block_duration_type_values">
+        <item>Seconds</item>
+        <item>Minutes</item>
+        <item>Hours</item>
+        <item>Days</item>
+        <item>Months</item>
+        <item>Years</item>
+    </array>
+
+    <string-array name="block_duration_type_ids">
+        <item>1</item>
+        <item>60</item>
+        <item>3600</item>
+        <item>86400</item>
+        <item>2592000</item>
+        <item>31536000</item>
+    </string-array>
 
 </resources>

@@ -41,6 +41,6 @@
             android:lines="1"
             android:gravity="center_vertical"
             android:text="@string/title_forgot_password"
-            android:textColor="@color/primary_color"
+            android:textColor="@color/action_primary_color"
             android:textAppearance="?android:attr/textAppearanceMedium"/>
 </LinearLayout>

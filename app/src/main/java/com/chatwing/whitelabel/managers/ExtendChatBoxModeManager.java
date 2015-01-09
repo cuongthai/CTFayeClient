@@ -24,12 +24,14 @@ import android.widget.Toast;
 
 import com.chatwing.whitelabel.Constants;
 import com.chatwing.whitelabel.R;
+import com.chatwing.whitelabel.activities.NoMenuWebViewActivity;
 import com.chatwing.whitelabel.events.LoadOnlineUsersSuccessEvent;
 import com.chatwingsdk.events.internal.CurrentChatBoxEvent;
 import com.chatwingsdk.managers.ChatboxModeManager;
 import com.chatwingsdk.managers.CurrentChatBoxManager;
 import com.chatwingsdk.managers.UserManager;
 import com.chatwingsdk.pojos.ChatBox;
+import com.chatwingsdk.validators.PermissionsValidator;
 import com.readystatesoftware.viewbadger.BadgeView;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -74,6 +76,9 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
         switch (item.getItemId()) {
             case R.id.copy_alias:
                 copyAliasCurrentChatBox();
+                return true;
+            case R.id.manage_blacklist:
+                manageBlackList();
                 return true;
             default:
                 return false;
@@ -138,18 +143,21 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
 
         MenuItem shareChatBoxItem = menu.findItem(R.id.share_chat_box);
         MenuItem copyAliasItem = menu.findItem(R.id.copy_alias);
+        MenuItem manageBlackListItem = menu.findItem(R.id.manage_blacklist);
 
         // Invalidate all menu related objects
         mOnlineUsersItem.setVisible(false);
         mOnlineUsersBadgeView.hide();
         shareChatBoxItem.setVisible(false);
         copyAliasItem.setVisible(false);
+        manageBlackListItem.setVisible(false);
+
         // Now config them
         if (mCurrentChatBoxManager.getCurrentChatBox() != null) {
             // When main view or online users drawer is opened
             // and current chat box is available.
             mOnlineUsersItem.setVisible(true);
-            shareChatBoxItem.setVisible(true);
+            shareChatBoxItem.setVisible(true  && Constants.ALLOW_SHARE_CHATBOX);
             if (mNumOfOnlineUser > 0) {
                 mOnlineUsersBadgeView.setText(Integer.toString(mNumOfOnlineUser));
                 mOnlineUsersBadgeView.show();
@@ -168,8 +176,11 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
             shareChatBoxActionProvider.setShareIntent(intent);
 
 
-            if (chatBox.getAlias() != null) {
+            if (chatBox.getAlias() != null && Constants.ALLOW_SHARE_CHATBOX) {
                 copyAliasItem.setVisible(true);
+            }
+            if (mUserManager.userHasPermission(chatBox, PermissionsValidator.Permission.UNBLOCK_USER)) {
+                manageBlackListItem.setVisible(true);
             }
 
         }
@@ -275,6 +286,15 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
 
     private String constructAliasLink(String alias) {
         return Constants.CHATWING_BASE_URL + "/" + alias;
+    }
+
+    private void manageBlackList() {
+        ActionBarActivity activity = mActivityDelegate.getActivity();
+        Intent i = new Intent(activity, NoMenuWebViewActivity.class);
+        i.putExtra(NoMenuWebViewActivity.EXTRA_URL, String.format(ApiManager.MANAGE_BLACKLIST_URL,
+                mCurrentChatBoxManager.getCurrentChatBox().getKey(),
+                mUserManager.getCurrentUser().getAccessToken()));
+        activity.startActivity(i);
     }
 
 }
