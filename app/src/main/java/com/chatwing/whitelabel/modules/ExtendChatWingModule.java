@@ -4,6 +4,7 @@ import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.managers.WLApiManagerImpl;
 import com.chatwing.whitelabel.services.BlockUserIntentService;
 import com.chatwing.whitelabel.services.DeleteMessageIntentService;
+import com.chatwing.whitelabel.services.IgnoreUserIntentService;
 import com.chatwing.whitelabel.services.UpdateAvatarIntentService;
 import com.chatwing.whitelabel.services.UpdateUserProfileService;
 import com.chatwingsdk.modules.ChatWingModule;
@@ -21,6 +22,7 @@ import dagger.Provides;
                 UpdateUserProfileService.class,
                 DeleteMessageIntentService.class,
                 BlockUserIntentService.class,
+                IgnoreUserIntentService.class,
                 UpdateAvatarIntentService.class
         },
         addsTo = ChatWingModule.class,

@@ -35,4 +35,8 @@
         android:icon="@drawable/ic_action_manage_blacklist"
         app:showAsAction="never"/>
 
+    <item android:id="@+id/manage_notification"
+        android:title="@string/title_activity_notification"
+        android:icon="@drawable/ic_action_notification"
+        app:showAsAction="never"/>
 </menu>

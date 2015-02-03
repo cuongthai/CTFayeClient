@@ -9,11 +9,13 @@ import com.chatwing.whitelabel.fragments.ExtendChatMessagesFragment;
 import com.chatwing.whitelabel.pojos.OnlineUser;
 import com.chatwing.whitelabel.pojos.params.BlockUserParams;
 import com.chatwing.whitelabel.pojos.params.DeleteMessageParams;
+import com.chatwing.whitelabel.pojos.params.IgnoreUserParams;
 import com.chatwing.whitelabel.pojos.params.OnlineUserParams;
 import com.chatwing.whitelabel.pojos.params.ResetPasswordParams;
 import com.chatwing.whitelabel.pojos.params.UpdateUserProfileParams;
 import com.chatwing.whitelabel.pojos.responses.BlackListResponse;
 import com.chatwing.whitelabel.pojos.responses.DeleteMessageResponse;
+import com.chatwing.whitelabel.pojos.responses.IgnoreUserResponse;
 import com.chatwing.whitelabel.pojos.responses.LoadOnlineUsersResponse;
 import com.chatwing.whitelabel.pojos.responses.RegisterResponse;
 import com.chatwing.whitelabel.pojos.responses.ResetPasswordResponse;
@@ -193,7 +195,24 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
         if (type.equals(Constants.TYPE_CHATWING)) {
             return R.drawable.ic_launcher;
         }
-
+        if (type.equals(Constants.TYPE_FACEBOOK)) {
+            return R.drawable.login_type_facebook;
+        }
+        if (type.equals(Constants.TYPE_TWITTER)) {
+            return R.drawable.login_type_twitter;
+        }
+        if (type.equals(Constants.TYPE_GOOGLE)) {
+            return R.drawable.login_type_google;
+        }
+        if (type.equals(Constants.TYPE_YAHOO)) {
+            return R.drawable.login_type_yahoo;
+        }
+        if (type.equals(Constants.TYPE_GUEST)) {
+            return R.drawable.login_type_guest;
+        }
+        if (type.equals(Constants.TYPE_TUMBLR)) {
+            return R.drawable.login_type_tumblr;
+        }
         return 0;
     }
 
@@ -203,6 +222,41 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
             return DEFAULT_AVATAR_URL;
         }
         return getAvatarUrl(user.getLoginType(), user.getLoginId());
+    }
+
+    @Override
+    public IgnoreUserResponse ignoreUser(User user,
+                                         String userId,
+                                         String userType,
+                                         boolean ignored)
+            throws UserUnauthenticatedException,
+            HttpRequest.HttpRequestException,
+            ApiException,
+            InvalidAccessTokenException {
+        validate(user);
+
+        Gson gson = new Gson();
+
+        IgnoreUserParams params = new IgnoreUserParams(userId, userType);
+        String paramsString = gson.toJson(params);
+
+        HttpRequest request;
+        if (ignored) {
+            request = HttpRequest.post(USER_UNIGNORE);
+        } else {
+            request = HttpRequest.post(USER_IGNORE);
+        }
+        setUpRequest(request, user);
+        request.send(paramsString);
+        String responseString;
+        try {
+            responseString = validate(request);
+            return gson.fromJson(responseString, IgnoreUserResponse.class);
+        } catch (ValidationException e) {
+            throw ApiException.createException(e);
+        } catch (InvalidIdentityException e) {
+            throw ApiException.createException(e);
+        }
     }
 
     @Override
@@ -233,7 +287,7 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
         try {
             responseString = validate(request);
             DeleteMessageResponse deleteMessageResponse = gson.fromJson(responseString, DeleteMessageResponse.class);
-            if (ChatWingError.hasPermissionError(deleteMessageResponse.getError())){
+            if (ChatWingError.hasPermissionError(deleteMessageResponse.getError())) {
                 throw new RequiredPermissionException();
             }
             return deleteMessageResponse;
@@ -286,13 +340,13 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
         try {
             responseString = validate(request);
             BlackListResponse blackListResponse = gson.fromJson(responseString, BlackListResponse.class);
-            if (ChatWingError.hasPermissionError(blackListResponse.getError())){
+            if (ChatWingError.hasPermissionError(blackListResponse.getError())) {
                 throw new RequiredPermissionException();
             }
             return blackListResponse;
         } catch (JsonSyntaxException e) {
             throw ApiException.createJsonSyntaxException(e, responseString);
-        }  catch (InvalidIdentityException e) {
+        } catch (InvalidIdentityException e) {
             throw ApiException.createException(e);
         }
     }

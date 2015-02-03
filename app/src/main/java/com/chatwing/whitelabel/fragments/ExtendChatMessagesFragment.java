@@ -2,6 +2,7 @@ package com.chatwing.whitelabel.fragments;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,10 +20,12 @@ import com.chatwing.whitelabel.events.RequestBlockIPEvent;
 import com.chatwing.whitelabel.events.RequestBlockTypeEvent;
 import com.chatwing.whitelabel.services.BlockUserIntentService;
 import com.chatwing.whitelabel.services.DeleteMessageIntentService;
+import com.chatwing.whitelabel.services.IgnoreUserIntentService;
 import com.chatwingsdk.fragments.ChatMessagesFragment;
 import com.chatwingsdk.fragments.CommunicationMessagesFragment;
 import com.chatwingsdk.managers.CurrentChatBoxManager;
 import com.chatwingsdk.managers.UserManager;
+import com.chatwingsdk.pojos.BaseUser;
 import com.chatwingsdk.pojos.Message;
 import com.chatwingsdk.validators.PermissionsValidator;
 import com.chatwingsdk.views.ErrorMessageView;
@@ -79,18 +82,32 @@ public class ExtendChatMessagesFragment extends ChatMessagesFragment {
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         if (previousSelectedMessage == null) return;
-        if (hasAdminPermissions()) {
-            boolean canDeleteMessage = hasPermission(PermissionsValidator.Permission.DELETE_MESSAGE);
-            boolean canBlockUser = hasPermission(PermissionsValidator.Permission.BLOCK_USER);
-            MenuInflater menuInflater = getActivity().getMenuInflater();
-            menuInflater.inflate(R.menu.context_menu_chat_message, menu);
+        boolean showIgnoreButton = mUserManager.getCurrentUser() == null
+                ? false
+                : shouldShowIgnoreButton(previousSelectedMessage.getUserId(), previousSelectedMessage.getUserType());
+        if (!(hasAdminPermissions() || showIgnoreButton)) {
+            return;
+        }
+        MenuInflater menuInflater = getActivity().getMenuInflater();
+        menuInflater.inflate(R.menu.context_menu_chat_message, menu);
 
-            // Only show options that the user can do.
-            MenuItem blockItem = menu.findItem(R.id.block);
-            MenuItem deleteItem = menu.findItem(R.id.delete);
+        boolean canDeleteMessage = hasPermission(PermissionsValidator.Permission.DELETE_MESSAGE);
+        boolean canBlockUser = hasPermission(PermissionsValidator.Permission.BLOCK_USER);
 
-            deleteItem.setVisible(canDeleteMessage);
-            blockItem.setVisible(canBlockUser);
+        // Only show options that the user can do.
+        MenuItem blockItem = menu.findItem(R.id.block);
+        MenuItem deleteItem = menu.findItem(R.id.delete);
+
+        deleteItem.setVisible(canDeleteMessage);
+        blockItem.setVisible(canBlockUser);
+
+        //Ignore button
+        MenuItem ignoreItem = menu.findItem(R.id.ignore);
+        ignoreItem.setVisible(showIgnoreButton);
+        if (mUserManager.hasIgnored(previousSelectedMessage.getUserId(), previousSelectedMessage.getUserType())) {
+            ignoreItem.setTitle(R.string.title_unignore);
+        } else {
+            ignoreItem.setTitle(R.string.title_ignore);
         }
     }
 
@@ -104,17 +121,18 @@ public class ExtendChatMessagesFragment extends ChatMessagesFragment {
     public void onMessageEditEvent(MessageEditEvent event) {
         final Message[] messages = event.getMessages();
         if (messages.length == 1) {
+            previousSelectedMessage = messages[0];
             mWebview.showContextMenu();
-        }else{
+        } else {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle(getString(R.string.title_dialog_select_message))
                     .setItems(getMessagesArray(messages), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int position) {
-                    previousSelectedMessage = messages[position];
-                    mWebview.showContextMenu();
-                }
-            });
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int position) {
+                            previousSelectedMessage = messages[position];
+                            mWebview.showContextMenu();
+                        }
+                    });
             AlertDialog dialog = builder.create();
             dialog.show();
         }
@@ -122,8 +140,8 @@ public class ExtendChatMessagesFragment extends ChatMessagesFragment {
 
     private CharSequence[] getMessagesArray(Message[] messages) {
         CharSequence[] messageContents = new CharSequence[messages.length];
-        for(int i=0;i<messages.length;i++){
-            messageContents[i]=messages[i].getContent();
+        for (int i = 0; i < messages.length; i++) {
+            messageContents[i] = messages[i].getContent();
         }
         return messageContents;
     }
@@ -137,9 +155,20 @@ public class ExtendChatMessagesFragment extends ChatMessagesFragment {
             case R.id.block:
                 blockUser(previousSelectedMessage);
                 return true;
+            case R.id.ignore:
+                ignoreUser(previousSelectedMessage);
+                return true;
             default:
                 return super.onContextItemSelected(item);
         }
+    }
+
+    private void ignoreUser(Message message) {
+        Intent intent = new Intent(getActivity(), IgnoreUserIntentService.class);
+        intent.putExtra(IgnoreUserIntentService.EXTRA_USER_ID, message.getUserId());
+        intent.putExtra(IgnoreUserIntentService.EXTRA_USER_TYPE, message.getUserType());
+        intent.putExtra(IgnoreUserIntentService.EXTRA_IGNORED, mUserManager.hasIgnored(message.getUserId(), message.getUserType()));
+        getActivity().startService(intent);
     }
 
     private void deleteMessage(Message message) {
@@ -213,6 +242,21 @@ public class ExtendChatMessagesFragment extends ChatMessagesFragment {
         intent.putExtra(BlockUserIntentService.EXTRA_REASON, event.getReason());
         intent.putExtra(BlockUserIntentService.EXTRA_DURATION, event.getDuration());
         getActivity().startService(intent);
+    }
+
+    private boolean shouldShowIgnoreButton(String loginId, String userType) {
+        BaseUser mCurrentUser = mUserManager.getCurrentUser();
+        if (mCurrentUser == null) {
+            return false;
+        }
+        boolean isMe = mUserManager.isCurrentUser(
+                BaseUser.computeIdentifier(loginId, userType));
+        boolean meOrGuest = isMe
+                || BaseUser.isGuest(userType)
+                || mCurrentUser.isGuest();
+
+
+        return !meOrGuest;
     }
 
     public static interface Delegate extends CommunicationMessagesFragment.Delegate {

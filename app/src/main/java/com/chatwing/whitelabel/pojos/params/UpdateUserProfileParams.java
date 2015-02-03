@@ -16,6 +16,8 @@ public class UpdateUserProfileParams extends Params {
     private boolean scrollToLatestMessage;
     @SerializedName("remember_previous_style")
     private boolean rememberPreviousStyle;
+    @SerializedName("conversation_push_notification")
+    private boolean allowPushNotification;
     private String name;
     private String username;
 
@@ -25,5 +27,6 @@ public class UpdateUserProfileParams extends Params {
         rememberPreviousStyle = userProfile.shouldRememberPreviousStyle();
         name = userProfile.getName();
         username = userProfile.getUsername();
+        allowPushNotification = userProfile.isAllowPushNotification();
     }
 }

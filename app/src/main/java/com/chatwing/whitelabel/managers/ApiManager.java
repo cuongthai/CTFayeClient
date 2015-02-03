@@ -4,6 +4,7 @@ import com.chatwing.whitelabel.fragments.ExtendChatMessagesFragment;
 import com.chatwing.whitelabel.pojos.OnlineUser;
 import com.chatwing.whitelabel.pojos.responses.BlackListResponse;
 import com.chatwing.whitelabel.pojos.responses.DeleteMessageResponse;
+import com.chatwing.whitelabel.pojos.responses.IgnoreUserResponse;
 import com.chatwing.whitelabel.pojos.responses.LoadOnlineUsersResponse;
 import com.chatwing.whitelabel.pojos.responses.RegisterResponse;
 import com.chatwing.whitelabel.pojos.responses.ResetPasswordResponse;
@@ -34,6 +35,8 @@ public interface ApiManager extends com.chatwingsdk.managers.ApiManager {
     String BLACKLIST_CREATE_URL = URL_END_POINT + "/chatbox/blacklist/create";
     String MANAGE_BLACKLIST_URL = Constants.CHATWING_BASE_URL + "/chatbox/%s/control?access_token=%s&client_id="
             + ChatWing.getAppId();
+    String USER_IGNORE= URL_END_POINT + "/chat-user/ignore";
+    String USER_UNIGNORE= URL_END_POINT + "/chat-user/unignore";
 
     DeleteMessageResponse deleteMessage(User user,
                                         int chatBoxId,
@@ -65,6 +68,15 @@ public interface ApiManager extends com.chatwingsdk.managers.ApiManager {
             HttpRequest.HttpRequestException,
             EmailValidator.InvalidEmailException,
             ValidationException;
+
+    IgnoreUserResponse ignoreUser(User user,
+                                  String userId,
+                                  String userType,
+                                  boolean ignored)
+            throws UserUnauthenticatedException,
+            HttpRequest.HttpRequestException,
+            ApiException,
+            InvalidAccessTokenException;
 
     RegisterResponse register(String email,
                               String password,

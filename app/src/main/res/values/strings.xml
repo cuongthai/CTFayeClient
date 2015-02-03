@@ -83,6 +83,7 @@
     <string name="title_preference_version">Version</string>
     <string name="title_preference_remember_previous_style">"Remember previous style"</string>
     <string name="title_preference_clear_previous_style">"Clear previous style"</string>
+    <string name="title_preference_allow_conversation_notification">"Default push notification for new conversations"</string>
     <string name="title_manage_blacklist">"Manage BlackList"</string>
     <string name="title_refresh">"Refresh"</string>
     <string name="title_open_in_browser">"Open in Browser"</string>
@@ -99,6 +100,9 @@
     <string name="empty_online_users">"No online users found."</string>
     <string name="preference_clear_previous_style">"clear_previous_style"</string>
     <string name="title_dialog_select_message">Select message</string>
+    <string name="title_ignore">Ignore</string>
+    <string name="title_unignore">Show Content</string>
+    <string name="gcm_sender_id">341431874860</string>
 
     <array name="block_duration_type_values">
         <item>Seconds</item>

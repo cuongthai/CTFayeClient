@@ -27,6 +27,7 @@ import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.activities.NoMenuWebViewActivity;
 import com.chatwing.whitelabel.events.LoadOnlineUsersSuccessEvent;
 import com.chatwingsdk.events.internal.CurrentChatBoxEvent;
+import com.chatwingsdk.events.internal.UpdateSubscriptionEvent;
 import com.chatwingsdk.managers.ChatboxModeManager;
 import com.chatwingsdk.managers.CurrentChatBoxManager;
 import com.chatwingsdk.managers.UserManager;
@@ -73,6 +74,7 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        super.onOptionsItemSelected(item);
         switch (item.getItemId()) {
             case R.id.copy_alias:
                 copyAliasCurrentChatBox();
@@ -139,6 +141,7 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
         boolean chatBoxesDrawerOpened = mActivityDelegate.getDrawerLayout().isDrawerOpen(DRAWER_GRAVITY_CHAT_BOXES);
 
         MenuItem shareChatBoxItem = menu.findItem(R.id.share_chat_box);
@@ -194,6 +197,11 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
         if (mRefreshOnlineUsersHandler != null) {
             mRefreshOnlineUsersHandler.removeMessages(MSG_GET_ONLINE_USERS);
         }
+    }
+
+    @Subscribe
+    public void onUpdateSubscriptionEvent(UpdateSubscriptionEvent event) {
+        super.onUpdateSubscriptionEvent(event);
     }
 
     @Subscribe

@@ -2,6 +2,7 @@ package com.chatwing.whitelabel;
 
 import android.app.Application;
 
+import com.chatwing.whitelabel.activities.ExtendCommunicationActivity;
 import com.chatwing.whitelabel.interfaces.WLJSInterfaceImpl;
 import com.chatwingsdk.ChatWing;
 import com.chatwingsdk.interfaces.JSInterfaceImpl;
@@ -26,6 +27,7 @@ public class ChatWingApplication extends Application {
         //Currently support only one chatbox enter from client, it should be loaded from server
         ChatWing.initialize(this, "android", "", new String[]{"1873"}, LegacyLoginActivity.class);
         ChatWing.setIsDebugging(false);
+        ChatWing.instance(this).setMainActivityClass(ExtendCommunicationActivity.class);
         ChatWing.instance(this).getChatwingGraph().plus(getModules().toArray());
     }
 

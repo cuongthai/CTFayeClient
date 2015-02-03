@@ -15,6 +15,7 @@
         <activity
             android:name=".activities.ExtendCommunicationActivity"
             android:label="@string/app_name"
+            android:launchMode="singleTop"
             android:icon="@drawable/ic_launcher"></activity>
 
         <activity
@@ -24,7 +25,6 @@
             android:icon="@drawable/ic_launcher">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -54,6 +54,7 @@
         <service android:name=".services.UpdateUserProfileService" />
         <service android:name=".services.DeleteMessageIntentService" />
         <service android:name=".services.BlockUserIntentService" />
+        <service android:name=".services.IgnoreUserIntentService" />
 
 
         <!-- FB 3.0 section -->

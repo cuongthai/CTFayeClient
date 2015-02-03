@@ -16,6 +16,10 @@
         <Preference
             android:key="@string/preference_clear_previous_style"
             android:title="@string/title_preference_clear_previous_style" />
+        <CheckBoxPreference
+            android:key="@string/preference_push_notification_conversation"
+            android:title="@string/title_preference_allow_conversation_notification"
+            android:defaultValue="@bool/default_push_notification_conversation"/>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/title_preference_category_extras">

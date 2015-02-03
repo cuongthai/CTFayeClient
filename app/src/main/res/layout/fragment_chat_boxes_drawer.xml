@@ -73,7 +73,7 @@
             android:textSize="@dimen/authenticate_button_text_size"
             android:textStyle="bold"
             style="@style/ButtonChatWing"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
 
         <LinearLayout
@@ -125,7 +125,7 @@
             android:drawableLeft="@drawable/ic_action_settings_light"
             android:text="@string/title_settings"
             android:background="@drawable/item_selector"
-            style="@style/Theme.ChatWing.DrawerItemTitle"/>
+            style="@style/Theme.ChatWing.DrawerItemTitle" />
 
         <LinearLayout
             android:id="@+id/logout"

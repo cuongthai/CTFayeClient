@@ -11,18 +11,15 @@ import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
-import android.view.MenuItem;
 import android.view.View;
 
 import com.chatwing.whitelabel.BuildConfig;
 import com.chatwing.whitelabel.Constants;
 import com.chatwing.whitelabel.R;
-import com.chatwing.whitelabel.modules.ExtendChatWingModule;
 import com.chatwing.whitelabel.modules.PreferenceActivityModule;
 import com.chatwing.whitelabel.services.UpdateUserProfileService;
 import com.chatwingsdk.ChatWing;
 import com.chatwingsdk.events.internal.UpdateUserEvent;
-import com.chatwingsdk.fragments.InjectableFragmentDelegate;
 import com.chatwingsdk.managers.UserManager;
 import com.chatwingsdk.pojos.UserProfile;
 import com.chatwingsdk.views.ErrorMessageView;
@@ -53,6 +50,7 @@ public class SettingsFragment extends PreferenceFragment
     UserManager mUserManager;
     @Inject
     ErrorMessageView mErrorMessageView;
+    private Preference mNotificationConversationPreference;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -79,6 +77,7 @@ public class SettingsFragment extends PreferenceFragment
         mChatBoxCategoryPreference = (PreferenceCategory) findPreference(getString(R.string.preference_category_chat_box));
 
         mClearPreference = findPreference(getString(R.string.preference_clear_previous_style));
+        mNotificationConversationPreference = findPreference(getString(R.string.preference_push_notification_conversation));
         String name = mNamePreference.getSharedPreferences().getString(
                 mNamePreference.getKey(),
                 getString(R.string.summary_name));
@@ -86,7 +85,7 @@ public class SettingsFragment extends PreferenceFragment
         mFeedbackPreference.setOnPreferenceClickListener(this);
         mNamePreference.setOnPreferenceChangeListener(this);
         mClearPreference.setOnPreferenceClickListener(this);
-
+        mNotificationConversationPreference.setOnPreferenceChangeListener(this);
         String versionName;
         int versionCode;
         try {

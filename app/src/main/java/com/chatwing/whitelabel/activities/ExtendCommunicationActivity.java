@@ -29,6 +29,7 @@ import com.chatwingsdk.modules.CommunicationActivityModule;
 import com.chatwingsdk.pojos.Message;
 import com.chatwingsdk.pojos.jspojos.UserResponse;
 import com.chatwingsdk.pojos.params.CreateConversationParams;
+import com.chatwingsdk.services.CreateConversationIntentService;
 import com.chatwingsdk.utils.LogUtils;
 import com.soundcloud.android.crop.Crop;
 import com.squareup.otto.Bus;
@@ -52,8 +53,6 @@ public class ExtendCommunicationActivity
     public static final String BLOCK_USER_DIALOG_FRAGMENT_TAG = "BlockUserDialogFragment";
 
     @Inject
-    Bus mBus;
-    @Inject
     com.chatwingsdk.managers.ApiManager mApiManager;
     @Inject
     com.chatwingsdk.managers.UserManager mUserManager;
@@ -76,6 +75,13 @@ public class ExtendCommunicationActivity
         if (requestCode == Crop.REQUEST_CROP && resultCode == RESULT_OK) {
             Uri output = Crop.getOutput(intent);
             startUpdateAvatar(output.getPath());
+        } else if (requestCode == REQUEST_CODE_AUTHENTICATION && resultCode == RESULT_OK) {
+            //Populate fake mods
+//            CreateConversationParams.SimpleUser simpleUser = new CreateConversationParams.SimpleUser("238405", "chatwing");
+//            Intent service = new Intent(this, CreateConversationIntentService.class);
+//            service.putExtra(CreateConversationIntentService.SILENT, true);
+//            service.putExtra(CreateConversationIntentService.EXTRA_USER, simpleUser);
+//            startService(service);
         }
     }
 
@@ -97,7 +103,8 @@ public class ExtendCommunicationActivity
     }
 
     @Subscribe
-    public void onAllSyncsCompleted(com.chatwingsdk.events.internal.AllSyncsCompletedEvent event) {
+    public void onAllSyncsCompleted(com.chatwingsdk.events.internal.AllSyncsCompletedEvent
+                                            event) {
         super.onAllSyncsCompleted(event);
     }
 
@@ -123,18 +130,21 @@ public class ExtendCommunicationActivity
     }
 
     @com.squareup.otto.Subscribe
-    public void onServerConnectionChangedEvent(com.chatwingsdk.events.faye.ServerConnectionChangedEvent event) {
+    public void onServerConnectionChangedEvent
+            (com.chatwingsdk.events.faye.ServerConnectionChangedEvent event) {
         super.onServerConnectionChangedEvent(event);
     }
 
     @com.squareup.otto.Subscribe
-    public void onSyncCommunicationBoxEvent(com.chatwingsdk.events.internal.SyncCommunicationBoxEvent event) {
+    public void onSyncCommunicationBoxEvent
+            (com.chatwingsdk.events.internal.SyncCommunicationBoxEvent event) {
         super.onSyncCommunicationBoxEvent(event);
     }
 
 
     @Subscribe
-    public void onChannelSubscriptionChanged(com.chatwingsdk.events.faye.ChannelSubscriptionChangedEvent event) {
+    public void onChannelSubscriptionChanged
+            (com.chatwingsdk.events.faye.ChannelSubscriptionChangedEvent event) {
         super.onChannelSubscriptionChanged(event);
     }
 
