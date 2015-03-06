@@ -7,7 +7,10 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.events.BlockedEvent;
@@ -16,6 +19,7 @@ import com.chatwing.whitelabel.fragments.ExtendChatMessagesFragment;
 import com.chatwing.whitelabel.fragments.ExtendCommunicationDrawerFragment;
 import com.chatwing.whitelabel.fragments.OnlineUsersFragment;
 import com.chatwing.whitelabel.fragments.PhotoPickerDialogFragment;
+import com.chatwing.whitelabel.fragments.SettingsFragment;
 import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.managers.ExtendChatBoxModeManager;
 import com.chatwing.whitelabel.modules.ExtendCommunicationActivityModule;
@@ -23,16 +27,14 @@ import com.chatwing.whitelabel.services.UpdateAvatarIntentService;
 import com.chatwingsdk.activities.BaseABFragmentActivity;
 import com.chatwingsdk.activities.CommunicationActivity;
 import com.chatwingsdk.events.internal.ViewProfileEvent;
-import com.chatwingsdk.fragments.ChatMessagesFragment;
 import com.chatwingsdk.fragments.CommunicationMessagesFragment;
 import com.chatwingsdk.modules.CommunicationActivityModule;
 import com.chatwingsdk.pojos.Message;
-import com.chatwingsdk.pojos.jspojos.UserResponse;
+import com.chatwingsdk.pojos.jspojos.JSUserResponse;
 import com.chatwingsdk.pojos.params.CreateConversationParams;
-import com.chatwingsdk.services.CreateConversationIntentService;
-import com.chatwingsdk.utils.LogUtils;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.soundcloud.android.crop.Crop;
-import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
 import java.util.Arrays;
@@ -75,13 +77,6 @@ public class ExtendCommunicationActivity
         if (requestCode == Crop.REQUEST_CROP && resultCode == RESULT_OK) {
             Uri output = Crop.getOutput(intent);
             startUpdateAvatar(output.getPath());
-        } else if (requestCode == REQUEST_CODE_AUTHENTICATION && resultCode == RESULT_OK) {
-            //Populate fake mods
-//            CreateConversationParams.SimpleUser simpleUser = new CreateConversationParams.SimpleUser("238405", "chatwing");
-//            Intent service = new Intent(this, CreateConversationIntentService.class);
-//            service.putExtra(CreateConversationIntentService.SILENT, true);
-//            service.putExtra(CreateConversationIntentService.EXTRA_USER, simpleUser);
-//            startService(service);
         }
     }
 
@@ -110,7 +105,7 @@ public class ExtendCommunicationActivity
 
     @Subscribe
     public void onTouchUserInfoEvent(com.chatwingsdk.events.internal.TouchUserInfoEvent event) {
-        UserResponse user = event.getUser();
+        JSUserResponse user = event.getUser();
         String loginType = user.getLoginType();
         String loginId = user.getLoginId();
         String userAvatar = user.getUserAvatar();
@@ -218,6 +213,7 @@ public class ExtendCommunicationActivity
     @Override
     public void showSettings() {
         Intent i = new Intent(this, MainPreferenceActivity.class);
+        i.putExtra(SettingsFragment.LOAD_LATEST_USER_PROFILE, true);
         startActivity(i);
     }
 
@@ -262,5 +258,70 @@ public class ExtendCommunicationActivity
             BlockUserDialogFragment newFragment = BlockUserDialogFragment.newInstance(message);
             newFragment.show(getSupportFragmentManager(), BLOCK_USER_DIALOG_FRAGMENT_TAG);
         }
+    }
+
+    /**
+     * This class makes the ad request and loads the ad.
+     */
+    public static class AdFragment extends Fragment {
+
+        private AdView mAdView;
+
+        public AdFragment() {
+        }
+
+        @Override
+        public void onActivityCreated(Bundle bundle) {
+            super.onActivityCreated(bundle);
+
+            // Gets the ad view defined in layout/ad_fragment.xml with ad unit ID set in
+            // values/strings.xml.
+            mAdView = (AdView) getView().findViewById(R.id.adView);
+
+            // Create an ad request. Check logcat output for the hashed device ID to
+            // get test ads on a physical device. e.g.
+            // "Use AdRequest.Builder.addTestDevice("ABCDEF012345") to get test ads on this device."
+            AdRequest adRequest = new AdRequest.Builder()
+                    .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                    .addTestDevice("8852195CD9EACCCF36E4DEBF3288370B")
+                    .build();
+
+            // Start loading the ad in the background.
+            mAdView.loadAd(adRequest);
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            return inflater.inflate(R.layout.fragment_ad, container, false);
+        }
+
+        /** Called when leaving the activity */
+        @Override
+        public void onPause() {
+            if (mAdView != null) {
+                mAdView.pause();
+            }
+            super.onPause();
+        }
+
+        /** Called when returning to the activity */
+        @Override
+        public void onResume() {
+            super.onResume();
+            if (mAdView != null) {
+                mAdView.resume();
+            }
+        }
+
+        /** Called before the activity is destroyed */
+        @Override
+        public void onDestroy() {
+            if (mAdView != null) {
+                mAdView.destroy();
+            }
+            super.onDestroy();
+        }
+
     }
 }

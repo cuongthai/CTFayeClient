@@ -4,6 +4,7 @@ from itertools import chain
 import shutil
 import os
 import colors
+import colorsys
 CONFIG_FILE = "gradle.properties"
 types = 'app/build-types'
 src_package = "/res/values"
@@ -68,13 +69,20 @@ def getTextColorHex(color):
     else:
         return colors.hex("#FFFFFF")
 
+def getLighterShadeColor(color):
+    hls = colorsys.rgb_to_hls(color.r, color.g, color.b)
+    print hls[1]
+    hsv2 = 0.97
+    rgb = colorsys.hls_to_rgb(hls[0], hsv2, hls[2])
+    return colors.rgb(rgb[0],rgb[1],rgb[2])
+
 def write_color_theme():
     theme_main_color = colors.hex(get_value(config,"COLOR_THEME"))
     action_primary_color = colors.hex(get_value(config,"COLOR_ACTION_PRIMARY"))
     action_secondary_color = colors.hex(get_value(config,"COLOR_ACTION_SECONDARY"))
     textColor= colors.hex(get_value(config,"COLOR_TEXT"))
     textActionColor= colors.hex(get_value(config,"COLOR_ACTION_TEXT"))
-
+    bgColor = getLighterShadeColor(theme_main_color)
     for type in ['/release','/debug']:
         f = open(types + type + src_package + "/colors.xml", "w")
         f.writelines("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n")
@@ -84,6 +92,7 @@ def write_color_theme():
         f.writelines("<color name=\"%s\">%s</color>\n" % ("action_secondary_color",action_secondary_color.hex))
         f.writelines("<color name=\"%s\">#D9%s</color>\n" % ("text_color",textColor.hex[1:]))
         f.writelines("<color name=\"%s\">#D9%s</color>\n" % ("text_action_color",textActionColor.hex[1:]))
+        f.writelines("<color name=\"%s\">%s</color>\n" % ("bg_color",bgColor.hex))
         f.writelines("</resources>\n")
         f.close()
 
@@ -106,7 +115,7 @@ ensure_build_type_folders()
 write_string_xml()
 write_ic_launcher()
 write_color_theme()
-create_certs()
+#create_certs()
 
 print(get_value(config, "APP_NAME"))
 os.system("./gradlew assembleRelease")

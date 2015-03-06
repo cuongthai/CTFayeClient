@@ -14,6 +14,8 @@ import com.chatwing.whitelabel.fragments.LoginTwitterFragment;
 import com.chatwingsdk.modules.AuthenticateActivityModule;
 import com.chatwingsdk.modules.ChatWingModule;
 import com.chatwingsdk.modules.ForActivity;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.PlusClient;
 
 import javax.inject.Singleton;
@@ -79,9 +81,12 @@ public class LegacyActivityModule {
 
     @Provides
     @Singleton
-    PlusClient providePlusClient() {
-        return new PlusClient.Builder(mActivity, mActivity, mActivity)
-                .setVisibleActivities("http://schemas.google.com/AddActivity")
+    GoogleApiClient provideGoogleApiClient() {
+        return new GoogleApiClient.Builder(mActivity)
+                .addApi(Plus.API)
+                .addScope(Plus.SCOPE_PLUS_LOGIN)
+                .addConnectionCallbacks(mActivity)
+                .addOnConnectionFailedListener(mActivity)
                 .build();
     }
 

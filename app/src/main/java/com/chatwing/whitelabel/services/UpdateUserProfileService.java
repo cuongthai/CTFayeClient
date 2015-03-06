@@ -23,7 +23,7 @@ import javax.inject.Inject;
  * Date: 8/6/13
  * Time: 4:14 AM
  */
-public class UpdateUserProfileService extends BaseIntentService {
+public class UpdateUserProfileService extends ExtendBaseIntentService {
     public static final String EXTRA_OLD_PROFILE = "old_profile";
 
     @Inject
@@ -31,11 +31,6 @@ public class UpdateUserProfileService extends BaseIntentService {
     @Override
     public void onCreate() {
         super.onCreate();
-    }
-
-    @Override
-    protected List<Object> getModules() {
-        return Arrays.<Object>asList(new ChatWingModule(this), new ExtendChatWingModule());
     }
 
     public UpdateUserProfileService() {

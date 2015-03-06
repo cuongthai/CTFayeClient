@@ -29,8 +29,10 @@ import com.chatwingsdk.modules.ForApplication;
 import com.chatwingsdk.pojos.Message;
 import com.chatwingsdk.pojos.User;
 import com.chatwingsdk.pojos.errors.ChatWingError;
-import com.chatwingsdk.pojos.jspojos.UserResponse;
+import com.chatwingsdk.pojos.jspojos.JSUserResponse;
+import com.chatwingsdk.pojos.params.ConcreteParams;
 import com.chatwingsdk.pojos.params.RegisterParams;
+import com.chatwingsdk.pojos.responses.UserResponse;
 import com.chatwingsdk.validators.ChatBoxIdValidator;
 import com.github.kevinsawicki.http.HttpRequest;
 import com.google.gson.Gson;
@@ -133,6 +135,29 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
     }
 
     @Override
+    public UserResponse loadUserDetails(User user)
+            throws UserUnauthenticatedException,
+            HttpRequest.HttpRequestException,
+            ApiException,
+            InvalidAccessTokenException {
+        validate(user);
+
+        Gson gson = new Gson();
+        ConcreteParams paramsString = new ConcreteParams();
+        HttpRequest request = HttpRequest.get(USER_DETAIL + appendParams(paramsString));
+        setUpRequest(request, user);
+        String responseString;
+        try {
+            responseString = validate(request);
+            return gson.fromJson(responseString, UserResponse.class);
+        } catch (ValidationException e) {
+            throw ApiException.createException(e);
+        } catch (InvalidIdentityException e) {
+            throw ApiException.createException(e);
+        }
+    }
+
+    @Override
     public LoadOnlineUsersResponse loadOnlineUsers(int chatBoxId)
             throws ApiException,
             HttpRequest.HttpRequestException,
@@ -186,6 +211,35 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
             throw ApiException.createException(e);
         }
     }
+
+    public void verifyEmail(User user)
+            throws UserUnauthenticatedException,
+            HttpRequest.HttpRequestException,
+            ApiException {
+        validate(user);
+
+        Gson gson = new Gson();
+        ConcreteParams params = new ConcreteParams();
+        String paramsString = gson.toJson(params);
+
+        HttpRequest request = HttpRequest.post(USER_VERIFY);
+        setUpRequest(request, user);
+        request.send(paramsString);
+        String responseString = null;
+
+        try {
+            responseString = validate(request);
+        } catch (JsonSyntaxException e) {
+            throw ApiException.createJsonSyntaxException(e, responseString);
+        } catch (InvalidIdentityException e) {
+            throw ApiException.createException(e);
+        } catch (InvalidAccessTokenException e) {
+            throw ApiException.createException(e);
+        } catch (ValidationException e) {
+            throw ApiException.createException(e);
+        }
+    }
+
 
     @Override
     public int getLoginTypeImageResId(String type) {
@@ -352,7 +406,7 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
     }
 
     @Override
-    public UserResponse updateAvatar(User user,
+    public JSUserResponse updateAvatar(User user,
                                      String path)
             throws UserUnauthenticatedException,
             HttpRequest.HttpRequestException,
@@ -369,7 +423,7 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
 
         try {
             responseString = validate(request);
-            return new Gson().fromJson(responseString, UserResponse.class);
+            return new Gson().fromJson(responseString, JSUserResponse.class);
         } catch (InvalidAccessTokenException e) {
             throw ApiException.createException(e);
         } catch (InvalidIdentityException e) {

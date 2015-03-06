@@ -12,9 +12,11 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.support.v4.app.Fragment;
 import android.view.MenuItem;
+import android.view.Window;
 
 import com.chatwing.whitelabel.ChatWingApplication;
 import com.chatwing.whitelabel.R;
+import com.chatwing.whitelabel.fragments.SettingsFragment;
 import com.chatwing.whitelabel.modules.ExtendCommunicationActivityModule;
 import com.chatwing.whitelabel.modules.PreferenceActivityModule;
 import com.chatwingsdk.activities.BaseABFragmentActivity;
@@ -37,10 +39,11 @@ import javax.inject.Inject;
  * Date: 6/14/13
  * Time: 10:11 AM
  */
-public class MainPreferenceActivity extends BaseABFragmentActivity  {
+public class MainPreferenceActivity extends BaseABFragmentActivity implements SettingsFragment.SettingDelegate {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_preferences);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -60,5 +63,10 @@ public class MainPreferenceActivity extends BaseABFragmentActivity  {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void showLoading(boolean show) {
+        setSupportProgressBarIndeterminateVisibility(show);
     }
 }

@@ -36,7 +36,7 @@ android {
         applicationId PACKAGE_NAME
         minSdkVersion 14
         targetSdkVersion 20
-        versionCode 1
+        versionCode 2
         versionName "1.0"
     }
 
@@ -91,12 +91,16 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.soundcloud.android:android-crop:0.9.10@aar'
     compile 'com.viewpagerindicator:library:2.4.2-SNAPSHOT@aar'
-    compile 'com.github.chatwing:library:0.5.90-SNAPSHOT@aar'
     compile 'com.android.support:appcompat-v7:20.0.0'
     compile 'com.facebook:facebook-android-sdk:3.5.2@aar'
-    compile 'com.google.android.gms:play-services:3.2.25'
     compile 'com.crashlytics.android:crashlytics:1.+'
     compile 'org.twitter4j:twitter4j-core:4.0.0'
     compile 'org.twitter4j:twitter4j-async:4.0.0'
     compile 'com.github.matthewyork:ColoursLibrary:1.0.+@aar'
+    compile 'com.google.android.gms:play-services-ads:6.5.87'
+    compile 'com.google.android.gms:play-services-base:6.5.87'
+    compile 'com.google.android.gms:play-services-plus:6.5.87'
+    compile 'com.viewpagerindicator:library:2.4.2-SNAPSHOT@aar'
+//    compile 'com.github.chatwing:library:0.5.106-SNAPSHOT@aar'
+    compile project(':libs:UniversitySDK:chatwing-sdk')
 }

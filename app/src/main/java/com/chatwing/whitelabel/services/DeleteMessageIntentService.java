@@ -17,7 +17,7 @@ import javax.inject.Inject;
 /**
  * Created by nguyenthanhhuy on 12/21/13.
  */
-public class DeleteMessageIntentService extends BaseIntentService {
+public class DeleteMessageIntentService extends ExtendBaseIntentService {
     public static final String EXTRA_CHAT_BOX_ID = "chat_box_id";
     public static final String EXTRA_MESSAGE_ID = "message_id";
 
@@ -26,11 +26,6 @@ public class DeleteMessageIntentService extends BaseIntentService {
 
     public DeleteMessageIntentService() {
         super("DeleteMessageIntentService");
-    }
-
-    @Override
-    protected List<Object> getModules() {
-        return Arrays.asList(new ChatWingModule(this), new ExtendChatWingModule());
     }
 
     @Override

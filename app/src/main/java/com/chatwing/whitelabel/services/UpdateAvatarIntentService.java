@@ -20,7 +20,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class UpdateAvatarIntentService extends BaseIntentService {
+public class UpdateAvatarIntentService extends ExtendBaseIntentService {
     private static final Object sLock = new Object();
     public static final String EXTRA_AVATAR_PATH = "bitmap";
     private static boolean sIsInProgress;
@@ -29,11 +29,6 @@ public class UpdateAvatarIntentService extends BaseIntentService {
 
     @Inject
     ApiManager mApiManager;
-
-    @Override
-    protected List<Object> getModules() {
-        return Arrays.<Object>asList(new ChatWingModule(this), new ExtendChatWingModule());
-    }
 
     public UpdateAvatarIntentService() {
         super("UpdateAvatarIntentService");

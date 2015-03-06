@@ -19,7 +19,7 @@ import javax.inject.Inject;
 /**
  * Created by steve on 30/06/2014.
  */
-public class BlockUserIntentService extends BaseIntentService {
+public class BlockUserIntentService extends ExtendBaseIntentService {
     public static final String EXTRA_MESSAGE = "message";
     public static final String EXTRA_BLOCK = "block";
     public static final String EXTRA_CLEAR_MESSAGE = "clear_message";
@@ -32,10 +32,6 @@ public class BlockUserIntentService extends BaseIntentService {
         super("BlockUserIntentService");
     }
 
-    @Override
-    protected List<Object> getModules() {
-        return Arrays.asList(new ChatWingModule(this), new ExtendChatWingModule());
-    }
     /**
      * throws
      * ApiManager.ApiException

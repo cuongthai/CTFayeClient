@@ -16,7 +16,8 @@ import com.chatwingsdk.ChatWing;
 import com.chatwingsdk.Constants;
 import com.chatwingsdk.pojos.Message;
 import com.chatwingsdk.pojos.User;
-import com.chatwingsdk.pojos.jspojos.UserResponse;
+import com.chatwingsdk.pojos.jspojos.JSUserResponse;
+import com.chatwingsdk.pojos.responses.UserResponse;
 import com.chatwingsdk.validators.ChatBoxIdValidator;
 import com.github.kevinsawicki.http.HttpRequest;
 
@@ -37,6 +38,8 @@ public interface ApiManager extends com.chatwingsdk.managers.ApiManager {
             + ChatWing.getAppId();
     String USER_IGNORE= URL_END_POINT + "/chat-user/ignore";
     String USER_UNIGNORE= URL_END_POINT + "/chat-user/unignore";
+    String USER_DETAIL = URL_END_POINT + "/chat-user/read";
+    String USER_VERIFY = URL_END_POINT + "/chat-user/verify";
 
     DeleteMessageResponse deleteMessage(User user,
                                         int chatBoxId,
@@ -90,6 +93,12 @@ public interface ApiManager extends com.chatwingsdk.managers.ApiManager {
 
     public String getChatBoxUrl(String chatBoxKey);
 
+    UserResponse loadUserDetails(User user)
+            throws UserUnauthenticatedException,
+            ApiException,
+            HttpRequest.HttpRequestException,
+            InvalidAccessTokenException;
+
     LoadOnlineUsersResponse loadOnlineUsers(int chatBoxId)
             throws ApiException,
             HttpRequest.HttpRequestException,
@@ -106,11 +115,15 @@ public interface ApiManager extends com.chatwingsdk.managers.ApiManager {
             ValidationException,
             InvalidAccessTokenException;
 
-    UserResponse updateAvatar(User currentUser,
+    JSUserResponse updateAvatar(User currentUser,
                               String path)
             throws UserUnauthenticatedException,
             HttpRequest.HttpRequestException,
             ApiException;
+
+    void verifyEmail(User user)
+            throws UserUnauthenticatedException,
+            HttpRequest.HttpRequestException, ApiException;
 
     public static class RequiredPermissionException extends Exception {
     }

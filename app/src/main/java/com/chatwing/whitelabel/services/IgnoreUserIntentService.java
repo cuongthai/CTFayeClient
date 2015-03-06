@@ -18,7 +18,7 @@ import javax.inject.Inject;
 /**
  * Created by steve on 30/06/2014.
  */
-public class IgnoreUserIntentService extends BaseIntentService {
+public class IgnoreUserIntentService extends ExtendBaseIntentService {
     public static final String EXTRA_USER_ID = "EXTRA_USER_ID";
     public static final String EXTRA_USER_TYPE = "EXTRA_USER_TYPE";
     public static final String EXTRA_IGNORED = "EXTRA_IGNORED";
@@ -28,11 +28,6 @@ public class IgnoreUserIntentService extends BaseIntentService {
 
     public IgnoreUserIntentService() {
         super("IgnoreUserIntentService");
-    }
-
-    @Override
-    protected List<Object> getModules() {
-        return Arrays.<Object>asList(new ChatWingModule(this), new ExtendChatWingModule());
     }
 
     @Override

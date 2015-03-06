@@ -26,7 +26,7 @@ public class ChatWingApplication extends Application {
 
         //Currently support only one chatbox enter from client, it should be loaded from server
         ChatWing.initialize(this, "android", "", new String[]{"1873"}, LegacyLoginActivity.class);
-        ChatWing.setIsDebugging(false);
+        ChatWing.setIsDebugging(true);
         ChatWing.instance(this).setMainActivityClass(ExtendCommunicationActivity.class);
         ChatWing.instance(this).getChatwingGraph().plus(getModules().toArray());
     }

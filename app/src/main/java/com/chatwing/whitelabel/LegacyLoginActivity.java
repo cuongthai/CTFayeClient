@@ -47,14 +47,13 @@ import com.chatwingsdk.managers.ProgressViewsManager;
 import com.chatwingsdk.managers.UserManager;
 import com.chatwingsdk.pojos.User;
 import com.chatwingsdk.pojos.params.oauth.AuthenticationParams;
-import com.chatwingsdk.utils.LogUtils;
 import com.chatwingsdk.utils.NetworkUtils;
 import com.chatwingsdk.views.QuickMessageView;
 import com.facebook.Session;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.plus.PlusClient;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.plus.Plus;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -66,8 +65,8 @@ import javax.inject.Inject;
 public class LegacyLoginActivity extends AuthenticateActivity
         implements AuthenticateFragment.Delegate,
         LoginFragment.Delegate,
-        GooglePlayServicesClient.ConnectionCallbacks,
-        GooglePlayServicesClient.OnConnectionFailedListener,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
         GuestLoginFragment.Delegate,
         ForgotPasswordFragment.Delegate {
     private static final String TAG_FRAGMENT_LOGIN_TWITTER =
@@ -88,7 +87,7 @@ public class LegacyLoginActivity extends AuthenticateActivity
     @Inject
     NetworkUtils mNetworkUtils;
     @Inject
-    PlusClient mPlusClient;
+    GoogleApiClient mGoogleApiClient;
     @Inject
     ProgressViewsManager mProgressViewsManager;
     @Inject
@@ -161,9 +160,9 @@ public class LegacyLoginActivity extends AuthenticateActivity
             session.closeAndClearTokenInformation();
         }
 
-        if (mPlusClient.isConnected()) {
-            mPlusClient.clearDefaultAccount();
-            mPlusClient.disconnect();
+        if (mGoogleApiClient.isConnected()) {
+            Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
+            mGoogleApiClient.disconnect();
         }
     }
 
@@ -184,7 +183,7 @@ public class LegacyLoginActivity extends AuthenticateActivity
                 return;
             }
 
-            if (!mPlusClient.isConnected()) {
+            if (!mGoogleApiClient.isConnected()) {
                 if (mConnectionResult == null) {
                     connectPlusClient();
                 } else {
@@ -257,8 +256,8 @@ public class LegacyLoginActivity extends AuthenticateActivity
                 || requestCode == REQUEST_CODE_GET_GOOGLE_PLAY_SERVICES) {
             // Google+ resolve error
             if (resultCode == Activity.RESULT_OK
-                    && !mPlusClient.isConnected()
-                    && !mPlusClient.isConnecting()) {
+                    && !mGoogleApiClient.isConnected()
+                    && !mGoogleApiClient.isConnecting()) {
                 mConnectionResult = null;
                 connectPlusClient();
             } else {
@@ -305,7 +304,7 @@ public class LegacyLoginActivity extends AuthenticateActivity
 
     private void connectPlusClient() {
         mProgressViewsManager.showProgress(true, R.string.progress_logging_in);
-        mPlusClient.connect();
+        mGoogleApiClient.connect();
     }
 
     private void loadGooglePlusAccessToken() {
@@ -313,7 +312,7 @@ public class LegacyLoginActivity extends AuthenticateActivity
         GetGooglePlusAccessTokenTask task = new GetGooglePlusAccessTokenTask(
                 mBus,
                 this,
-                mPlusClient.getAccountName(),
+                Plus.AccountApi.getAccountName(mGoogleApiClient),
                 Constants.GOOGLE_PLUS_SCOPES,
                 null);
         startTask(task.execute());
@@ -396,11 +395,6 @@ public class LegacyLoginActivity extends AuthenticateActivity
         loadGooglePlusAccessToken();
     }
 
-    @Override
-    public void onDisconnected() {
-        LogUtils.v("G+ disconnected.");
-    }
-
     /////////////////////////////////////////////////////////////
     // Google Plus Connection Failed Listener
     /////////////////////////////////////////////////////////////
@@ -432,6 +426,14 @@ public class LegacyLoginActivity extends AuthenticateActivity
 
     @Override
     public void resetPassword(String email) throws EmailValidator.InvalidEmailException {
+
+    }
+
+    ////////////////////////////////////////////////////////////
+    // Google Api Clients Callbacks
+    ////////////////////////////////////////////////////////////
+    @Override
+    public void onConnectionSuspended(int i) {
 
     }
 }

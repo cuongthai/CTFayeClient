@@ -14,9 +14,15 @@
         android:name=".ChatWingApplication">
         <activity
             android:name=".activities.ExtendCommunicationActivity"
+            android:theme="@style/Theme.ChatWing"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:icon="@drawable/ic_launcher"></activity>
+
+        <!--Include the AdActivity configChanges and theme. -->
+        <activity android:name="com.google.android.gms.ads.AdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
+            android:theme="@android:style/Theme.Translucent" />
 
         <activity
             tools:replace="android:icon"
@@ -55,6 +61,8 @@
         <service android:name=".services.DeleteMessageIntentService" />
         <service android:name=".services.BlockUserIntentService" />
         <service android:name=".services.IgnoreUserIntentService" />
+        <service android:name=".services.DownloadUserDetailIntentService" />
+        <service android:name=".services.VerifyEmailIntentService" />
 
 
         <!-- FB 3.0 section -->
@@ -77,6 +85,9 @@
         <meta-data
             android:name="com.crashlytics.ApiKey"
             android:value="89c22334cc2e886b1c091b4f1b544dde2d2e2028" />
+
+        <meta-data android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
     </application>
 
 </manifest>

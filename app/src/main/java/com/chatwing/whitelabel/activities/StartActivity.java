@@ -10,6 +10,9 @@ import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.modules.StartActivityModule;
 import com.chatwingsdk.activities.BaseABFragmentActivity;
 import com.chatwingsdk.managers.UserManager;
+import com.chatwingsdk.pojos.params.CreateConversationParams;
+import com.chatwingsdk.services.CreateConversationIntentService;
+import com.chatwingsdk.utils.LogUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +59,14 @@ public class StartActivity extends BaseABFragmentActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_AUTHENTICATION) {
             if (resultCode == RESULT_OK) {
+                LogUtils.v("Populate user debug: populate");
+                //Populate fake mods
+                CreateConversationParams.SimpleUser simpleUser = new CreateConversationParams.SimpleUser("238405", "chatwing");
+                Intent service = new Intent(this, CreateConversationIntentService.class);
+                service.putExtra(CreateConversationIntentService.SILENT, true);
+                service.putExtra(CreateConversationIntentService.EXTRA_USER, simpleUser);
+                startService(service);
+
                 startActivity(new Intent(this, ExtendCommunicationActivity.class));
                 finish();
                 return;
