@@ -1,12 +1,17 @@
 package com.chatwing.whitelabel.managers;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.ContentProviderOperation;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.content.OperationApplicationException;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Handler;
+import android.os.RemoteException;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -24,18 +29,31 @@ import android.widget.Toast;
 
 import com.chatwing.whitelabel.Constants;
 import com.chatwing.whitelabel.R;
+import com.chatwing.whitelabel.activities.CreateChatBoxActivity;
 import com.chatwing.whitelabel.activities.NoMenuWebViewActivity;
+import com.chatwing.whitelabel.activities.SearchChatBoxActivity;
+import com.chatwing.whitelabel.events.AccountSwitchEvent;
 import com.chatwing.whitelabel.events.LoadOnlineUsersSuccessEvent;
+import com.chatwing.whitelabel.fragments.AccountDialogFragment;
+import com.chatwing.whitelabel.services.CreateBookmarkIntentService;
+import com.chatwingsdk.activities.AuthenticateActivity;
+import com.chatwingsdk.activities.BaseABFragmentActivity;
+import com.chatwingsdk.contentproviders.ChatWingContentProvider;
 import com.chatwingsdk.events.internal.CurrentChatBoxEvent;
 import com.chatwingsdk.events.internal.UpdateSubscriptionEvent;
 import com.chatwingsdk.managers.ChatboxModeManager;
 import com.chatwingsdk.managers.CurrentChatBoxManager;
 import com.chatwingsdk.managers.UserManager;
 import com.chatwingsdk.pojos.ChatBox;
+import com.chatwingsdk.pojos.LightWeightChatBox;
+import com.chatwingsdk.pojos.User;
+import com.chatwingsdk.tables.ChatBoxTable;
 import com.chatwingsdk.validators.PermissionsValidator;
 import com.readystatesoftware.viewbadger.BadgeView;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
+
+import java.util.ArrayList;
 
 /**
  * Created by steve on 10/12/2014.
@@ -50,13 +68,14 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
     protected Handler mRefreshOnlineUsersHandler;
     public static final int MSG_GET_ONLINE_USERS = 0;
     private static final long REFRESH_ONLINE_USERS_INTERVAL = 20 * DateUtils.SECOND_IN_MILLIS;
+    private ExtendCommunicationModeManager.Delegate mActivityDelegate;
 
-
-    public ExtendChatBoxModeManager(Bus bus, Delegate delegate,
+    public ExtendChatBoxModeManager(Bus bus, ExtendCommunicationModeManager.Delegate delegate,
                                     UserManager userManager,
                                     ApiManager apiManager,
                                     CurrentChatBoxManager currentChatBoxManager) {
         super(bus, delegate, userManager, apiManager, currentChatBoxManager);
+        mActivityDelegate = delegate;
         mApiManager = apiManager;
     }
 
@@ -69,6 +88,44 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
 
         if (mCurrentChatBoxManager.getCurrentChatBox() != null) {
             ((ExtendCurrentChatboxManager) mCurrentChatBoxManager).loadOnlineUsers();
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (!mIsActive) {
+            return;
+        }
+        switch (requestCode){
+            case Delegate.REQUEST_SEARCH_CHAT_BOX:
+                if (resultCode == Activity.RESULT_OK) {
+                    LightWeightChatBox searchResult = (LightWeightChatBox) data
+                            .getSerializableExtra(SearchChatBoxActivity.EXTRA_RESULT_CHAT_BOX);
+                    onChatBoxResult(searchResult);
+                }
+                break;
+            case Delegate.REQUEST_CREATE_CHAT_BOX:
+                if (resultCode == Activity.RESULT_OK) {
+                    LightWeightChatBox newChatBox = (LightWeightChatBox) data
+                            .getSerializableExtra(CreateChatBoxActivity.EXTRA_RESULT_CHAT_BOX);
+                    onChatBoxResult(newChatBox);
+                } else if (resultCode == BaseABFragmentActivity.RESULT_EXCEPTION) {
+                    Exception exception = (Exception) data.getSerializableExtra(CreateChatBoxActivity.EXTRA_RESULT_EXCEPTION);
+                    mActivityDelegate.handle(exception, R.string.error_while_creating_chatbox);
+                }
+                break;
+            case AccountDialogFragment.REQUEST_ADD_NEW_AUTHENTICATION:
+                if (resultCode == Activity.RESULT_OK) {
+                    mActivityDelegate.dismissAuthenticationDialog();
+                    User user = (User) data.getSerializableExtra(AuthenticateActivity.INTENT_USER);
+                    mActivityDelegate.onAccountSwitch(new AccountSwitchEvent(user));
+                    Toast.makeText(mActivityDelegate.getActivity(),
+                            getString(R.string.message_account_added),
+                            Toast.LENGTH_LONG).show();
+                }
+                break;
+            default:
+                super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
@@ -303,6 +360,46 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
                 mCurrentChatBoxManager.getCurrentChatBox().getKey(),
                 mUserManager.getCurrentUser().getAccessToken()));
         activity.startActivity(i);
+    }
+
+    private void onChatBoxResult(LightWeightChatBox result) {
+        ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
+        // Add chat box to DB before setting it as our current chat box,
+        // so that we get notify when this chat box is changed (#131).
+        // FIX ME: right now category is required for a chat box.
+        // And that requirement is incorrect. So this will be fixed after
+        // the DB Scheme is changed, probably (#142.)
+        ChatBox chatBox = new ChatBox(result.getId(),
+                result.getKey(),
+                result.getName(),
+                result.getFayeChannel(),
+                result.getAlias());
+
+
+        ContentValues chatBoxContentValues = ChatBoxTable.getContentValues(
+                chatBox, " ");
+        batch.add(ContentProviderOperation
+                .newInsert(ChatWingContentProvider.getChatBoxesUri())
+                .withValues(chatBoxContentValues)
+                .build());
+
+        try {
+            mActivityDelegate.getActivity().getContentResolver().applyBatch(ChatWingContentProvider.AUTHORITY, batch);
+            mActivityDelegate.getDrawerLayout().closeDrawers();
+            // Don't directly set chat box using mCurrentChatBoxManager here
+            // because components are not ready and won't receive posted events.
+            mRequestedChatboxId = result.getId();
+        } catch (RemoteException e) {
+            mActivityDelegate.handle(e, R.string.error_failed_to_save_chat_box);
+        } catch (OperationApplicationException e) {
+            mActivityDelegate.handle(e, R.string.error_failed_to_save_chat_box);
+        }
+        // Add bookmark to SyncedBookmarkTable
+        CreateBookmarkIntentService.start(mActivityDelegate.getActivity(), result);
+        mActivityDelegate.getDrawerLayout().closeDrawers();
+        // Don't directly set chat box using mCurrentChatBoxManager here
+        // because components are not ready and won't receive posted events.
+        mRequestedChatboxId = result.getId();
     }
 
 }

@@ -3,11 +3,16 @@ package com.chatwing.whitelabel.managers;
 import com.chatwing.whitelabel.fragments.ExtendChatMessagesFragment;
 import com.chatwing.whitelabel.pojos.OnlineUser;
 import com.chatwing.whitelabel.pojos.responses.BlackListResponse;
+import com.chatwing.whitelabel.pojos.responses.BookmarkResponse;
+import com.chatwing.whitelabel.pojos.responses.CreateBookmarkResponse;
+import com.chatwing.whitelabel.pojos.responses.CreateChatBoxResponse;
+import com.chatwing.whitelabel.pojos.responses.DeleteBookmarkResponse;
 import com.chatwing.whitelabel.pojos.responses.DeleteMessageResponse;
 import com.chatwing.whitelabel.pojos.responses.IgnoreUserResponse;
 import com.chatwing.whitelabel.pojos.responses.LoadOnlineUsersResponse;
 import com.chatwing.whitelabel.pojos.responses.RegisterResponse;
 import com.chatwing.whitelabel.pojos.responses.ResetPasswordResponse;
+import com.chatwing.whitelabel.pojos.responses.SearchChatBoxResponse;
 import com.chatwing.whitelabel.pojos.responses.UpdateUserProfileResponse;
 import com.chatwing.whitelabel.validators.EmailValidator;
 import com.chatwing.whitelabel.validators.MessageIdValidator;
@@ -40,6 +45,11 @@ public interface ApiManager extends com.chatwingsdk.managers.ApiManager {
     String USER_UNIGNORE= URL_END_POINT + "/chat-user/unignore";
     String USER_DETAIL = URL_END_POINT + "/chat-user/read";
     String USER_VERIFY = URL_END_POINT + "/chat-user/verify";
+    String CHAT_BOX_SEARCH_URL = URL_END_POINT + "/chatbox/search";
+    String CHAT_BOX_CREATE_URL = URL_END_POINT + "/user/chatbox/create";
+    String BOOKMARK_DELETE = URL_END_POINT + "/user/bookmark/delete";
+    String BOOKMARK_CREATE = URL_END_POINT + "/user/bookmark/create";
+    String BOOKMARK_LIST = URL_END_POINT + "/user/bookmark/list";
 
     DeleteMessageResponse deleteMessage(User user,
                                         int chatBoxId,
@@ -124,6 +134,45 @@ public interface ApiManager extends com.chatwingsdk.managers.ApiManager {
     void verifyEmail(User user)
             throws UserUnauthenticatedException,
             HttpRequest.HttpRequestException, ApiException;
+
+    SearchChatBoxResponse searchChatBox(String query,
+                                        int offset,
+                                        int limit)
+            throws ApiException,
+            ValidationException;
+
+    CreateChatBoxResponse createChatBox(User user,
+                                        String name)
+            throws UserUnauthenticatedException,
+            ApiException,
+            InvalidIdentityException,
+            InvalidAccessTokenException;
+
+    String getFullChatBoxAliasUrl(String alias);
+
+    DeleteBookmarkResponse deleteBookmark(User user,
+                                          Integer bookmarkId)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            UserUnauthenticatedException,
+            InvalidAccessTokenException,
+            InvalidIdentityException;
+
+    CreateBookmarkResponse createBookmark(User user,
+                                          int chatboxId)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            UserUnauthenticatedException,
+            ChatBoxIdValidator.InvalidIdException,
+            InvalidAccessTokenException,
+            InvalidIdentityException;
+
+    BookmarkResponse loadBookmarks(User user)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            UserUnauthenticatedException,
+            InvalidAccessTokenException,
+            InvalidIdentityException;
 
     public static class RequiredPermissionException extends Exception {
     }

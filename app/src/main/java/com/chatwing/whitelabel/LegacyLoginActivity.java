@@ -85,6 +85,8 @@ public class LegacyLoginActivity extends AuthenticateActivity
     @Inject
     LoginFragment mLoginFragment;
     @Inject
+    AuthenticateFragment mSecondAuthenticationFragment;
+    @Inject
     NetworkUtils mNetworkUtils;
     @Inject
     GoogleApiClient mGoogleApiClient;
@@ -123,7 +125,27 @@ public class LegacyLoginActivity extends AuthenticateActivity
                         mLoginFragment,
                         TAG_FRAGMENT_MAIN_AUTHENTICATE)
                 .commit();
+
+        renderAppropriateUIForAppType();
     }
+
+    private void renderAppropriateUIForAppType() {
+        if(isOfficialChatWingApp()){
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(
+                            R.id.second_auth_fragment_container,
+                            mSecondAuthenticationFragment,
+                            getString(R.string.fragment_tag_authenticate))
+                    .commit();
+        }
+    }
+
+    private boolean isOfficialChatWingApp() {
+        return getResources().getBoolean(R.bool.official);
+    }
+
+
 
     @Override
     @Subscribe
@@ -282,7 +304,7 @@ public class LegacyLoginActivity extends AuthenticateActivity
                 R.string.title_login_tumblr,
                 R.string.title_login_twitter,
                 R.string.title_login_yahoo,
-                0
+                R.string.title_login_guest
         );
     }
 

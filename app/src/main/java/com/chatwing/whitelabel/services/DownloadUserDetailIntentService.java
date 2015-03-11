@@ -4,6 +4,7 @@ import android.content.Intent;
 
 import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwingsdk.events.internal.UpdateUserEvent;
+import com.chatwingsdk.managers.SyncManager;
 import com.chatwingsdk.pojos.User;
 import com.chatwingsdk.pojos.responses.UserResponse;
 import com.chatwingsdk.utils.LogUtils;
@@ -18,6 +19,8 @@ public class DownloadUserDetailIntentService extends ExtendBaseIntentService {
     private static final Object sLock = new Object();
     @Inject
     ApiManager mApiManager;
+    @Inject
+    SyncManager mSyncManager;
 
     public DownloadUserDetailIntentService() {
         super("DownloadUserDetailIntentService");
@@ -64,4 +67,9 @@ public class DownloadUserDetailIntentService extends ExtendBaseIntentService {
         }
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mSyncManager.removeServiceFromQueue(this);
+    }
 }

@@ -7,9 +7,13 @@
     <color name="text_action_color">#D9FFFFFF</color>
     <color name="bg_color">#fefef5</color>
 
-    <color name="main_background_color">@android:color/white</color>
     <color name="profile_drawer_bg_color">@color/primary_color</color>
     <color name="main_color">@color/primary_color</color>
     <color name="chatwing_icon_color">@android:color/darker_gray</color>
 
+    <color name="walkthrough_page_1_background_color">#8000</color>
+    <color name="walkthrough_page_2_background_color">#EA1B21</color>
+    <color name="walkthrough_page_3_background_color">#0192FF</color>
+    <color name="walkthrough_page_4_background_color">#FF5002</color>
+    <color name="walkthrough_page_5_background_color">#028414</color>
 </resources>

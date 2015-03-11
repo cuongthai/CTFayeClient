@@ -72,7 +72,7 @@
         android:layout_width="@dimen/drawer_width"
         android:layout_height="match_parent"
         android:layout_gravity="left"
-        android:background="@color/main_background_color">
+        android:background="@color/bg_color">
 
         <fragment
             android:name="com.chatwing.whitelabel.fragments.ExtendCommunicationDrawerFragment"

@@ -1,0 +1,59 @@
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.chatwing.activities.CreateChatBoxActivity">
+
+    <!-- Create progress -->
+    <LinearLayout
+        android:id="@+id/create_chat_box_status"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:id="@+id/create_chat_box_status_message"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="@string/progress_creating_chat_box" />
+    </LinearLayout>
+
+    <!-- Chat box form -->
+    <ScrollView
+        android:id="@+id/create_chat_box_form"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/bg_color">
+
+        <LinearLayout style="@style/FormContainer">
+
+            <EditText
+                android:id="@+id/name"
+                android:singleLine="true"
+                android:maxLines="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textAutoCorrect"
+                android:hint="@string/hint_chat_box_name" />
+
+            <Button
+                android:id="@+id/create_chat_box_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/title_create_entered_chat_box"
+                android:paddingLeft="32dp"
+                android:paddingRight="32dp" />
+
+        </LinearLayout>
+    </ScrollView>
+</merge>

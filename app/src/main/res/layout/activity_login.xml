@@ -47,13 +47,13 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"/>
 
-                <include layout="@layout/view_section_divider"/>
-
-                <fragment
-                    class="com.chatwing.whitelabel.fragments.AuthenticateFragment"
+                <LinearLayout
+                    android:id="@+id/second_auth_fragment_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:tag="@string/fragment_tag_authenticate"/>
+                    android:orientation="vertical"/>
+
+
             </LinearLayout>
         </ScrollView>
     </FrameLayout>

@@ -8,17 +8,27 @@ import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.fragments.ExtendChatMessagesFragment;
 import com.chatwing.whitelabel.pojos.OnlineUser;
 import com.chatwing.whitelabel.pojos.params.BlockUserParams;
+import com.chatwing.whitelabel.pojos.params.CreateBookmarkParams;
+import com.chatwing.whitelabel.pojos.params.CreateChatBoxParams;
+import com.chatwing.whitelabel.pojos.params.DeleteBookmarkParams;
 import com.chatwing.whitelabel.pojos.params.DeleteMessageParams;
 import com.chatwing.whitelabel.pojos.params.IgnoreUserParams;
+import com.chatwing.whitelabel.pojos.params.LoadBookmarkParams;
 import com.chatwing.whitelabel.pojos.params.OnlineUserParams;
 import com.chatwing.whitelabel.pojos.params.ResetPasswordParams;
+import com.chatwing.whitelabel.pojos.params.SearchChatBoxParams;
 import com.chatwing.whitelabel.pojos.params.UpdateUserProfileParams;
 import com.chatwing.whitelabel.pojos.responses.BlackListResponse;
+import com.chatwing.whitelabel.pojos.responses.BookmarkResponse;
+import com.chatwing.whitelabel.pojos.responses.CreateBookmarkResponse;
+import com.chatwing.whitelabel.pojos.responses.CreateChatBoxResponse;
+import com.chatwing.whitelabel.pojos.responses.DeleteBookmarkResponse;
 import com.chatwing.whitelabel.pojos.responses.DeleteMessageResponse;
 import com.chatwing.whitelabel.pojos.responses.IgnoreUserResponse;
 import com.chatwing.whitelabel.pojos.responses.LoadOnlineUsersResponse;
 import com.chatwing.whitelabel.pojos.responses.RegisterResponse;
 import com.chatwing.whitelabel.pojos.responses.ResetPasswordResponse;
+import com.chatwing.whitelabel.pojos.responses.SearchChatBoxResponse;
 import com.chatwing.whitelabel.pojos.responses.UpdateUserProfileResponse;
 import com.chatwing.whitelabel.validators.EmailValidator;
 import com.chatwing.whitelabel.validators.MessageIdValidator;
@@ -34,6 +44,7 @@ import com.chatwingsdk.pojos.params.ConcreteParams;
 import com.chatwingsdk.pojos.params.RegisterParams;
 import com.chatwingsdk.pojos.responses.UserResponse;
 import com.chatwingsdk.validators.ChatBoxIdValidator;
+import com.chatwingsdk.validators.PermissionsValidator;
 import com.github.kevinsawicki.http.HttpRequest;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -57,6 +68,8 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
     ChatBoxIdValidator mChatBoxIdValidator;
     @Inject
     MessageIdValidator mMessageIdValidator;
+    @Inject
+    PermissionsValidator mPermissionsValidator;
 
     @Override
     public ResetPasswordResponse resetPassword(String email)
@@ -428,6 +441,195 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
             throw ApiException.createException(e);
         } catch (InvalidIdentityException e) {
             throw ApiException.createException(e);
+        } catch (ValidationException e) {
+            throw ApiException.createException(e);
+        }
+    }
+
+    @Override
+    public SearchChatBoxResponse searchChatBox(String query,
+                                               int offset,
+                                               int limit)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            ValidationException {
+        if (TextUtils.isEmpty(query)) {
+            throw new ValidationException(
+                    new ChatWingError(ChatWingError.ERROR_CODE_VALIDATION_ERR,
+                            mContext.getString(R.string.error_required_chat_wing_login_to_create_chat_boxes),
+                            null));
+        }
+
+        Gson gson = new Gson();
+        SearchChatBoxParams params = new SearchChatBoxParams(query, offset, limit);
+
+        HttpRequest request = HttpRequest.get(CHAT_BOX_SEARCH_URL + appendParams(params));
+        String responseString = null;
+        try {
+            responseString = validate(request);
+            return gson.fromJson(responseString, SearchChatBoxResponse.class);
+        } catch (JsonSyntaxException e) {
+            throw ApiException.createJsonSyntaxException(e, responseString);
+        } catch (InvalidAccessTokenException e) {
+            throw ApiException.createException(e);
+        } catch (InvalidIdentityException e) {
+            throw ApiException.createException(e);
+        }
+    }
+
+    @Override
+    public CreateChatBoxResponse createChatBox(User user,
+                                               String name)
+            throws UserUnauthenticatedException,
+            ApiException,
+            HttpRequest.HttpRequestException,
+            InvalidAccessTokenException,
+            InvalidIdentityException {
+        validate(user);
+        if (!mPermissionsValidator.canCreateChatBox(user)) {
+            throw new InvalidIdentityException(new ChatWingError(
+                    ChatWingError.ERROR_CODE_INVALID_IDENTITY,
+                    mContext.getString(R.string.error_required_chat_wing_login_to_create_chat_boxes),
+                    null));
+        }
+
+        Gson gson = new Gson();
+        CreateChatBoxParams params = new CreateChatBoxParams(name);
+        String paramsString = gson.toJson(params);
+
+        HttpRequest request = HttpRequest.post(CHAT_BOX_CREATE_URL);
+        setUpRequest(request, user);
+        request.send(paramsString);
+        String responseString = null;
+
+        try {
+            responseString = validate(request);
+            CreateChatBoxResponse createChatBoxResponse = gson.fromJson(responseString, CreateChatBoxResponse.class);
+            return createChatBoxResponse;
+        } catch (JsonSyntaxException e) {
+            throw ApiException.createJsonSyntaxException(e, responseString);
+        } catch (ValidationException e) {
+            throw ApiException.createException(e);
+        }
+    }
+
+    @Override
+    public String getFullChatBoxAliasUrl(String alias) {
+        return Constants.CHATWING_BASE_URL + "/" + alias;
+    }
+
+    @Override
+    public DeleteBookmarkResponse deleteBookmark(User user,
+                                                 Integer bookmarkId)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            UserUnauthenticatedException,
+            InvalidAccessTokenException,
+            InvalidIdentityException {
+        validate(user);
+
+        if (bookmarkId == null) {
+            throw ApiException.createException(new Exception(mContext.getString(R.string.error_while_deleting_bookmark)));
+        }
+
+        if (!mPermissionsValidator.canBookmark(user)) {
+            throw new InvalidIdentityException(new ChatWingError(
+                    ChatWingError.ERROR_CODE_INVALID_IDENTITY,
+                    mContext.getString(R.string.error_required_chat_wing_login),
+                    null));
+        }
+
+        Gson gson = new Gson();
+
+        DeleteBookmarkParams params = new DeleteBookmarkParams();
+        params.setId(bookmarkId);
+        String paramsString = gson.toJson(params);
+        HttpRequest request = HttpRequest.post(BOOKMARK_DELETE);
+        setUpRequest(request, user);
+        request.send(paramsString);
+        String responseString = null;
+        try {
+            responseString = validate(request);
+            DeleteBookmarkResponse deleteBookmarkResponse = gson.fromJson(responseString,
+                    DeleteBookmarkResponse.class);
+            return deleteBookmarkResponse;
+        } catch (JsonSyntaxException e) {
+            throw ApiException.createJsonSyntaxException(e, responseString);
+        } catch (ValidationException e) {
+            throw ApiException.createException(e);
+        }
+    }
+
+    @Override
+    public CreateBookmarkResponse createBookmark(User user,
+                                                 int chatboxId)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            UserUnauthenticatedException,
+            ChatBoxIdValidator.InvalidIdException,
+            InvalidAccessTokenException,
+            InvalidIdentityException {
+        validate(user);
+        mChatBoxIdValidator.validate(chatboxId);
+
+        if (!mPermissionsValidator.canBookmark(user)) {
+            throw new InvalidIdentityException(new ChatWingError(
+                    ChatWingError.ERROR_CODE_INVALID_IDENTITY,
+                    mContext.getString(R.string.error_required_chat_wing_login),
+                    null));
+        }
+
+        Gson gson = new Gson();
+
+        CreateBookmarkParams params = new CreateBookmarkParams();
+        params.setChatboxId(chatboxId);
+        String paramsString = gson.toJson(params);
+
+        HttpRequest request = HttpRequest.post(BOOKMARK_CREATE);
+        setUpRequest(request, user);
+        request.send(paramsString);
+
+        String responseString = null;
+        try {
+            responseString = validate(request);
+            CreateBookmarkResponse createBookmarkResponse = gson.fromJson(responseString,
+                    CreateBookmarkResponse.class);
+            return createBookmarkResponse;
+        } catch (JsonSyntaxException e) {
+            throw ApiException.createJsonSyntaxException(e, responseString);
+        } catch (ValidationException e) {
+            throw ApiException.createException(e);
+        }
+    }
+
+    @Override
+    public BookmarkResponse loadBookmarks(User user)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            UserUnauthenticatedException,
+            InvalidAccessTokenException,
+            InvalidIdentityException {
+        validate(user);
+
+        if (!mPermissionsValidator.canBookmark(user)) {
+            throw new InvalidIdentityException(new ChatWingError(
+                    ChatWingError.ERROR_CODE_INVALID_IDENTITY,
+                    mContext.getString(R.string.error_required_chat_wing_login),
+                    null));
+        }
+
+        LoadBookmarkParams params = new LoadBookmarkParams();
+        Gson gson = new Gson();
+        HttpRequest request = HttpRequest.get(BOOKMARK_LIST + appendParams(params));
+        setUpRequest(request, user);
+        String responseString = null;
+
+        try {
+            responseString = validate(request);
+            BookmarkResponse bookmarksResponse = gson.fromJson(responseString, BookmarkResponse.class);
+            return bookmarksResponse;
+        } catch (JsonSyntaxException e) {
+            throw ApiException.createJsonSyntaxException(e, responseString);
         } catch (ValidationException e) {
             throw ApiException.createException(e);
         }

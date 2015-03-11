@@ -119,13 +119,8 @@ public class AuthenticateFragment extends Fragment implements View.OnClickListen
         yahooLoginBtn.setOnClickListener(this);
         yahooLoginBtn.setText(info.mYahooAuthText);
 
-        if (info.mGuestAuthText != 0) {
-            guestLoginBtn.setVisibility(View.VISIBLE);
-            guestLoginBtn.setOnClickListener(this);
-            guestLoginBtn.setText(info.mGuestAuthText);
-        } else {
-            guestLoginBtn.setVisibility(View.GONE);
-        }
+        guestLoginBtn.setOnClickListener(this);
+        guestLoginBtn.setText(info.mGuestAuthText);
 
     }
 

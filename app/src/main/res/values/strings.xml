@@ -27,7 +27,11 @@
     <string name="title_login_twitter">"Log In with Twitter"</string>
     <string name="title_login_yahoo">"Log In with Yahoo!"</string>
     <string name="title_login_guest">"Log In as Guest"</string>
+    <string name="title_chat_boxes_drawer_search">Search for a chat box</string>
+    <string name="title_chat_boxes_drawer_create">Create a chat box</string>
+    <string name="title_bookmarks">"Bookmarks"</string>
 
+    <string name="hint_search_chat_box">"Search chat boxes by name"</string>
     <string name="hint_email">"Email"</string>
     <string name="hint_password">"Password"</string>
     <string name="title_forgot_password">"Forgot password"</string>
@@ -36,6 +40,8 @@
     <string name="fb_app_id">"1111"</string>
     <string name="progress_logging_in">"Logging in…"</string>
     <string name="progress_getting_access_token">"Getting access token…"</string>
+    <string name="progress_creating_chat_box">"Creating…"</string>
+    <string name="progress_searching">"Searching…"</string>
     <string name="error_unavailable_google_plus_login">"Log in with Google is unavailable."</string>
     <string name="error_invalid_guest_name">"Guest name must be filled"</string>
     <string name="hint_guest_name">"Guest 123"</string>
@@ -60,7 +66,15 @@
     <string name="title_register_twitter">"Sign Up using Twitter"</string>
     <string name="title_register_yahoo">"Sign Up using Yahoo"</string>
     <string name="title_cancel">Cancel</string>
+    <string name="title_btn_create_chat_box">"Create"</string>
+    <string name="title_menu_search_chat_box">"Search a chat box"</string>
+    <string name="title_delete_bookmark">"Delete"</string>
 
+    <string name="empty_bookmarks">"No bookmarked chat boxes."</string>
+    <string name="empty_search_chat_box_results">"No chat boxes with name \"%s\" found."</string>
+    <string name="empty_search_chat_box_query">"Let's start searching chat boxes by name."</string>
+    <string name="error_required_chat_wing_login">"You need to login with a ChatWing account to use these awesome features."</string>
+    <string name="error_required_chat_wing_login_to_create_chat_boxes">"You need to login with a ChatWing account to create chat boxes."</string>
     <string name="error_required_agree_conditions">"You must read and agree the Terms of Service and License"</string>
     <string name="error_block_user_no_permission">"You do not have permission to block user."</string>
     <string name="error_delete_message_no_permission">"You do not have permission to delete messages."</string>
@@ -68,6 +82,12 @@
     <string name="error_invalid_chat_box_id">"Chat box id is invalid."</string>
     <string name="error_require_permission_to_view_ip">"You dont have permission to block user"</string>
     <string name="error_while_blocking_user">"There was an error while blocking user."</string>
+    <string name="error_while_deleting_bookmark">"There was an error while deleting bookmark."</string>
+    <string name="error_account_not_found">"Account not found. Please select another one"</string>
+    <string name="error_while_creating_chatbox">"There was an error while creating chatbox."</string>
+    <string name="error_failed_to_save_chat_box">"Failed to save the chat box"</string>
+
+
     <string name="title_block_type">"Block %s"</string>
     <string name="title_block_ip">"Block IP"</string>
     <string name="title_activity_login">"Log In"</string>
@@ -90,16 +110,33 @@
     <string name="title_manage_blacklist">"Manage BlackList"</string>
     <string name="title_refresh">"Refresh"</string>
     <string name="title_open_in_browser">"Open in Browser"</string>
+    <string name="title_activity_walkthrough">"Welcome"</string>
+
     <string name="summary_remember_previous_style">"Remember style of previous chat and apply to new ones."</string>
     <string name="summary_name">"Your name that is displayed in chat boxes."</string>
     <string name="summary_email">"Your email that will receive notification"</string>
 
+    <string name="message_bookmarks_selected">" selected"</string>
     <string name="message_blocked">"Blocked"</string>
     <string name="message_share_chat_box_subject">"Join me in this chat box"</string>
     <string name="message_hint_block_reason">"You have been banned"</string>
     <string name="message_hint_block_duration">3600</string>
     <string name="message_block_clear_message">"Clear messages"</string>
     <string name="message_block_user">"Block User"</string>
+    <string name="message_walkthrough_page_1_main_text"></string>
+    <string name="message_walkthrough_page_1_secondary_text">"Your new way of communicating with people across the globe"</string>
+    <string name="message_walkthrough_page_2_main_text">"Login options"</string>
+    <string name="message_walkthrough_page_2_secondary_text">"Enable the login methods to allow in your room"</string>
+    <string name="message_walkthrough_page_3_main_text">"Connectivity"</string>
+    <string name="message_walkthrough_page_3_secondary_text">"Start group chat or private chat connected anywhere"</string>
+    <string name="message_walkthrough_page_4_main_text">"Invitation"</string>
+    <string name="message_walkthrough_page_4_secondary_text">"Invite your friends through social sharing"</string>
+    <string name="message_walkthrough_page_5_main_text">"Customizations"</string>
+    <string name="message_walkthrough_page_5_secondary_text">"Over 200 customizable options when creating a room"</string>
+    <string name="message_account_switched">"Account switched"</string>
+    <string name="message_account_picker">"Account Picker"</string>
+    <string name="message_account_added">"New account added"</string>
+    <string name="message_need_switch_account">You need to use another account to access this chatbox</string>
 
     <string name="empty_online_users">"No online users found."</string>
     <string name="preference_clear_previous_style">"clear_previous_style"</string>
@@ -109,6 +146,11 @@
     <string name="title_unignore">Show Content</string>
     <string name="gcm_sender_id">341431874860</string>
     <string name="message_email_verification_sent">Please check your email for verification</string>
+    <string name="hint_chat_box_name">"Name (optional)"</string>
+    <string name="title_create_entered_chat_box">"Create it"</string>
+    <string name="title_activity_search_chat_box">"Search chat box</string>
+    <string name="title_activity_create_chat_box">"Create chat box"</string>
+    <string name="title_add_account">Add new account...</string>
 
     <array name="block_duration_type_values">
         <item>Seconds</item>

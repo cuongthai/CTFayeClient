@@ -6,8 +6,7 @@
     android:orientation="horizontal"
     android:gravity="center_vertical"
     android:paddingTop="@dimen/item_padding"
-    android:paddingBottom="@dimen/item_padding"
-    android:visibility="gone">
+    android:paddingBottom="@dimen/item_padding">
 
     <View
         style="@style/Theme.ChatWing.VerticalDivider"

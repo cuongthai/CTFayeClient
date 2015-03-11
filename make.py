@@ -9,6 +9,7 @@ CONFIG_FILE = "gradle.properties"
 types = 'app/build-types'
 src_package = "/res/values"
 STRING_MAPPING = {"APP_NAME": "app_name","FACEBOOK_APP_ID":"fb_app_id"}
+BOOL_MAPPING = {"OFFICIAL":"official"}
 
 class Helper:
     def __init__(self, section, file):
@@ -45,6 +46,16 @@ def write_string_xml():
         f.writelines("<resources>\n")
         for appName in STRING_MAPPING:
             f.writelines("<string name=\"%s\">%s</string>\n" % (STRING_MAPPING[appName], get_value(config, appName)))
+        f.writelines("</resources>\n")
+        f.close()
+def write_bool_xml():
+    for type in ['/release','/debug']:
+        f = open(types + type + src_package + "/bools.xml", "w")
+        f.writelines("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n")
+        f.writelines("<resources>\n")
+        for key in BOOL_MAPPING:
+            val = get_value(config, key)
+            f.writelines("<bool name=\"%s\">%s</bool>\n" % (BOOL_MAPPING[key], "true" if "Yes"==val else "false"))
         f.writelines("</resources>\n")
         f.close()
 
@@ -113,6 +124,7 @@ def create_certs():
 os.system("./gradlew clean")
 ensure_build_type_folders()
 write_string_xml()
+write_bool_xml()
 write_ic_launcher()
 write_color_theme()
 #create_certs()

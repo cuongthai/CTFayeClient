@@ -1,11 +1,16 @@
 package com.chatwing.whitelabel.modules;
 
+import android.app.SearchManager;
+import android.content.Context;
+
 import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.managers.WLApiManagerImpl;
 import com.chatwing.whitelabel.services.BlockUserIntentService;
+import com.chatwing.whitelabel.services.CreateBookmarkIntentService;
 import com.chatwing.whitelabel.services.DeleteMessageIntentService;
 import com.chatwing.whitelabel.services.DownloadUserDetailIntentService;
 import com.chatwing.whitelabel.services.IgnoreUserIntentService;
+import com.chatwing.whitelabel.services.SyncBookmarkIntentService;
 import com.chatwing.whitelabel.services.UpdateAvatarIntentService;
 import com.chatwing.whitelabel.services.UpdateUserProfileService;
 import com.chatwing.whitelabel.services.VerifyEmailIntentService;
@@ -26,18 +31,32 @@ import dagger.Provides;
                 BlockUserIntentService.class,
                 IgnoreUserIntentService.class,
                 DownloadUserDetailIntentService.class,
+                SyncBookmarkIntentService.class,
+                CreateBookmarkIntentService.class,
                 VerifyEmailIntentService.class,
                 UpdateAvatarIntentService.class
         },
         addsTo = ChatWingModule.class,
+        library = true,
         overrides = true
 )
 public class ExtendChatWingModule {
+    private final Context mApplication;
+
+    public ExtendChatWingModule(Context application) {
+        mApplication = application;
+    }
 
     @Provides
     @Singleton
     ApiManager provideApiManager(WLApiManagerImpl impl) {
         return impl;
+    }
+
+    @Singleton
+    @Provides
+    SearchManager provideSearchManager() {
+        return (SearchManager) mApplication.getSystemService(Context.SEARCH_SERVICE);
     }
 
 }

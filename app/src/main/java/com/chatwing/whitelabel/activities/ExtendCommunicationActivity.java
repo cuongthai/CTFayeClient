@@ -1,6 +1,9 @@
 package com.chatwing.whitelabel.activities;
 
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.ProviderInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -13,8 +16,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.chatwing.whitelabel.R;
+import com.chatwing.whitelabel.events.AccountSwitchEvent;
 import com.chatwing.whitelabel.events.BlockedEvent;
+import com.chatwing.whitelabel.fragments.AccountDialogFragment;
 import com.chatwing.whitelabel.fragments.BlockUserDialogFragment;
+import com.chatwing.whitelabel.fragments.BookmarkedChatBoxesDrawerFragment;
 import com.chatwing.whitelabel.fragments.ExtendChatMessagesFragment;
 import com.chatwing.whitelabel.fragments.ExtendCommunicationDrawerFragment;
 import com.chatwing.whitelabel.fragments.OnlineUsersFragment;
@@ -22,18 +28,28 @@ import com.chatwing.whitelabel.fragments.PhotoPickerDialogFragment;
 import com.chatwing.whitelabel.fragments.SettingsFragment;
 import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.managers.ExtendChatBoxModeManager;
+import com.chatwing.whitelabel.managers.ExtendCommunicationModeManager;
 import com.chatwing.whitelabel.modules.ExtendCommunicationActivityModule;
+import com.chatwing.whitelabel.services.DownloadUserDetailIntentService;
+import com.chatwing.whitelabel.services.SyncBookmarkIntentService;
 import com.chatwing.whitelabel.services.UpdateAvatarIntentService;
 import com.chatwingsdk.activities.BaseABFragmentActivity;
 import com.chatwingsdk.activities.CommunicationActivity;
+import com.chatwingsdk.contentproviders.ChatWingContentProvider;
+import com.chatwingsdk.events.internal.SyncCommunicationBoxEvent;
 import com.chatwingsdk.events.internal.ViewProfileEvent;
 import com.chatwingsdk.fragments.CommunicationMessagesFragment;
 import com.chatwingsdk.modules.CommunicationActivityModule;
 import com.chatwingsdk.pojos.Message;
+import com.chatwingsdk.pojos.errors.ChatWingError;
 import com.chatwingsdk.pojos.jspojos.JSUserResponse;
 import com.chatwingsdk.pojos.params.CreateConversationParams;
+import com.chatwingsdk.pojos.responses.ChatBoxDetailsResponse;
+import com.chatwingsdk.services.SyncCommunicationBoxesIntentService;
+import com.chatwingsdk.utils.LogUtils;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.gson.Gson;
 import com.soundcloud.android.crop.Crop;
 import com.squareup.otto.Subscribe;
 
@@ -49,10 +65,12 @@ public class ExtendCommunicationActivity
         extends CommunicationActivity
         implements ExtendCommunicationDrawerFragment.Listener,
         OnlineUsersFragment.OnlineUsersFragmentDelegate,
-        ExtendChatMessagesFragment.Delegate {
+        ExtendChatMessagesFragment.Delegate,
+        ExtendCommunicationModeManager.Delegate {
 
     public static final String AVATAR_PICKER_DIALOG_FRAGMENT_TAG = "AvatarPickerDialogFragment";
     public static final String BLOCK_USER_DIALOG_FRAGMENT_TAG = "BlockUserDialogFragment";
+    public static final String ACCOUNT_DIALOG_FRAGMENT_TAG = "AccountDialogFragmentTag";
 
     @Inject
     com.chatwingsdk.managers.ApiManager mApiManager;
@@ -62,6 +80,12 @@ public class ExtendCommunicationActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (!isOfficialChatWingApp()) {
+            startActivity(new Intent(this, StartActivity.class));
+            finish();
+            return;
+        }
 
         String onlineFragmentTag = getString(R.string.fragment_tag_online_user);
         if (getSupportFragmentManager().findFragmentByTag(onlineFragmentTag) == null) {
@@ -82,7 +106,11 @@ public class ExtendCommunicationActivity
 
     @Override
     protected Class<? extends BaseABFragmentActivity> getEntranceActivityClass() {
-        return StartActivity.class;
+        return isOfficialChatWingApp() ? ExtendCommunicationActivity.class : StartActivity.class;
+    }
+
+    private boolean isOfficialChatWingApp() {
+        return getResources().getBoolean(R.bool.official);
     }
 
     @Override
@@ -134,6 +162,14 @@ public class ExtendCommunicationActivity
     public void onSyncCommunicationBoxEvent
             (com.chatwingsdk.events.internal.SyncCommunicationBoxEvent event) {
         super.onSyncCommunicationBoxEvent(event);
+        SyncCommunicationBoxEvent.Status status = event.getStatus();
+
+        switch (status) {
+            case SUCCEED:
+                startSyncingBookmarks();
+                startSyncingCurrentUser();
+                break;
+        }
     }
 
 
@@ -177,6 +213,14 @@ public class ExtendCommunicationActivity
     }
 
     @Override
+    public void handle(Exception exception, int errorMessageResId) {
+        if (exception instanceof ApiManager.InvalidIdentityException) {
+            onInvalidAuthentication((ApiManager.InvalidIdentityException) exception);
+        } else
+            super.handle(exception, errorMessageResId);
+    }
+
+    @Override
     public void onContextMenuClosed(Menu menu) {
         super.onContextMenuClosed(menu);
         String fragmentTag = getString(R.string.tag_communication_messages);
@@ -211,6 +255,54 @@ public class ExtendCommunicationActivity
     }
 
     @Override
+    public void searchChatBox() {
+        setTitle(getActivity().getString(R.string.title_chat_boxes));
+        invalidateOptionsMenu();
+        if (isInConversationMode()) {
+            setupChatboxMode();
+        }
+
+        Intent i = new Intent(this, SearchChatBoxActivity.class);
+        startActivityForResult(i, REQUEST_SEARCH_CHAT_BOX);
+    }
+
+    @Override
+    public void createChatBox() {
+        if (mUserManager.userCanCreateChatBox()) {
+            setTitle(getActivity().getString(R.string.title_chat_boxes));
+            invalidateOptionsMenu();
+            if (isInConversationMode()) {
+                setupChatboxMode();
+            }
+
+            Intent i = new Intent(this, CreateChatBoxActivity.class);
+            startActivityForResult(i, REQUEST_CREATE_CHAT_BOX);
+        } else {
+            mErrorMessageView.show(R.string.error_required_chat_wing_login_to_create_chat_boxes);
+        }
+    }
+
+    @Override
+    public void showBookmarks() {
+        if (mUserManager.userCanBookmark()) {
+            setTitle(getActivity().getString(R.string.title_chat_boxes));
+            invalidateOptionsMenu();
+            if (isInConversationMode()) {
+                setupChatboxMode();
+            }
+            addToLeftDrawer(new BookmarkedChatBoxesDrawerFragment());
+        } else {
+            mErrorMessageView.show(R.string.error_required_chat_wing_login);
+        }
+    }
+
+    @Override
+    public void openAccountPicker() {
+        getDrawerLayout().closeDrawers();
+        showAccountPicker(null);
+    }
+
+    @Override
     public void showSettings() {
         Intent i = new Intent(this, MainPreferenceActivity.class);
         i.putExtra(SettingsFragment.LOAD_LATEST_USER_PROFILE, true);
@@ -225,6 +317,18 @@ public class ExtendCommunicationActivity
     @Override
     public void createConversation(CreateConversationParams.SimpleUser simpleUser) {
         showConversation(simpleUser);
+    }
+
+    private synchronized void showAccountPicker(String message) {
+        Fragment oldFragment = getSupportFragmentManager().findFragmentByTag(
+                ACCOUNT_DIALOG_FRAGMENT_TAG);
+        if (oldFragment == null) {
+            AccountDialogFragment accountDialogFragment = AccountDialogFragment.newInstance(message);
+            accountDialogFragment.show(getSupportFragmentManager(),
+                    ACCOUNT_DIALOG_FRAGMENT_TAG);
+            //This to prevent duplication dialog. This should be used together with findFragmentByTag
+            getSupportFragmentManager().executePendingTransactions();
+        }
     }
 
     private void showAvatarPicker() {
@@ -257,6 +361,33 @@ public class ExtendCommunicationActivity
         if (oldFragment == null || oldFragment.isDismissingByUser()) {
             BlockUserDialogFragment newFragment = BlockUserDialogFragment.newInstance(message);
             newFragment.show(getSupportFragmentManager(), BLOCK_USER_DIALOG_FRAGMENT_TAG);
+        }
+    }
+
+    @Override
+    public void dismissAuthenticationDialog() {
+        Fragment authenticationDialog = getSupportFragmentManager().findFragmentByTag(ACCOUNT_DIALOG_FRAGMENT_TAG);
+        if (authenticationDialog != null)
+            ((DialogFragment) authenticationDialog).dismiss();
+    }
+
+    @Override
+    public void onAccountSwitch(AccountSwitchEvent accountSwitchEvent) {
+        getDrawerLayout().closeDrawers();
+        if (isInConversationMode()) {
+            mCurrentConversationManager.removeCurrentConversation();
+        }
+        mCurrentCommunicationMode.unsubscribeToChannels(mWebView);
+        mWebView = null;
+        mNotSubscribeToChannels = true;
+        //clean up irrelevant data
+        try {
+            getContentResolver().applyBatch(ChatWingContentProvider.AUTHORITY,
+                    ChatWingContentProvider.getClearAllDataBatch());
+            startSyncingCommunications();
+            invalidateOptionsMenu();
+        } catch (Exception e) {
+            LogUtils.e(e);
         }
     }
 
@@ -296,7 +427,9 @@ public class ExtendCommunicationActivity
             return inflater.inflate(R.layout.fragment_ad, container, false);
         }
 
-        /** Called when leaving the activity */
+        /**
+         * Called when leaving the activity
+         */
         @Override
         public void onPause() {
             if (mAdView != null) {
@@ -305,7 +438,9 @@ public class ExtendCommunicationActivity
             super.onPause();
         }
 
-        /** Called when returning to the activity */
+        /**
+         * Called when returning to the activity
+         */
         @Override
         public void onResume() {
             super.onResume();
@@ -314,7 +449,9 @@ public class ExtendCommunicationActivity
             }
         }
 
-        /** Called before the activity is destroyed */
+        /**
+         * Called before the activity is destroyed
+         */
         @Override
         public void onDestroy() {
             if (mAdView != null) {
@@ -322,6 +459,76 @@ public class ExtendCommunicationActivity
             }
             super.onDestroy();
         }
+    }
+
+    private void startSyncingBookmarks() {
+        if (mUserManager.getCurrentUser() == null
+                || SyncBookmarkIntentService.isInProgress()) {
+            // A sync operation is running. Just wait for it.
+            return;
+        }
+
+        getActivity().startService(new Intent(getActivity(), SyncBookmarkIntentService.class));
+    }
+
+    @Override
+    protected boolean syncingInProcess() {
+        return SyncCommunicationBoxesIntentService.isInProgress() || SyncBookmarkIntentService.isInProgress();
+    }
+
+    @Override
+    protected boolean startSyncingCommunications() {
+        boolean result = super.startSyncingCommunications();
+        super.mSyncManager.addToQueue(SyncBookmarkIntentService.class);
+        super.mSyncManager.addToQueue(DownloadUserDetailIntentService.class);
+        return result;
+    }
+
+    private boolean onInvalidAuthentication(ApiManager.InvalidIdentityException invalidIdentityException) {
+        ChatWingError error = invalidIdentityException.getError();
+        ChatBoxDetailsResponse.ChatBoxDetailErrorParams chatBoxDetailErrorParams =
+                new Gson().fromJson(error.getParams(), ChatBoxDetailsResponse.ChatBoxDetailErrorParams.class);
+
+        if (chatBoxDetailErrorParams == null) {
+            return true;
+        }
+        if (chatBoxDetailErrorParams.isForceLogin()
+                && mUserManager.getCurrentUser() == null) {
+            denyAccessCurrentManager();
+            showAccountPicker(getString(R.string.message_need_login));
+            return true;
+        }
+
+        if (!mUserManager.acceptAccessChatbox(mUserManager.getCurrentUser(),
+                chatBoxDetailErrorParams)) {
+            denyAccessCurrentManager();
+            showAccountPicker(getString(R.string.message_need_switch_account));
+            return true;
+        }
+
+        //No one can access this chatbox except admin, etc...
+        return false;
+    }
+
+    /**
+     * User has been denied to access chatbox, they should be kicked out
+     */
+    private void denyAccessCurrentManager() {
+        if (isInChatBoxMode()) {
+            mCurrentChatboxManager.removeCurrentChatBox();
+        } else {
+            mCurrentConversationManager.removeCurrentConversation();
+        }
+    }
+
+    private void startSyncingCurrentUser() {
+        if (mUserManager.getCurrentUser() == null
+                || DownloadUserDetailIntentService.isInProgress()) {
+            // A sync operation is running. Just wait for it.
+            return;
+        }
+
+        getActivity().startService(new Intent(getActivity(), DownloadUserDetailIntentService.class));
 
     }
 }

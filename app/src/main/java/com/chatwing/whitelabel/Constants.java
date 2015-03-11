@@ -1,5 +1,7 @@
 package com.chatwing.whitelabel;
 
+import com.chatwingsdk.ChatWing;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,6 +30,5 @@ public interface Constants extends com.chatwingsdk.Constants {
     String TWITTER_CONSUMER_SECRET = "3nww1xsLJBlpya9fiCQ1hgqMWPMQTivyHzEmktkMw";
     String FEEDBACK_EMAIL = "info@chatwing.com";
     boolean ALLOW_SHARE_CHATBOX = false;
-
 
 }

@@ -1,7 +1,9 @@
 package com.chatwing.whitelabel.modules;
 
 import com.chatwing.whitelabel.activities.ExtendCommunicationActivity;
+import com.chatwing.whitelabel.fragments.AccountDialogFragment;
 import com.chatwing.whitelabel.fragments.BlockUserDialogFragment;
+import com.chatwing.whitelabel.fragments.BookmarkedChatBoxesDrawerFragment;
 import com.chatwing.whitelabel.fragments.ExtendChatMessagesFragment;
 import com.chatwing.whitelabel.fragments.ExtendCommunicationDrawerFragment;
 import com.chatwing.whitelabel.fragments.OnlineUsersFragment;
@@ -41,6 +43,8 @@ import dagger.Provides;
                 ExtendChatMessagesFragment.class,
                 ExtendCommunicationActivity.class,
                 ExtendCommunicationDrawerFragment.class,
+                BookmarkedChatBoxesDrawerFragment.class,
+                AccountDialogFragment.class,
                 OnlineUsersFragment.class,
                 PhotoPickerDialogFragment.class,
                 BlockUserDialogFragment.class,
@@ -51,9 +55,9 @@ import dagger.Provides;
         overrides = true
 )
 public class ExtendCommunicationActivityModule {
-    private CommunicationActivity mActivity;
+    private ExtendCommunicationActivity mActivity;
 
-    public ExtendCommunicationActivityModule(CommunicationActivity activity) {
+    public ExtendCommunicationActivityModule(ExtendCommunicationActivity activity) {
         mActivity = activity;
     }
 

@@ -1,12 +1,17 @@
 package com.chatwing.whitelabel;
 
 import android.app.Application;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.ProviderInfo;
 
 import com.chatwing.whitelabel.activities.ExtendCommunicationActivity;
+import com.chatwing.whitelabel.activities.WalkthroughActivity;
 import com.chatwing.whitelabel.interfaces.WLJSInterfaceImpl;
 import com.chatwingsdk.ChatWing;
 import com.chatwingsdk.interfaces.JSInterfaceImpl;
 import com.chatwingsdk.modules.ChatWingModule;
+import com.chatwingsdk.utils.LogUtils;
 import com.crashlytics.android.Crashlytics;
 
 import java.util.Arrays;
@@ -25,10 +30,14 @@ public class ChatWingApplication extends Application {
         Crashlytics.start(this);
 
         //Currently support only one chatbox enter from client, it should be loaded from server
-        ChatWing.initialize(this, "android", "", new String[]{"1873"}, LegacyLoginActivity.class);
+        ChatWing.initialize(this, "android", "", new String[]{"1873"}, isOfficialChatWingApp()
+                ? WalkthroughActivity.class
+                : LegacyLoginActivity.class);
         ChatWing.setIsDebugging(true);
         ChatWing.instance(this).setMainActivityClass(ExtendCommunicationActivity.class);
         ChatWing.instance(this).getChatwingGraph().plus(getModules().toArray());
+
+
     }
 
     /**
@@ -41,5 +50,9 @@ public class ChatWingApplication extends Application {
 
     public ObjectGraph getApplicationGraph() {
         return ChatWing.instance(this).getChatwingGraph();
+    }
+
+    private boolean isOfficialChatWingApp() {
+        return getResources().getBoolean(R.bool.official);
     }
 }

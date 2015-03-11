@@ -17,6 +17,6 @@ public abstract class ExtendBaseIntentService extends BaseIntentService {
 
     @Override
     protected List<Object> getModules() {
-        return Arrays.asList(new ChatWingModule(this), new ExtendChatWingModule());
+        return Arrays.asList(new ChatWingModule(this), new ExtendChatWingModule(this));
     }
 }

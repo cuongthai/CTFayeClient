@@ -33,7 +33,12 @@
                     android:layout_alignParentLeft="true"
                     android:scaleType="fitCenter"
                     android:layout_centerVertical="true" />
-
+                <ImageView android:id="@+id/next"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:src="@drawable/ic_next"
+                    android:layout_centerVertical="true"/>
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -76,6 +81,38 @@
             style="@style/ButtonChatWing"
             android:visibility="gone" />
 
+        <TextView
+            android:id="@+id/search_chat_box"
+            android:drawableLeft="@drawable/ic_action_search_light"
+            android:text="@string/title_chat_boxes_drawer_search"
+            style="@style/Theme.ChatWing.DrawerItemTitle"/>
+
+        <TextView
+            android:id="@+id/create_chat_box"
+            android:drawableLeft="@drawable/ic_action_new_light"
+            android:text="@string/title_chat_boxes_drawer_create"
+            style="@style/Theme.ChatWing.DrawerItemTitle"/>
+
+        <LinearLayout
+            android:id="@+id/bookmarks"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/item_selector"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:drawableLeft="@drawable/ic_action_important_light"
+                android:text="@string/title_bookmarks"
+                style="@style/Theme.ChatWing.DrawerItemTitle"/>
+
+            <TextView
+                android:id="@+id/bookmarks_unread_count"
+                style="@style/Theme.ChatWing.DrawerItemCounter"/>
+
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/categories"
