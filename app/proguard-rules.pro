@@ -34,3 +34,20 @@
 -keepnames class * implements android.os.Parcelable {
     public static final ** CREATOR;
 }
+
+# Twitter4J
+-dontwarn javax.management.**
+-dontwarn javax.xml.**
+-dontwarn java.lang.management.**
+-dontwarn org.apache.log4j.**
+-dontwarn org.apache.commons.logging.**
+-dontwarn org.slf4j.**
+-dontwarn org.json.*
+-keep class javax.** { *; }
+-keep class org.** { *; }
+-keep class twitter4j.** { *; }
+
+# Google Play Services
+-keep class * extends java.util.ListResourceBundle {
+    protected Object[][] getContents();
+}

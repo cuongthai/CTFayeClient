@@ -18,6 +18,7 @@
     <string name="fragment_tag_authenticate">"authenticate-fragment"</string>
     <string name="fragment_tag_settings">"settings-fragment"</string>
     <string name="fragment_tag_online_user">"online-user-fragment"</string>
+    <string name="fragment_tag_ads">"ads-fragment"</string>
     <string name="title_from_camera">"Take a photo"</string>
     <string name="title_from_gallery">"Choose from library"</string>
     <string name="title_login_chatwing">"Log In with %s"</string>
@@ -30,6 +31,7 @@
     <string name="title_chat_boxes_drawer_search">Search for a chat box</string>
     <string name="title_chat_boxes_drawer_create">Create a chat box</string>
     <string name="title_bookmarks">"Bookmarks"</string>
+    <string name="title_bookmark_current_chat_box">"Bookmark"</string>
 
     <string name="hint_search_chat_box">"Search chat boxes by name"</string>
     <string name="hint_email">"Email"</string>
@@ -37,7 +39,8 @@
     <string name="title_forgot_password">"Forgot password"</string>
     <string name="error_invalid_email">"Email is invalid."</string>
     <string name="error_invalid_password">"Password is invalid."</string>
-    <string name="fb_app_id">"1111"</string>
+    <string name="error_failed_to_save_bookmark">"There was an error while bookmarking your chatbox"</string>
+    <string name="progress_sending">"Sending…"</string>
     <string name="progress_logging_in">"Logging in…"</string>
     <string name="progress_getting_access_token">"Getting access token…"</string>
     <string name="progress_creating_chat_box">"Creating…"</string>
@@ -137,6 +140,7 @@
     <string name="message_account_picker">"Account Picker"</string>
     <string name="message_account_added">"New account added"</string>
     <string name="message_need_switch_account">You need to use another account to access this chatbox</string>
+    <string name="message_current_chat_box_bookmarked">"Bookmarked"</string>
 
     <string name="empty_online_users">"No online users found."</string>
     <string name="preference_clear_previous_style">"clear_previous_style"</string>

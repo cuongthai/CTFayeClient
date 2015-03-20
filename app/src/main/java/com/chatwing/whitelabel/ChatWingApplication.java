@@ -1,17 +1,12 @@
 package com.chatwing.whitelabel;
 
 import android.app.Application;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.ProviderInfo;
 
 import com.chatwing.whitelabel.activities.ExtendCommunicationActivity;
+import com.chatwing.whitelabel.activities.LegacyLoginActivity;
 import com.chatwing.whitelabel.activities.WalkthroughActivity;
-import com.chatwing.whitelabel.interfaces.WLJSInterfaceImpl;
 import com.chatwingsdk.ChatWing;
-import com.chatwingsdk.interfaces.JSInterfaceImpl;
 import com.chatwingsdk.modules.ChatWingModule;
-import com.chatwingsdk.utils.LogUtils;
 import com.crashlytics.android.Crashlytics;
 
 import java.util.Arrays;
@@ -36,8 +31,6 @@ public class ChatWingApplication extends Application {
         ChatWing.setIsDebugging(true);
         ChatWing.instance(this).setMainActivityClass(ExtendCommunicationActivity.class);
         ChatWing.instance(this).getChatwingGraph().plus(getModules().toArray());
-
-
     }
 
     /**

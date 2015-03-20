@@ -5,18 +5,17 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.view.LayoutInflater;
 
-import com.chatwing.whitelabel.LegacyLoginActivity;
+import com.chatwing.whitelabel.activities.LegacyLoginActivity;
 import com.chatwing.whitelabel.fragments.AuthenticateFragment;
 import com.chatwing.whitelabel.fragments.ForgotPasswordFragment;
 import com.chatwing.whitelabel.fragments.GuestLoginFragment;
 import com.chatwing.whitelabel.fragments.LoginFragment;
+import com.chatwing.whitelabel.fragments.LoginScribeFragment;
 import com.chatwing.whitelabel.fragments.LoginTwitterFragment;
-import com.chatwingsdk.modules.AuthenticateActivityModule;
 import com.chatwingsdk.modules.ChatWingModule;
 import com.chatwingsdk.modules.ForActivity;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.plus.Plus;
-import com.google.android.gms.plus.PlusClient;
 
 import javax.inject.Singleton;
 
@@ -34,9 +33,10 @@ import dagger.Provides;
                 LoginFragment.class,
                 LoginTwitterFragment.class,
                 GuestLoginFragment.class,
-                ForgotPasswordFragment.class
+                ForgotPasswordFragment.class,
+                LoginScribeFragment.class
         },
-        addsTo = ChatWingModule.class,
+        addsTo = ExtendChatWingModule.class,
         overrides = true
 )
 public class LegacyActivityModule {

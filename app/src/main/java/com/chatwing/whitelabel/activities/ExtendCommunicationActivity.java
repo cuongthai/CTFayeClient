@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.events.AccountSwitchEvent;
 import com.chatwing.whitelabel.events.BlockedEvent;
+import com.chatwing.whitelabel.events.DeleteBookmarkEvent;
 import com.chatwing.whitelabel.fragments.AccountDialogFragment;
 import com.chatwing.whitelabel.fragments.BlockUserDialogFragment;
 import com.chatwing.whitelabel.fragments.BookmarkedChatBoxesDrawerFragment;
@@ -27,9 +28,11 @@ import com.chatwing.whitelabel.fragments.OnlineUsersFragment;
 import com.chatwing.whitelabel.fragments.PhotoPickerDialogFragment;
 import com.chatwing.whitelabel.fragments.SettingsFragment;
 import com.chatwing.whitelabel.managers.ApiManager;
+import com.chatwing.whitelabel.managers.BuildManager;
 import com.chatwing.whitelabel.managers.ExtendChatBoxModeManager;
 import com.chatwing.whitelabel.managers.ExtendCommunicationModeManager;
 import com.chatwing.whitelabel.modules.ExtendCommunicationActivityModule;
+import com.chatwing.whitelabel.pojos.responses.DeleteBookmarkResponse;
 import com.chatwing.whitelabel.services.DownloadUserDetailIntentService;
 import com.chatwing.whitelabel.services.SyncBookmarkIntentService;
 import com.chatwing.whitelabel.services.UpdateAvatarIntentService;
@@ -76,12 +79,14 @@ public class ExtendCommunicationActivity
     com.chatwingsdk.managers.ApiManager mApiManager;
     @Inject
     com.chatwingsdk.managers.UserManager mUserManager;
+    @Inject
+    BuildManager mBuildManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (!isOfficialChatWingApp()) {
+        if (!mBuildManager.isOfficialChatWingApp()) {
             startActivity(new Intent(this, StartActivity.class));
             finish();
             return;
@@ -92,6 +97,15 @@ public class ExtendCommunicationActivity
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.add(R.id.right_drawer_container, new OnlineUsersFragment(), onlineFragmentTag);
             fragmentTransaction.commit();
+        }
+
+        String adsFragmentTag = getString(R.string.fragment_tag_ads);
+        if (mBuildManager.isSupportedAds()
+                && getSupportFragmentManager().findFragmentByTag(adsFragmentTag) == null) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.ads_container, new AdFragment(), adsFragmentTag)
+                    .commit();
         }
     }
 
@@ -106,11 +120,7 @@ public class ExtendCommunicationActivity
 
     @Override
     protected Class<? extends BaseABFragmentActivity> getEntranceActivityClass() {
-        return isOfficialChatWingApp() ? ExtendCommunicationActivity.class : StartActivity.class;
-    }
-
-    private boolean isOfficialChatWingApp() {
-        return getResources().getBoolean(R.bool.official);
+        return mBuildManager.isOfficialChatWingApp() ? ExtendCommunicationActivity.class : StartActivity.class;
     }
 
     @Override
@@ -371,6 +381,7 @@ public class ExtendCommunicationActivity
             ((DialogFragment) authenticationDialog).dismiss();
     }
 
+    @Subscribe
     @Override
     public void onAccountSwitch(AccountSwitchEvent accountSwitchEvent) {
         getDrawerLayout().closeDrawers();
@@ -530,5 +541,39 @@ public class ExtendCommunicationActivity
 
         getActivity().startService(new Intent(getActivity(), DownloadUserDetailIntentService.class));
 
+    }
+
+    /**
+     * After deleting bookmark on server, we delete on client
+     *
+     * @param event
+     */
+    @Subscribe
+    public void onDeletedBookmarkEvent(DeleteBookmarkEvent event) {
+        if (handleDeleteBookmarkEvent(event)) {
+            return;
+        }
+
+        DeleteBookmarkResponse.DeletedBookmark deletedBookmark = event.getResponse().getData();
+
+        Uri syncedBookmarkWithChatBoxIdUri = ChatWingContentProvider
+                .getSyncedBookmarkWithChatBoxIdUri(deletedBookmark.getChatBoxId());
+
+        int delete = getContentResolver()
+                .delete(syncedBookmarkWithChatBoxIdUri,
+                        null,
+                        null);
+        if (delete != 1) {
+            //Weird thing happen
+            LogUtils.e("After deleting on server, bookmark removal on client side has broken chatbox_id" +
+                    deletedBookmark.getChatBoxId());
+        }
+    }
+
+    private boolean handleDeleteBookmarkEvent(DeleteBookmarkEvent event) {
+        if (event.getException() == null)
+            return false;
+        mErrorMessageView.show(event.getException());
+        return true;
     }
 }

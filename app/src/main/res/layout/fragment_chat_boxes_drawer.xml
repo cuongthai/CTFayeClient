@@ -44,6 +44,7 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/account"
                     android:layout_toRightOf="@id/avatar"
+                    android:layout_toLeftOf="@id/next"
                     android:orientation="vertical"
                     android:layout_centerVertical="true">
 

@@ -22,12 +22,7 @@ public interface Constants extends com.chatwingsdk.Constants {
      */
     String GOOGLE_PLUS_SCOPES = "oauth2:https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email";
 
-    /**
-     * Twitter constants
-     */
-    String TWITTER_CALLBACK_URL = "chatwing://abc";
-    String TWITTER_CONSUMER_KEY = "UjGTlYTd1U6r0E4EoGUWHw";
-    String TWITTER_CONSUMER_SECRET = "3nww1xsLJBlpya9fiCQ1hgqMWPMQTivyHzEmktkMw";
+
     String FEEDBACK_EMAIL = "info@chatwing.com";
     boolean ALLOW_SHARE_CHATBOX = false;
 

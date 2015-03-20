@@ -43,6 +43,7 @@ import com.chatwingsdk.pojos.jspojos.JSUserResponse;
 import com.chatwingsdk.pojos.params.ConcreteParams;
 import com.chatwingsdk.pojos.params.RegisterParams;
 import com.chatwingsdk.pojos.responses.UserResponse;
+import com.chatwingsdk.utils.LogUtils;
 import com.chatwingsdk.validators.ChatBoxIdValidator;
 import com.chatwingsdk.validators.PermissionsValidator;
 import com.github.kevinsawicki.http.HttpRequest;
@@ -544,6 +545,7 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
         DeleteBookmarkParams params = new DeleteBookmarkParams();
         params.setId(bookmarkId);
         String paramsString = gson.toJson(params);
+        LogUtils.v("Bookmark delete params "+paramsString+":"+user.getAccessToken());
         HttpRequest request = HttpRequest.post(BOOKMARK_DELETE);
         setUpRequest(request, user);
         request.send(paramsString);

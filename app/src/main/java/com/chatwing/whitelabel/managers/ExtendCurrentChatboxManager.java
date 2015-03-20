@@ -64,4 +64,14 @@ public class ExtendCurrentChatboxManager extends CurrentChatBoxManager {
             mBus.post(new LoadOnlineUsersSuccessEvent(data.getCount(), data.getList()));
         }
     }
+
+    @Override
+    public void stopBackgroundTasks() {
+        if (mCurrentOnlineUsersTask != null) {
+            if (mCurrentOnlineUsersTask.getStatus() != AsyncTask.Status.FINISHED) {
+                mCurrentOnlineUsersTask.cancel(true);
+            }
+            mCurrentOnlineUsersTask = null;
+        }
+    }
 }

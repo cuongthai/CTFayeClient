@@ -7,6 +7,7 @@ import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.managers.WLApiManagerImpl;
 import com.chatwing.whitelabel.services.BlockUserIntentService;
 import com.chatwing.whitelabel.services.CreateBookmarkIntentService;
+import com.chatwing.whitelabel.services.DeleteBookmarkIntentService;
 import com.chatwing.whitelabel.services.DeleteMessageIntentService;
 import com.chatwing.whitelabel.services.DownloadUserDetailIntentService;
 import com.chatwing.whitelabel.services.IgnoreUserIntentService;
@@ -34,6 +35,7 @@ import dagger.Provides;
                 SyncBookmarkIntentService.class,
                 CreateBookmarkIntentService.class,
                 VerifyEmailIntentService.class,
+                DeleteBookmarkIntentService.class,
                 UpdateAvatarIntentService.class
         },
         addsTo = ChatWingModule.class,

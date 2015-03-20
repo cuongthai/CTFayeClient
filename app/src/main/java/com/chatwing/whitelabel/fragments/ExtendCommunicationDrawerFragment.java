@@ -11,9 +11,11 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.chatwing.whitelabel.R;
+import com.chatwing.whitelabel.events.AccountSwitchEvent;
 import com.chatwingsdk.contentproviders.ChatWingContentProvider;
 import com.chatwingsdk.fragments.CommunicationDrawerFragment;
 import com.chatwingsdk.tables.ChatBoxTable;
+import com.squareup.otto.Subscribe;
 
 /**
  * Created by steve on 17/12/2014.
@@ -140,6 +142,11 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
     @com.squareup.otto.Subscribe
     public void onUpdateUserEvent(com.chatwingsdk.events.internal.UpdateUserEvent event) {
         super.onUpdateUserEvent(event);
+    }
+
+    @Subscribe
+    public void onAccountSwitch(AccountSwitchEvent event) {
+        updateUserViews();
     }
 
     public static interface Listener extends CommunicationDrawerFragment.Listener {

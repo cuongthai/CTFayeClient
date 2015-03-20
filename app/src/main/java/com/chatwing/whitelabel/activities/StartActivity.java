@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 
-import com.chatwing.whitelabel.LegacyLoginActivity;
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.modules.StartActivityModule;
 import com.chatwingsdk.activities.BaseABFragmentActivity;

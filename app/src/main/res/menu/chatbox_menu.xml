@@ -30,6 +30,10 @@
         android:icon="@drawable/ic_action_copy_holo_dark"
         app:showAsAction="never"
         android:visible="false"/>
+    <item android:id="@+id/bookmark_chat_box"
+        android:title="@string/title_bookmark_current_chat_box"
+        android:icon="@drawable/ic_action_important"
+        app:showAsAction="never"/>
     <item android:id="@+id/manage_blacklist"
         android:title="@string/title_manage_blacklist"
         android:icon="@drawable/ic_action_manage_blacklist"

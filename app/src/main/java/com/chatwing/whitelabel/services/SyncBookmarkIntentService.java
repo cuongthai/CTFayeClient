@@ -10,7 +10,7 @@ import com.chatwing.whitelabel.events.SyncBookmarkEvent;
 import com.chatwing.whitelabel.pojos.responses.BookmarkResponse;
 import com.chatwingsdk.contentproviders.ChatWingContentProvider;
 import com.chatwingsdk.managers.ApiManager;
-import com.chatwingsdk.managers.SyncManager;
+import com.chatwingsdk.pojos.ChatBox;
 import com.chatwingsdk.pojos.LightWeightChatBox;
 import com.chatwingsdk.pojos.SyncedBookmark;
 import com.chatwingsdk.tables.ChatBoxTable;
@@ -18,7 +18,9 @@ import com.chatwingsdk.tables.SyncedBookmarkTable;
 import com.chatwingsdk.utils.LogUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -29,8 +31,6 @@ import javax.inject.Inject;
 public class SyncBookmarkIntentService extends ExtendBaseIntentService {
     private static boolean sIsInProgress;
     private static final Object sLock = new Object();
-    @Inject
-    SyncManager mSyncManager;
     @Inject
     com.chatwing.whitelabel.managers.ApiManager mApiManager;
 
@@ -57,9 +57,11 @@ public class SyncBookmarkIntentService extends ExtendBaseIntentService {
              *   3.2: Create bookmarks
              * 4. Submit out of sync bookmark to server
              */
+            Map<Integer, Integer> chatboxLastReads = getChatboxUnreadCount();
             ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
 
             List<LightWeightChatBox> unSyncedBookmarks = getUnSyncedBookmarks();
+            refillUnreadCount(bookmarks, chatboxLastReads);
             fillAddOperationsMissingChatBoxes(batch, bookmarks);
             fillRemoveOperationsSyncedBookmarks(batch);
             fillAddOperationsRemoteBookmarks(batch, bookmarks);
@@ -87,6 +89,34 @@ public class SyncBookmarkIntentService extends ExtendBaseIntentService {
         }
         setIsInProgress(false);
         post(result);
+    }
+
+    private void refillUnreadCount(SyncedBookmark[] bookmarks, Map<Integer, Integer> chatboxUnreadCounts) {
+        for (SyncedBookmark syncedBookmark : bookmarks) {
+            ChatBox chatBox = syncedBookmark.getChatBox();
+            if (chatboxUnreadCounts.containsKey(chatBox.getId())) {
+                chatBox.setUnreadCount(chatboxUnreadCounts.get(chatBox.getId()));
+            }
+        }
+    }
+
+    private Map<Integer, Integer> getChatboxUnreadCount() {
+        Map<Integer, Integer> maps = new HashMap<Integer, Integer>();
+        Cursor query = getContentResolver().query(ChatWingContentProvider.getChatBoxesUri(),
+                new String[]{ChatBoxTable._ID, ChatBoxTable.UNREAD_COUNT},
+                null,
+                null,
+                null);
+        boolean hasNext = query.moveToFirst();
+        while (hasNext) {
+            int id = query.getInt(query.getColumnIndex(ChatBoxTable._ID));
+            int unreadCount = query.getInt(query.getColumnIndex(ChatBoxTable.UNREAD_COUNT));
+            LogUtils.v("Get last read " + id + ": unreadCount =" + unreadCount);
+            maps.put(id, unreadCount);
+            hasNext = query.moveToNext();
+        }
+
+        return maps;
     }
 
     private void post(final SyncBookmarkEvent event) {

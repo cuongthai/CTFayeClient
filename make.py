@@ -9,7 +9,7 @@ CONFIG_FILE = "gradle.properties"
 types = 'app/build-types'
 src_package = "/res/values"
 STRING_MAPPING = {"APP_NAME": "app_name","FACEBOOK_APP_ID":"fb_app_id"}
-BOOL_MAPPING = {"OFFICIAL":"official"}
+BOOL_MAPPING = {"OFFICIAL":"official","ADS":"show_ads"}
 
 class Helper:
     def __init__(self, section, file):

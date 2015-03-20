@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 
 import com.chatwingsdk.tasks.CallbackTask;
+import com.chatwingsdk.utils.LogUtils;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.squareup.otto.Bus;
 
@@ -30,6 +31,8 @@ public class GetGooglePlusAccessTokenTask extends CallbackTask<Void, Void, Strin
 
     @Override
     protected String run(Void... params) throws Exception {
-        return GoogleAuthUtil.getToken(mContext, mUsername, mScope, mExtras);
+        String token = GoogleAuthUtil.getToken(mContext, mUsername, mScope, mExtras);
+        LogUtils.v("Google Authenticate: "+token);
+        return token;
     }
 }

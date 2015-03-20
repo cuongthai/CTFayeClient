@@ -9,7 +9,6 @@ import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewTreeObserver;
 
-import com.chatwing.whitelabel.LegacyLoginActivity;
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.adapters.WalkthroughPagerAdapter;
 import com.chatwing.whitelabel.fragments.WalkthroughPageFragment;
@@ -20,7 +19,6 @@ import com.chatwingsdk.activities.BaseABFragmentActivity;
 import com.chatwingsdk.managers.UserManager;
 import com.chatwingsdk.pojos.User;
 import com.chatwingsdk.validators.ChatBoxKeyValidator;
-import com.facebook.LoginActivity;
 import com.viewpagerindicator.CirclePageIndicator;
 
 import java.util.Arrays;

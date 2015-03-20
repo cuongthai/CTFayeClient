@@ -23,17 +23,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <fragment
-            android:id="@+id/adFragment"
-            android:name="com.chatwing.whitelabel.activities.ExtendCommunicationActivity$AdFragment"
+        <FrameLayout
+            android:id="@+id/ads_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true" />
+            android:layout_alignParentTop="true">
+
+            </FrameLayout>
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/adFragment">
+            android:layout_below="@+id/ads_container">
 
             <LinearLayout
                 android:id="@+id/progress_container"

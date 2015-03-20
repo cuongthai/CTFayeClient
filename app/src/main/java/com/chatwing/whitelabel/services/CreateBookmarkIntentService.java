@@ -43,14 +43,6 @@ public class CreateBookmarkIntentService extends ExtendBaseIntentService {
         context.startService(intent);
     }
 
-    public static void startCompatibility(Context context, LightWeightChatBox chatBox) {
-        Intent intent = new Intent(context, CreateBookmarkIntentService.class);
-        intent.setAction(ACTION_CREATE_BOOKMARK);
-        intent.putExtra(CHATBOX_KEY, chatBox);
-        intent.putExtra("is_upgrading", true);
-        context.startService(intent);
-    }
-
     @Override
     protected void onHandleIntent(Intent intent) {
         if(mUserManager.getCurrentUser() == null){

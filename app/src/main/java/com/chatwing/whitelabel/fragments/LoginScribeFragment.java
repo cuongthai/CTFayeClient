@@ -1,11 +1,10 @@
 package com.chatwing.whitelabel.fragments;
 
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -16,67 +15,74 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextView;
 
-import com.chatwing.whitelabel.BuildConfig;
-import com.chatwing.whitelabel.Constants;
 import com.chatwing.whitelabel.R;
-import com.chatwing.whitelabel.pojos.oauth.OAuthParams;
+import com.chatwing.whitelabel.scribeconfigs.ScribeConfig;
+import com.chatwing.whitelabel.scribeconfigs.YahooConfig;
+import com.chatwing.whitelabel.tasks.GetScribeAccessTokenTask;
+import com.chatwing.whitelabel.tasks.GetScribeRequestTokenTask;
+import com.chatwingsdk.events.internal.TaskFinishedEvent;
 import com.chatwingsdk.events.internal.UserAuthenticationEvent;
 import com.chatwingsdk.fragments.InjectableFragmentDelegate;
-import com.chatwingsdk.modules.ForMainThread;
 import com.chatwingsdk.pojos.params.oauth.AuthenticationParams;
-import com.chatwingsdk.utils.LogUtils;
 import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
+
+import org.scribe.builder.ServiceBuilder;
+import org.scribe.model.Token;
+import org.scribe.model.Verifier;
+import org.scribe.oauth.OAuthService;
 
 import javax.inject.Inject;
 
-import twitter4j.AsyncTwitter;
-import twitter4j.AsyncTwitterFactory;
-import twitter4j.TwitterAdapter;
-import twitter4j.TwitterException;
-import twitter4j.TwitterMethod;
-import twitter4j.auth.AccessToken;
-import twitter4j.auth.RequestToken;
-
-
 /**
  * Author: Huy Nguyen
- * Date: 4/14/13
- * Time: 4:55 PM
+ * Date: 8/30/13
+ * Time: 10:50 AM
  */
-public class LoginTwitterFragment extends Fragment {
+public class LoginScribeFragment extends Fragment {
+    protected static final String EXTRA_TAG = "tag";
+    protected static final String EXTRA_DELEGATE_CLASS_NAME = "delegate_class_name";
 
-    private static final String KEY_DENIED = "denied";
-    private static final String KEY_OAUTH_VERIFIER = "oauth_verifier";
-    private static final String EXTRA_TAG = "tag";
-
-    public static LoginTwitterFragment newInstance(String tag) {
-        Bundle args = new Bundle();
+    public static LoginScribeFragment newInstance(Class<? extends ScribeConfig> scribeConfigClass,
+                                                  String tag) {
+        Bundle args = new Bundle(2);
+        args.putString(EXTRA_DELEGATE_CLASS_NAME, scribeConfigClass.getName());
         args.putString(EXTRA_TAG, tag);
-        LoginTwitterFragment instance = new LoginTwitterFragment();
+        LoginScribeFragment instance = new LoginScribeFragment();
         instance.setArguments(args);
         return instance;
     }
 
-    @Inject
-    Bus mBus;
-    @Inject
-    @ForMainThread
-    Handler mHandler;
+    private OAuthService mOAuthService;
+    private Token mRequestToken;
+    private String mTag;
+    private ScribeConfig mScribeConfig;
+    private AsyncTask<?, ?, ?> mCurrentTask;
+
     private WebView mWebView;
     private View mProgressView;
     private TextView mProgressText;
     private View mContentView;
-    private AsyncTwitter mAsyncTwitter;
-    private RequestToken mRequestToken;
-    private String mTag;
+    @Inject
+    Bus mBus;
 
-    public LoginTwitterFragment() {
+    public LoginScribeFragment() {
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mTag = getArguments().getString(EXTRA_TAG);
+        Bundle args = getArguments();
+        mTag = args.getString(EXTRA_TAG);
+
+        // Construct the delegate from class name
+        String delegateClassName = args.getString(EXTRA_DELEGATE_CLASS_NAME);
+        try {
+            Class delegateClass = Class.forName(delegateClassName);
+            mScribeConfig = (ScribeConfig) delegateClass.newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -86,8 +92,7 @@ public class LoginTwitterFragment extends Fragment {
             mWebView.destroy();
         }
 
-        View v = inflater.inflate(
-                R.layout.fragment_login_webview, container, false);
+        View v = inflater.inflate(R.layout.fragment_login_webview, container, false);
 
         mWebView = (WebView) v.findViewById(R.id.webview);
         // Fix #10 (WebView doesn't gain input focus).
@@ -108,21 +113,16 @@ public class LoginTwitterFragment extends Fragment {
         mWebView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                LogUtils.v("Load: " + url);
-                if (url.contains(BuildConfig.TWITTER_CALLBACK_URL)) {
-                    Uri uri = Uri.parse(url);
-
-                    String deniedParam = uri.getQueryParameter(KEY_DENIED);
-                    if (!TextUtils.isEmpty(deniedParam)) {
-                        // The user taps the Cancel button on WebView.
-                        mBus.post(UserAuthenticationEvent.canceledEvent(mTag));
-                        return true;
-                    }
-
+                if (url.contains(mScribeConfig.getCallbackURL())) {
                     setProgressText(R.string.progress_getting_access_token);
-                    getAsyncTwitter().getOAuthAccessTokenAsync(
-                            mRequestToken,
-                            uri.getQueryParameter(KEY_OAUTH_VERIFIER));
+
+                    Uri uri = Uri.parse(url);
+                    String oauthVerifier = uri.getQueryParameter("oauth_verifier");
+                    Verifier verifier = new Verifier(oauthVerifier);
+                    GetScribeAccessTokenTask task = new GetScribeAccessTokenTask(
+                            mBus, mRequestToken, verifier);
+                    task.execute(getOAuthService());
+                    startTask(task);
 
                     return true;
                 } else {
@@ -143,6 +143,15 @@ public class LoginTwitterFragment extends Fragment {
         webSettings.setAppCacheEnabled(false);
         webSettings.setJavaScriptEnabled(true);
 
+        //This fix yahoo login to reasonable ui
+        if (YahooConfig.class.getName().equalsIgnoreCase(mScribeConfig.getClass().getName())) {
+            mWebView.clearCache(true);
+            webSettings.setAppCacheEnabled(false);
+            webSettings.setBuiltInZoomControls(true);
+            webSettings.setLoadWithOverviewMode(true);
+            webSettings.setUseWideViewPort(true);
+        }
+
         return v;
     }
 
@@ -154,10 +163,6 @@ public class LoginTwitterFragment extends Fragment {
         mProgressText
                 = (TextView) mProgressView.findViewById(R.id.progress_text);
         mContentView = view.findViewById(R.id.content_container);
-
-        setProgressText(R.string.progress_getting_request_token);
-        getAsyncTwitter()
-                .getOAuthRequestTokenAsync(BuildConfig.TWITTER_CALLBACK_URL);
     }
 
     @Override
@@ -168,11 +173,19 @@ public class LoginTwitterFragment extends Fragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        setProgressText(R.string.progress_getting_request_token);
+        startTask(new GetScribeRequestTokenTask(mBus).execute(getOAuthService()));
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         if (Build.VERSION.SDK_INT >= 11) {
             mWebView.onResume();
         }
+        mBus.register(this);
     }
 
     @Override
@@ -181,15 +194,13 @@ public class LoginTwitterFragment extends Fragment {
         if (Build.VERSION.SDK_INT >= 11) {
             mWebView.onPause();
         }
+        mBus.unregister(this);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if (mAsyncTwitter != null) {
-            mAsyncTwitter.shutdown();
-            mAsyncTwitter = null;
-        }
+        stopCurrentTask();
     }
 
     @Override
@@ -201,75 +212,51 @@ public class LoginTwitterFragment extends Fragment {
         }
     }
 
-    private AsyncTwitter getAsyncTwitter() {
-        if (mAsyncTwitter == null) {
-            AsyncTwitterFactory factory = new AsyncTwitterFactory();
-            mAsyncTwitter = factory.getInstance();
-            LogUtils.v("Consumer key "+BuildConfig.TWITTER_CONSUMER_KEY);
-            LogUtils.v("Consumer secret "+BuildConfig.TWITTER_CONSUMER_SECRET);
-            mAsyncTwitter.setOAuthConsumer(BuildConfig.TWITTER_CONSUMER_KEY,
-                    BuildConfig.TWITTER_CONSUMER_SECRET);
-            mAsyncTwitter.addListener(new TwitterListener());
-        }
-
-        return mAsyncTwitter;
+    ///////////////////////////////////////////////////////////
+    // Manage current async task
+    //////////////////////////////////////////////////////////
+    private void startTask(AsyncTask<?, ?, ?> task) {
+        stopCurrentTask();
+        mCurrentTask = task;
     }
 
-    ////////////////////////////////////////////////////////
-    // Handle Twitter events
-    ////////////////////////////////////////////////////////
-    private class TwitterListener extends TwitterAdapter {
-        @Override
-        public void gotOAuthRequestToken(final RequestToken token) {
-            Runnable runnable = new Runnable() {
-                @Override
-                public void run() {
-                    mRequestToken = token;
-                    if (mWebView != null) {
-                        mWebView.loadUrl(mRequestToken.getAuthenticationURL());
-                    }
-                }
-            };
-            runOnUiThread(runnable);
-        }
-
-        @Override
-        public void gotOAuthAccessToken(final AccessToken token) {
-            Runnable runnable = new Runnable() {
-                @Override
-                public void run() {
-                    AuthenticationParams params = new OAuthParams(
-                            Constants.TYPE_TWITTER,
-                            token.getToken(),
-                            token.getTokenSecret(),
-                            new TwitterJsonParams(
-                                    token.getUserId(),
-                                    token.getScreenName())
-                    );
-                     mBus.post(UserAuthenticationEvent.succeedEvent(mTag, params));
-                }
-            };
-            runOnUiThread(runnable);
-        }
-
-        @Override
-        public void onException(final TwitterException te,
-                                TwitterMethod method) {
-            Runnable runnable = new Runnable() {
-                @Override
-                public void run() {
-                    mBus.post(UserAuthenticationEvent.failedEvent(mTag, te));
-                }
-            };
-            runOnUiThread(runnable);
+    private void stopCurrentTask() {
+        if (mCurrentTask != null) {
+            if (mCurrentTask.getStatus() != AsyncTask.Status.FINISHED) {
+                mCurrentTask.cancel(true);
+            }
+            mCurrentTask = null;
         }
     }
 
-    private void runOnUiThread(Runnable runnable) {
-        if (mHandler == null) {
+    //////////////////////////////////////////////////////
+    // Handle task events
+    //////////////////////////////////////////////////////
+    @Subscribe
+    public void onTaskFinished(TaskFinishedEvent event) {
+        AsyncTask<?, ?, ?> task = event.getTask();
+        if (task != mCurrentTask) {
             return;
         }
-        mHandler.post(runnable);
+
+        mCurrentTask = null;
+
+        Exception exception = event.getException();
+        if (exception != null) {
+            mBus.post(UserAuthenticationEvent.failedEvent(mTag, exception));
+            return;
+        }
+
+        Token token = (Token) event.getResult();
+        if (task instanceof GetScribeRequestTokenTask) {
+            mRequestToken = token;
+            if (mWebView != null) {
+                mWebView.loadUrl(getOAuthService().getAuthorizationUrl(mRequestToken));
+            }
+        } else if (task instanceof GetScribeAccessTokenTask) {
+            AuthenticationParams params = mScribeConfig.getAuthenticationParams(token);
+            mBus.post(UserAuthenticationEvent.succeedEvent(mTag, params));
+        }
     }
 
     ///////////////////////////////////////////////////////////
@@ -303,5 +290,20 @@ public class LoginTwitterFragment extends Fragment {
     private void setProgressText(int resId) {
         setContentShown(false);
         mProgressText.setText(resId);
+    }
+
+    //////////////////////////////////////////////////////////////
+    // Other instance methods
+    //////////////////////////////////////////////////////////////
+    private OAuthService getOAuthService() {
+        if (mOAuthService == null) {
+            mOAuthService = new ServiceBuilder()
+                    .provider(mScribeConfig.getProvider())
+                    .apiKey(mScribeConfig.getApiKey())
+                    .apiSecret(mScribeConfig.getApiSecret())
+                    .callback(mScribeConfig.getCallbackURL())
+                    .build();
+        }
+        return mOAuthService;
     }
 }

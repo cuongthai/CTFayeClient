@@ -112,4 +112,6 @@ public class ExtendCommunicationActivityModule {
                 chatBoxIdValidator,
                 taskProvider);
     }
+
+
 }

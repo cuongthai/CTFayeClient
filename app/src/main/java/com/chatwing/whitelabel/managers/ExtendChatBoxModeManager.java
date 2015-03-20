@@ -9,6 +9,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.RemoteException;
@@ -33,6 +34,7 @@ import com.chatwing.whitelabel.activities.CreateChatBoxActivity;
 import com.chatwing.whitelabel.activities.NoMenuWebViewActivity;
 import com.chatwing.whitelabel.activities.SearchChatBoxActivity;
 import com.chatwing.whitelabel.events.AccountSwitchEvent;
+import com.chatwing.whitelabel.events.CreateBookmarkEvent;
 import com.chatwing.whitelabel.events.LoadOnlineUsersSuccessEvent;
 import com.chatwing.whitelabel.fragments.AccountDialogFragment;
 import com.chatwing.whitelabel.services.CreateBookmarkIntentService;
@@ -46,8 +48,10 @@ import com.chatwingsdk.managers.CurrentChatBoxManager;
 import com.chatwingsdk.managers.UserManager;
 import com.chatwingsdk.pojos.ChatBox;
 import com.chatwingsdk.pojos.LightWeightChatBox;
+import com.chatwingsdk.pojos.SyncedBookmark;
 import com.chatwingsdk.pojos.User;
 import com.chatwingsdk.tables.ChatBoxTable;
+import com.chatwingsdk.tables.SyncedBookmarkTable;
 import com.chatwingsdk.validators.PermissionsValidator;
 import com.readystatesoftware.viewbadger.BadgeView;
 import com.squareup.otto.Bus;
@@ -96,7 +100,7 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
         if (!mIsActive) {
             return;
         }
-        switch (requestCode){
+        switch (requestCode) {
             case Delegate.REQUEST_SEARCH_CHAT_BOX:
                 if (resultCode == Activity.RESULT_OK) {
                     LightWeightChatBox searchResult = (LightWeightChatBox) data
@@ -133,6 +137,9 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);
         switch (item.getItemId()) {
+            case R.id.bookmark_chat_box:
+                bookmarkCurrentChatBox();
+                return true;
             case R.id.copy_alias:
                 copyAliasCurrentChatBox();
                 return true;
@@ -204,6 +211,7 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
         MenuItem shareChatBoxItem = menu.findItem(R.id.share_chat_box);
         MenuItem copyAliasItem = menu.findItem(R.id.copy_alias);
         MenuItem manageBlackListItem = menu.findItem(R.id.manage_blacklist);
+        MenuItem bookmarkChatBoxItem = menu.findItem(R.id.bookmark_chat_box);
 
         // Invalidate all menu related objects
         mOnlineUsersItem.setVisible(false);
@@ -211,13 +219,14 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
         shareChatBoxItem.setVisible(false);
         copyAliasItem.setVisible(false);
         manageBlackListItem.setVisible(false);
+        bookmarkChatBoxItem.setVisible(false);
 
         // Now config them
         if (mCurrentChatBoxManager.getCurrentChatBox() != null) {
             // When main view or online users drawer is opened
             // and current chat box is available.
             mOnlineUsersItem.setVisible(true);
-            shareChatBoxItem.setVisible(true  && Constants.ALLOW_SHARE_CHATBOX);
+            shareChatBoxItem.setVisible(true && Constants.ALLOW_SHARE_CHATBOX);
             if (mNumOfOnlineUser > 0) {
                 mOnlineUsersBadgeView.setText(Integer.toString(mNumOfOnlineUser));
                 mOnlineUsersBadgeView.show();
@@ -235,6 +244,13 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
                     MenuItemCompat.getActionProvider(shareChatBoxItem);
             shareChatBoxActionProvider.setShareIntent(intent);
 
+
+            if (mUserManager.userCanBookmark() &&
+                    !ChatWingContentProvider.hasSyncedBookmarkInDB(
+                            activity.getContentResolver(),
+                            chatBox.getId())) {
+                bookmarkChatBoxItem.setVisible(true);
+            }
 
             if (chatBox.getAlias() != null && Constants.ALLOW_SHARE_CHATBOX) {
                 copyAliasItem.setVisible(true);
@@ -313,6 +329,68 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
     @com.squareup.otto.Subscribe
     public void onUserSelectedChatBox(com.chatwingsdk.events.internal.UserSelectedChatBoxEvent event) {
         super.onUserSelectedChatBox(event);
+    }
+
+    @Subscribe
+    public void onCreateBookmarkEvent(CreateBookmarkEvent event) {
+        if (handleCreateBookmarkException(event)) {
+            return;
+        }
+        ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
+        SyncedBookmark syncedBookmark = event.getResponse().getData();
+        ChatBox chatBox = syncedBookmark.getChatBox();
+        //Update local chatbox
+        batch.add(ContentProviderOperation
+                .newUpdate(ChatWingContentProvider.getChatBoxWithIdUri(chatBox.getId()))
+                .withValues(ChatBoxTable.getContentValues(chatBox, null))
+                .build());
+
+        //Update local bookmarks
+        int chatBoxId = chatBox.getId();
+        syncedBookmark.setIsSynced(true);
+        if (ChatWingContentProvider.hasSyncedBookmarkInDB(
+                mActivityDelegate.getActivity().getContentResolver(),
+                chatBoxId)) {
+            //Update existing bookmark
+            Uri syncedBookmarkWithChatBoxIdUri = ChatWingContentProvider.getSyncedBookmarkWithChatBoxIdUri(chatBoxId);
+            batch.add(ContentProviderOperation
+                    .newUpdate(syncedBookmarkWithChatBoxIdUri)
+                    .withValues(SyncedBookmarkTable.getContentValues(syncedBookmark))
+                    .build());
+        } else {
+            //Somehow local bookmark is deleted, it should be add back
+            Uri syncedBookmarksUri = ChatWingContentProvider.getSyncedBookmarksUri();
+            batch.add(ContentProviderOperation
+                    .newInsert(syncedBookmarksUri)
+                    .withValues(SyncedBookmarkTable.getContentValues(syncedBookmark))
+                    .build());
+        }
+
+        try {
+            mActivityDelegate.getActivity().getContentResolver().applyBatch(ChatWingContentProvider.AUTHORITY, batch);
+
+            if (!event.isUpgrading())
+                Toast.makeText(mActivityDelegate.getActivity(), R.string.message_current_chat_box_bookmarked,
+                        Toast.LENGTH_SHORT)
+                        .show();
+        } catch (RemoteException e) {
+            mActivityDelegate.handle(e, R.string.error_failed_to_save_bookmark);
+        } catch (OperationApplicationException e) {
+            mActivityDelegate.handle(e, R.string.error_failed_to_save_bookmark);
+        }
+    }
+
+    private boolean handleCreateBookmarkException(CreateBookmarkEvent event) {
+        Exception exception = event.getException();
+        if (exception == null) {
+            return false;
+        }
+        if (exception instanceof OperationApplicationException || exception instanceof RemoteException) {
+            mActivityDelegate.handle(exception, R.string.error_failed_to_save_chat_box);
+            return true;
+        }
+        mActivityDelegate.handle(exception, R.string.error_failed_to_save_bookmark);
+        return true;
     }
 
     @Override
@@ -400,6 +478,20 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
         // Don't directly set chat box using mCurrentChatBoxManager here
         // because components are not ready and won't receive posted events.
         mRequestedChatboxId = result.getId();
+    }
+
+    private void bookmarkCurrentChatBox() {
+        ChatBox chatBox = mCurrentChatBoxManager.getCurrentChatBox();
+        if (chatBox == null) {
+            return;
+        }
+        if (mUserManager.getCurrentUser() == null) {
+            Toast.makeText(mActivityDelegate.getActivity(),
+                    mActivityDelegate.getActivity().getString(R.string.error_failed_to_save_bookmark),
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+        CreateBookmarkIntentService.start(mActivityDelegate.getActivity(), LightWeightChatBox.copyFromChatbox(chatBox));
     }
 
 }

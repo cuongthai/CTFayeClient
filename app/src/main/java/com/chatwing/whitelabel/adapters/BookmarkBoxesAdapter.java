@@ -13,6 +13,7 @@ import com.chatwing.whitelabel.R;
 import com.chatwingsdk.tables.SyncedBookmarkTable;
 import com.chatwingsdk.pojos.ChatBox;
 import com.chatwingsdk.tables.ChatBoxTable;
+import com.chatwingsdk.utils.LogUtils;
 
 import java.util.HashSet;
 
@@ -41,6 +42,7 @@ public class BookmarkBoxesAdapter extends CursorAdapter {
 
     public void setBookmarkChecked(Cursor cursor, boolean checked) {
         Integer bookmarkId = cursor.getInt(cursor.getColumnIndexOrThrow(SyncedBookmarkTable.BOOKMARK_ID));
+        LogUtils.v("setBookmarkChecked "+bookmarkId);
         if (checked) {
             mBookmarkIds.add(bookmarkId);
         } else {
@@ -80,6 +82,7 @@ public class BookmarkBoxesAdapter extends CursorAdapter {
 
         //Change background state when in multi mode
         Integer bookmarkId = cursor.getInt(cursor.getColumnIndexOrThrow(SyncedBookmarkTable.BOOKMARK_ID));
+        LogUtils.v("Bindview "+bookmarkId);
         view.setBackgroundResource(mIsMultiMode ? R.drawable.item_bookmark_multi_selector : R.drawable.item_selector);
         if (mBookmarkIds.contains(bookmarkId)) {
             // if this item is checked - set checked state

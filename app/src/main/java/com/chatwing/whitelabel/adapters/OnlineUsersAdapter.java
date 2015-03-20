@@ -16,6 +16,7 @@ import com.chatwing.whitelabel.pojos.OnlineUser;
 import com.chatwing.whitelabel.utils.StringUtils;
 import com.chatwingsdk.managers.VolleyManager;
 import com.chatwingsdk.modules.ForActivity;
+import com.chatwingsdk.utils.LogUtils;
 
 
 import java.util.List;
@@ -81,6 +82,7 @@ public class OnlineUsersAdapter extends CompatArrayAdapter<OnlineUser> {
         viewHolder.loginType.setImageResource(resId);
 
         String avatarUrl = mApiManager.getAvatarUrl(user);
+        LogUtils.v("Avatar Url " + avatarUrl);
         ImageLoader imageLoader = mVolleyManager.getImageLoader();
         viewHolder.avatar.setImageUrl(avatarUrl, imageLoader);
 
