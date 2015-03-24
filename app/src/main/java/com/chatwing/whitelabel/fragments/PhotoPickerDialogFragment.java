@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
@@ -16,10 +17,12 @@ import android.widget.TextView;
 
 import com.chatwing.whitelabel.R;
 import com.chatwingsdk.fragments.InjectableFragmentDelegate;
+import com.chatwingsdk.utils.LogUtils;
 import com.soundcloud.android.crop.Crop;
 import com.squareup.otto.Bus;
 
 import java.io.File;
+import java.io.IOException;
 
 import javax.inject.Inject;
 
@@ -32,6 +35,7 @@ public class PhotoPickerDialogFragment extends DialogFragment {
     private InjectableFragmentDelegate mDelegate;
     private TextView mFromLibrary;
     private TextView mFromCamera;
+    private Uri photoSourceUri;
 
     public static PhotoPickerDialogFragment newInstance() {
         PhotoPickerDialogFragment accountDialogFragment = new PhotoPickerDialogFragment();
@@ -52,6 +56,10 @@ public class PhotoPickerDialogFragment extends DialogFragment {
             @Override
             public void onClick(View view) {
                 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                File sourceAvatar = new File(Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_PICTURES), "src_avatar");
+                photoSourceUri = Uri.fromFile(sourceAvatar);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoSourceUri);
                 if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
                     startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAMERA_PICKER_SELECT);
                 }
@@ -110,7 +118,7 @@ public class PhotoPickerDialogFragment extends DialogFragment {
         if (resultCode == Activity.RESULT_OK) {
             switch (requestCode) {
                 case REQUEST_IMAGE_CAMERA_PICKER_SELECT:
-                    startCropActivity(intent.getData());
+                    startCropActivity(photoSourceUri);
                     break;
                 case REQUEST_IMAGE_LIBRARY_PICKER_SELECT:
                     startCropActivity(intent.getData());

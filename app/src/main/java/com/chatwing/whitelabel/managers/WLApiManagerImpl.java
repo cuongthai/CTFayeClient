@@ -428,6 +428,7 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
         validate(user);
 
         HttpRequest request = HttpRequest.post(UPLOAD_AVATAR);
+        LogUtils.v("Access token "+user.getAccessToken());
         setUpRequest(request, user);
         //We have to specify this temp_avatar.jpg in order to upload the file...
         //https://github.com/kevinsawicki/http-request/issues/22

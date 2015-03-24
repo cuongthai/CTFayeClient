@@ -139,7 +139,7 @@
     <string name="message_account_switched">"Account switched"</string>
     <string name="message_account_picker">"Account Picker"</string>
     <string name="message_account_added">"New account added"</string>
-    <string name="message_need_switch_account">You need to use another account to access this chatbox</string>
+    <string name="message_need_switch_account">This chatbox only allows the following account types to join: %s</string>
     <string name="message_current_chat_box_bookmarked">"Bookmarked"</string>
 
     <string name="empty_online_users">"No online users found."</string>

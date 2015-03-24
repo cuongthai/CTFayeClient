@@ -40,6 +40,7 @@ import com.chatwingsdk.activities.BaseABFragmentActivity;
 import com.chatwingsdk.activities.CommunicationActivity;
 import com.chatwingsdk.contentproviders.ChatWingContentProvider;
 import com.chatwingsdk.events.internal.SyncCommunicationBoxEvent;
+import com.chatwingsdk.events.internal.UpdateUserEvent;
 import com.chatwingsdk.events.internal.ViewProfileEvent;
 import com.chatwingsdk.fragments.CommunicationMessagesFragment;
 import com.chatwingsdk.modules.CommunicationActivityModule;
@@ -159,7 +160,14 @@ public class ExtendCommunicationActivity
         if (!viewProfileEvent.isDenyReply()) {
             showConversation(new CreateConversationParams.SimpleUser(viewProfileEvent.getLoginId(), viewProfileEvent.getUserType()));
         }
+    }
 
+    @Subscribe
+    public void onUpdateUserProfileEvent(UpdateUserEvent event) {
+        Exception exception = event.getException();
+        if (exception != null) {
+            handle(exception, R.string.error_failed_to_update_user_profile);
+        }
     }
 
     @com.squareup.otto.Subscribe
@@ -516,7 +524,7 @@ public class ExtendCommunicationActivity
         if (!mUserManager.acceptAccessChatbox(mUserManager.getCurrentUser(),
                 chatBoxDetailErrorParams)) {
             denyAccessCurrentManager();
-            showAccountPicker(getString(R.string.message_need_switch_account));
+            showAccountPicker(getString(R.string.message_need_switch_account, chatBoxDetailErrorParams.getAuthenticationMethodString()));
             return true;
         }
 
