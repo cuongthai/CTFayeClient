@@ -86,7 +86,7 @@ public class ExtendCommunicationActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (!mBuildManager.isOfficialChatWingApp()) {
+        if (!mBuildManager.isOfficialChatWingApp() && userManager.getCurrentUser() == null) {
             startActivity(new Intent(this, StartActivity.class));
             finish();
             return;
@@ -308,6 +308,7 @@ public class ExtendCommunicationActivity
 
     @Override
     public void openAccountPicker() {
+        if (!mBuildManager.isOfficialChatWingApp()) return;
         getDrawerLayout().closeDrawers();
         showAccountPicker(null);
     }
@@ -473,6 +474,8 @@ public class ExtendCommunicationActivity
     }
 
     private void startSyncingBookmarks() {
+        if (!mBuildManager.isOfficialChatWingApp()) return;
+
         if (mUserManager.getCurrentUser() == null
                 || SyncBookmarkIntentService.isInProgress()) {
             // A sync operation is running. Just wait for it.

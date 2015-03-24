@@ -12,10 +12,13 @@ import android.widget.TextView;
 
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.events.AccountSwitchEvent;
+import com.chatwing.whitelabel.managers.BuildManager;
 import com.chatwingsdk.contentproviders.ChatWingContentProvider;
 import com.chatwingsdk.fragments.CommunicationDrawerFragment;
 import com.chatwingsdk.tables.ChatBoxTable;
 import com.squareup.otto.Subscribe;
+
+import javax.inject.Inject;
 
 /**
  * Created by steve on 17/12/2014.
@@ -28,11 +31,16 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
     private View mCreateChatBoxView;
     private TextView mBookmarksUnreadCountView;
     private View mUserInfoContainer;
+    private View bookmarkView;
+    @Inject
+    BuildManager mBuildManager;
+    private View mNextView;
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mUserInfoContainer = view.findViewById(R.id.user_info_layout);
+        mNextView = view.findViewById(R.id.next);
 
         view.findViewById(R.id.settings).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,7 +71,8 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
             }
         });
 
-        view.findViewById(R.id.bookmarks).setOnClickListener(new View.OnClickListener() {
+        bookmarkView = view.findViewById(R.id.bookmarks);
+        bookmarkView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mListener.showBookmarks();
@@ -78,13 +87,23 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
         });
 
         mBookmarksUnreadCountView = (TextView) view.findViewById(R.id.bookmarks_unread_count);
+
+
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        mListener.inject(this);
         LoaderManager loaderManager = getLoaderManager();
         loaderManager.initLoader(LOADER_ID_SYNCED_BOOKMARKS, null, this);
+
+        if(!mBuildManager.isOfficialChatWingApp()){
+            mCreateChatBoxView.setVisibility(View.GONE);
+            mSearchChatBoxView.setVisibility(View.GONE);
+            bookmarkView.setVisibility(View.GONE);
+            mNextView.setVisibility(View.GONE);
+        }
     }
 
     @Override

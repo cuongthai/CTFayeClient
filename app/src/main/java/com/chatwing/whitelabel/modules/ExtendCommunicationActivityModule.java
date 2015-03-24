@@ -10,6 +10,7 @@ import com.chatwing.whitelabel.fragments.OnlineUsersFragment;
 import com.chatwing.whitelabel.fragments.PhotoPickerDialogFragment;
 import com.chatwing.whitelabel.interfaces.WLJSInterfaceImpl;
 import com.chatwing.whitelabel.managers.ApiManager;
+import com.chatwing.whitelabel.managers.BuildManager;
 import com.chatwing.whitelabel.managers.ExtendChatBoxModeManager;
 import com.chatwing.whitelabel.managers.ExtendConversationModeManager;
 import com.chatwing.whitelabel.managers.ExtendCurrentChatboxManager;
@@ -79,13 +80,15 @@ public class ExtendCommunicationActivityModule {
     ChatboxModeManager provideChatboxModeManager(Bus bus,
                                                  UserManager userManager,
                                                  ApiManager apiManager,
-                                                 CurrentChatBoxManager currentChatBoxManager) {
+                                                 CurrentChatBoxManager currentChatBoxManager,
+                                                 BuildManager buildManager) {
         return new ExtendChatBoxModeManager(
                 bus,
                 mActivity,
                 userManager,
                 apiManager,
-                currentChatBoxManager);
+                currentChatBoxManager,
+                buildManager);
     }
 
     @Provides

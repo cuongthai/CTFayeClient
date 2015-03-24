@@ -36,8 +36,8 @@ android {
         applicationId PACKAGE_NAME
         minSdkVersion 14
         targetSdkVersion 20
-        versionCode 23
-        versionName "1.0"
+        versionCode Integer.parseInt(VERSION_CODE)
+        versionName VERSION_NAME
 
         buildConfigField 'String', 'TUMBLR_CALLBACK_URL', '"' + TUMBLR_CALLBACK_URL + '"'
         buildConfigField 'String', 'TUMBLR_API_KEY', '"' + TUMBLR_API_KEY + '"'
@@ -69,11 +69,6 @@ android {
             signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-
-        debug {
-            signingConfig signingConfigs.release
-        }
-
     }
 
     sourceSets {

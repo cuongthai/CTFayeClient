@@ -5,6 +5,14 @@
     <!-- Upload avatar from sd card-->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
+    <permission
+        android:name="${applicationId}.permission.C2D_MESSAGE"
+        android:protectionLevel="signature"
+         />
+
+    <uses-permission
+        android:name="${applicationId}.permission.C2D_MESSAGE" />
+
     <application
         tools:replace="icon, label, theme"
         android:allowBackup="true"
@@ -75,18 +83,17 @@
             android:label="@string/title_activity_search_chat_box"
             android:launchMode="singleTop">
             <intent-filter>
-                <action android:name="android.intent.action.SEARCH"/>
+                <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
 
             <meta-data
                 android:name="android.app.searchable"
-                android:resource="@xml/chat_box_searchable"/>
+                android:resource="@xml/chat_box_searchable" />
         </activity>
         <activity
             android:name=".activities.CreateChatBoxActivity"
             android:label="@string/title_activity_create_chat_box"
-            android:windowSoftInputMode="adjustResize|stateVisible">
-        </activity>
+            android:windowSoftInputMode="adjustResize|stateVisible"></activity>
 
         <activity
             android:name=".activities.MainPreferenceActivity"
@@ -106,9 +113,9 @@
         <service android:name=".services.IgnoreUserIntentService" />
         <service android:name=".services.DownloadUserDetailIntentService" />
         <service android:name=".services.VerifyEmailIntentService" />
-        <service android:name=".services.SyncBookmarkIntentService"/>
-        <service android:name=".services.CreateBookmarkIntentService"/>
-        <service android:name=".services.DeleteBookmarkIntentService"/>
+        <service android:name=".services.SyncBookmarkIntentService" />
+        <service android:name=".services.CreateBookmarkIntentService" />
+        <service android:name=".services.DeleteBookmarkIntentService" />
 
         <!-- FB 3.0 section -->
         <meta-data
@@ -121,12 +128,23 @@
             android:name="com.chatwingsdk.contentproviders.ChatWingContentProvider"
             android:authorities="${applicationId}.provider"
             android:exported="false"
-            tools:replace="android:authorities"/>
+            tools:replace="android:authorities" />
 
         <provider
             android:name=".contentproviders.SearchChatBoxSuggestionsProvider"
-            android:authorities="com.chatwing.SearchChatBoxSuggestionsProvider"
-            android:exported="false"/>
+            android:authorities="${applicationId}.SearchChatBoxSuggestionsProvider"
+            android:exported="false" />
+
+        <receiver
+            android:name="com.chatwingsdk.receivers.GcmBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+
+                <category android:name="${applicationId}" />
+            </intent-filter>
+        </receiver>
+
 
         <!-- Crashlytics -->
         <meta-data

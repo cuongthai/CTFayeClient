@@ -59,6 +59,8 @@ import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
 
+import javax.inject.Inject;
+
 /**
  * Created by steve on 10/12/2014.
  */
@@ -73,14 +75,17 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
     public static final int MSG_GET_ONLINE_USERS = 0;
     private static final long REFRESH_ONLINE_USERS_INTERVAL = 20 * DateUtils.SECOND_IN_MILLIS;
     private ExtendCommunicationModeManager.Delegate mActivityDelegate;
+    BuildManager mBuildManager;
 
     public ExtendChatBoxModeManager(Bus bus, ExtendCommunicationModeManager.Delegate delegate,
                                     UserManager userManager,
                                     ApiManager apiManager,
-                                    CurrentChatBoxManager currentChatBoxManager) {
+                                    CurrentChatBoxManager currentChatBoxManager,
+                                    BuildManager buildManager) {
         super(bus, delegate, userManager, apiManager, currentChatBoxManager);
         mActivityDelegate = delegate;
         mApiManager = apiManager;
+        mBuildManager = buildManager;
     }
 
     @Override
@@ -245,7 +250,8 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
             shareChatBoxActionProvider.setShareIntent(intent);
 
 
-            if (mUserManager.userCanBookmark() &&
+            if (mBuildManager.isOfficialChatWingApp() &&
+                    mUserManager.userCanBookmark() &&
                     !ChatWingContentProvider.hasSyncedBookmarkInDB(
                             activity.getContentResolver(),
                             chatBox.getId())) {
