@@ -12,6 +12,7 @@ import com.chatwing.whitelabel.pojos.params.CreateBookmarkParams;
 import com.chatwing.whitelabel.pojos.params.CreateChatBoxParams;
 import com.chatwing.whitelabel.pojos.params.DeleteBookmarkParams;
 import com.chatwing.whitelabel.pojos.params.DeleteMessageParams;
+import com.chatwing.whitelabel.pojos.params.FlagMessageParams;
 import com.chatwing.whitelabel.pojos.params.IgnoreUserParams;
 import com.chatwing.whitelabel.pojos.params.LoadBookmarkParams;
 import com.chatwing.whitelabel.pojos.params.OnlineUserParams;
@@ -24,6 +25,7 @@ import com.chatwing.whitelabel.pojos.responses.CreateBookmarkResponse;
 import com.chatwing.whitelabel.pojos.responses.CreateChatBoxResponse;
 import com.chatwing.whitelabel.pojos.responses.DeleteBookmarkResponse;
 import com.chatwing.whitelabel.pojos.responses.DeleteMessageResponse;
+import com.chatwing.whitelabel.pojos.responses.FlagMessageResponse;
 import com.chatwing.whitelabel.pojos.responses.IgnoreUserResponse;
 import com.chatwing.whitelabel.pojos.responses.LoadOnlineUsersResponse;
 import com.chatwing.whitelabel.pojos.responses.RegisterResponse;
@@ -162,7 +164,9 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
         setUpRequest(request, user);
         String responseString;
         try {
+            LogUtils.v("Syncing user detail before load");
             responseString = validate(request);
+            LogUtils.v("Syncing user detail "+responseString);
             return gson.fromJson(responseString, UserResponse.class);
         } catch (ValidationException e) {
             throw ApiException.createException(e);
@@ -634,6 +638,33 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
         } catch (JsonSyntaxException e) {
             throw ApiException.createJsonSyntaxException(e, responseString);
         } catch (ValidationException e) {
+            throw ApiException.createException(e);
+        }
+    }
+
+    @Override
+    public FlagMessageResponse flagMessage(User user, String messageID)
+            throws UserUnauthenticatedException,
+            HttpRequest.HttpRequestException,
+            ApiException,
+            InvalidAccessTokenException {
+        validate(user);
+
+        Gson gson = new Gson();
+
+        FlagMessageParams params = new FlagMessageParams(messageID);
+        String paramsString = gson.toJson(params);
+
+        HttpRequest request = HttpRequest.post(FLAG_MESSAGE);
+        setUpRequest(request, user);
+        request.send(paramsString);
+        String responseString;
+        try {
+            responseString = validate(request);
+            return gson.fromJson(responseString, FlagMessageResponse.class);
+        } catch (ValidationException e) {
+            throw ApiException.createException(e);
+        } catch (InvalidIdentityException e) {
             throw ApiException.createException(e);
         }
     }

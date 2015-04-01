@@ -21,7 +21,7 @@ import javax.inject.Inject;
 public class IgnoreUserIntentService extends ExtendBaseIntentService {
     public static final String EXTRA_USER_ID = "EXTRA_USER_ID";
     public static final String EXTRA_USER_TYPE = "EXTRA_USER_TYPE";
-    public static final String EXTRA_IGNORED = "EXTRA_IGNORED";
+    public static final String EXTRA_IGNORED = "EXTRA_MESSAGE_ID";
 
     @Inject
     ApiManager mApiManager;

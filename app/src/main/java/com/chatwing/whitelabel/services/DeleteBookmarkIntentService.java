@@ -6,6 +6,7 @@ import android.content.Intent;
 import com.chatwing.whitelabel.events.DeleteBookmarkEvent;
 import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.pojos.responses.DeleteBookmarkResponse;
+import com.chatwingsdk.pojos.User;
 import com.chatwingsdk.services.BaseIntentService;
 
 import java.util.ArrayList;
@@ -33,11 +34,16 @@ public class DeleteBookmarkIntentService extends ExtendBaseIntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        User user = mUserManager.getCurrentUser();
+        if (user == null || !mUserManager.userCanBookmark()) {
+            post(new DeleteBookmarkEvent(new Exception()));
+            return;
+        }
         ArrayList<Integer> bookmarkIds = intent.getIntegerArrayListExtra(BOOKMARK_IDS_KEY);
         for (Integer bookmarkId : bookmarkIds) {
             try {
                 DeleteBookmarkResponse deleteBookmarkResponse = mApiManager.deleteBookmark(
-                        mUserManager.getCurrentUser(),
+                        user,
                         bookmarkId);
                 mDeleteBookmarkEvent = new DeleteBookmarkEvent(deleteBookmarkResponse);
             } catch (Exception e) {

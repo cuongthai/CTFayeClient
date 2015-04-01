@@ -83,7 +83,7 @@ def getTextColorHex(color):
 def getLighterShadeColor(color):
     hls = colorsys.rgb_to_hls(color.r, color.g, color.b)
     print hls[1]
-    hsv2 = 0.97
+    hsv2 = 0.94
     rgb = colorsys.hls_to_rgb(hls[0], hsv2, hls[2])
     return colors.rgb(rgb[0],rgb[1],rgb[2])
 

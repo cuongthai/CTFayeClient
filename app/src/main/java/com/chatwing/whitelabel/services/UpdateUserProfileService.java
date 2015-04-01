@@ -28,6 +28,7 @@ public class UpdateUserProfileService extends ExtendBaseIntentService {
 
     @Inject
     ApiManager mApiManager;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -40,6 +41,12 @@ public class UpdateUserProfileService extends ExtendBaseIntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         User user = mUserManager.getCurrentUser();
+        if (user == null
+                || user.isGuest()) {
+            post(new UpdateUserEvent(UpdateUserEvent.STATE.CANCELLED));
+            return;
+        }
+
         UserProfile profile = (UserProfile) intent.getSerializableExtra(EXTRA_OLD_PROFILE);
         try {
             post(UpdateUserEvent.started());

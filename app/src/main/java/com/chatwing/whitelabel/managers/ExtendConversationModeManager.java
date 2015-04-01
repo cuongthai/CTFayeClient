@@ -1,25 +1,17 @@
 package com.chatwing.whitelabel.managers;
 
-import android.content.res.Resources;
-import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
 
 import com.chatwing.whitelabel.R;
 import com.chatwingsdk.events.internal.UpdateSubscriptionEvent;
+import com.chatwingsdk.managers.CommunicationActivityManager;
 import com.chatwingsdk.managers.ConversationModeManager;
 import com.chatwingsdk.managers.CurrentConversationManager;
 import com.chatwingsdk.managers.UserManager;
 import com.chatwingsdk.validators.ConversationIdValidator;
-import com.readystatesoftware.viewbadger.BadgeView;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -33,8 +25,9 @@ public class ExtendConversationModeManager extends ConversationModeManager {
                                          Delegate delegate,
                                          UserManager userManager,
                                          CurrentConversationManager currentConversationManager,
-                                         ConversationIdValidator conversationIdValidator) {
-        super(bus, delegate, userManager, currentConversationManager, conversationIdValidator);
+                                         ConversationIdValidator conversationIdValidator,
+                                         CommunicationActivityManager communicationActivityManager) {
+        super(bus, delegate, userManager, currentConversationManager, conversationIdValidator, communicationActivityManager);
     }
 
     @Override

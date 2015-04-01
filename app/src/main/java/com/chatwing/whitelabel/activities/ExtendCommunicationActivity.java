@@ -1,9 +1,6 @@
 package com.chatwing.whitelabel.activities;
 
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.ProviderInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -341,7 +338,9 @@ public class ExtendCommunicationActivity
     private synchronized void showAccountPicker(String message) {
         Fragment oldFragment = getSupportFragmentManager().findFragmentByTag(
                 ACCOUNT_DIALOG_FRAGMENT_TAG);
-        if (oldFragment == null) {
+        if (oldFragment == null
+                && isActive()) { // To prevent showdialog when activity is paused.
+                                 // Better Workaround http://stackoverflow.com/questions/8040280/how-to-handle-handler-messages-when-activity-fragment-is-paused
             AccountDialogFragment accountDialogFragment = AccountDialogFragment.newInstance(message);
             accountDialogFragment.show(getSupportFragmentManager(),
                     ACCOUNT_DIALOG_FRAGMENT_TAG);
@@ -404,7 +403,7 @@ public class ExtendCommunicationActivity
         try {
             getContentResolver().applyBatch(ChatWingContentProvider.AUTHORITY,
                     ChatWingContentProvider.getClearAllDataBatch());
-            startSyncingCommunications();
+            startSyncingCommunications(true);
             invalidateOptionsMenu();
         } catch (Exception e) {
             LogUtils.e(e);
@@ -499,8 +498,8 @@ public class ExtendCommunicationActivity
     }
 
     @Override
-    protected boolean startSyncingCommunications() {
-        boolean result = super.startSyncingCommunications();
+    protected boolean startSyncingCommunications(boolean needReload) {
+        boolean result = super.startSyncingCommunications(needReload);
         super.mSyncManager.addToQueue(SyncBookmarkIntentService.class);
         super.mSyncManager.addToQueue(DownloadUserDetailIntentService.class);
         return result;

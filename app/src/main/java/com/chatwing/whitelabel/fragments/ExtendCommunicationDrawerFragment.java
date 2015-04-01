@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.widget.TextView;
 
@@ -15,7 +16,9 @@ import com.chatwing.whitelabel.events.AccountSwitchEvent;
 import com.chatwing.whitelabel.managers.BuildManager;
 import com.chatwingsdk.contentproviders.ChatWingContentProvider;
 import com.chatwingsdk.fragments.CommunicationDrawerFragment;
+import com.chatwingsdk.managers.UserManager;
 import com.chatwingsdk.tables.ChatBoxTable;
+import com.chatwingsdk.utils.LogUtils;
 import com.squareup.otto.Subscribe;
 
 import javax.inject.Inject;
@@ -34,13 +37,17 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
     private View bookmarkView;
     @Inject
     BuildManager mBuildManager;
+    @Inject
+    UserManager mUserManager;
     private View mNextView;
+    private TextView mWebsiteTv;
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mUserInfoContainer = view.findViewById(R.id.user_info_layout);
         mNextView = view.findViewById(R.id.next);
+        mWebsiteTv = (TextView)view.findViewById(R.id.websiteTv);
 
         view.findViewById(R.id.settings).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -48,12 +55,7 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
                 mListener.showSettings();
             }
         });
-        mUserAvatarView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mListener.updateAvatar();
-            }
-        });
+
 
         mSearchChatBoxView = view.findViewById(R.id.search_chat_box);
         mSearchChatBoxView.setOnClickListener(new View.OnClickListener() {
@@ -79,12 +81,14 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
             }
         });
 
+
         mUserInfoContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mListener.openAccountPicker();
             }
         });
+
 
         mBookmarksUnreadCountView = (TextView) view.findViewById(R.id.bookmarks_unread_count);
 
@@ -98,12 +102,19 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
         LoaderManager loaderManager = getLoaderManager();
         loaderManager.initLoader(LOADER_ID_SYNCED_BOOKMARKS, null, this);
 
-        if(!mBuildManager.isOfficialChatWingApp()){
+        if (!mBuildManager.isOfficialChatWingApp()) {
             mCreateChatBoxView.setVisibility(View.GONE);
             mSearchChatBoxView.setVisibility(View.GONE);
             bookmarkView.setVisibility(View.GONE);
             mNextView.setVisibility(View.GONE);
+
+            mWebsiteTv.setVisibility(View.VISIBLE);
+            mWebsiteTv.setText("http://wildcatsociety.com/");
+            mWebsiteTv.setMovementMethod(LinkMovementMethod.getInstance());
         }
+
+
+
     }
 
     @Override
@@ -155,6 +166,23 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
                         null);
             default:
                 return super.onCreateLoader(id, args);
+        }
+    }
+
+    @Override
+    protected void updateUserViews() {
+        super.updateUserViews();
+
+        //Only allow chatwing to update avatar
+        if (mUserManager.getCurrentUser() != null && mUserManager.getCurrentUser().isChatWing()) {
+            mUserAvatarView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mListener.updateAvatar();
+                }
+            });
+        }else{
+            mUserAvatarView.setOnClickListener(null);
         }
     }
 

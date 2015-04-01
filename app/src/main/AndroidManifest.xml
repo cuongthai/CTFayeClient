@@ -112,6 +112,7 @@
         <service android:name=".services.DeleteMessageIntentService" />
         <service android:name=".services.BlockUserIntentService" />
         <service android:name=".services.IgnoreUserIntentService" />
+        <service android:name=".services.FlagMessageIntentService" />
         <service android:name=".services.DownloadUserDetailIntentService" />
         <service android:name=".services.VerifyEmailIntentService" />
         <service android:name=".services.SyncBookmarkIntentService" />

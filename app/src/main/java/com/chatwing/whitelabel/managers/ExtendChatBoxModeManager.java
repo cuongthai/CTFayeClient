@@ -44,6 +44,7 @@ import com.chatwingsdk.contentproviders.ChatWingContentProvider;
 import com.chatwingsdk.events.internal.CurrentChatBoxEvent;
 import com.chatwingsdk.events.internal.UpdateSubscriptionEvent;
 import com.chatwingsdk.managers.ChatboxModeManager;
+import com.chatwingsdk.managers.CommunicationActivityManager;
 import com.chatwingsdk.managers.CurrentChatBoxManager;
 import com.chatwingsdk.managers.UserManager;
 import com.chatwingsdk.pojos.ChatBox;
@@ -52,14 +53,13 @@ import com.chatwingsdk.pojos.SyncedBookmark;
 import com.chatwingsdk.pojos.User;
 import com.chatwingsdk.tables.ChatBoxTable;
 import com.chatwingsdk.tables.SyncedBookmarkTable;
+import com.chatwingsdk.validators.ChatBoxIdValidator;
 import com.chatwingsdk.validators.PermissionsValidator;
 import com.readystatesoftware.viewbadger.BadgeView;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
-
-import javax.inject.Inject;
 
 /**
  * Created by steve on 10/12/2014.
@@ -77,12 +77,15 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
     private ExtendCommunicationModeManager.Delegate mActivityDelegate;
     BuildManager mBuildManager;
 
-    public ExtendChatBoxModeManager(Bus bus, ExtendCommunicationModeManager.Delegate delegate,
+    public ExtendChatBoxModeManager(Bus bus,
+                                    ExtendCommunicationModeManager.Delegate delegate,
                                     UserManager userManager,
                                     ApiManager apiManager,
                                     CurrentChatBoxManager currentChatBoxManager,
-                                    BuildManager buildManager) {
-        super(bus, delegate, userManager, apiManager, currentChatBoxManager);
+                                    BuildManager buildManager,
+                                    ChatBoxIdValidator chatBoxIdValidator,
+                                    CommunicationActivityManager communicationActivityManager) {
+        super(bus, delegate, userManager, apiManager, currentChatBoxManager, chatBoxIdValidator, communicationActivityManager);
         mActivityDelegate = delegate;
         mApiManager = apiManager;
         mBuildManager = buildManager;

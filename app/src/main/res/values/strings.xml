@@ -147,6 +147,7 @@
     <string name="preference_verify_email">"verify_email"</string>
     <string name="title_dialog_select_message">Select message</string>
     <string name="title_ignore">Ignore</string>
+    <string name="title_flag">Flag</string>
     <string name="title_unignore">Show Content</string>
     <string name="gcm_sender_id">341431874860</string>
     <string name="message_email_verification_sent">Please check your email for verification</string>
@@ -175,4 +176,6 @@
     </string-array>
 
     <string name="banner_ad_unit_id">ca-app-pub-9492949418759375/8073202249</string>
+    <string name="message_flag">Flagged</string>
+    <string name="error_failed_to_flag">Failed to flag this message</string>
 </resources>

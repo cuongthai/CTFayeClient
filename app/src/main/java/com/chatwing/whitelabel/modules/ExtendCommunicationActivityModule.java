@@ -21,6 +21,7 @@ import com.chatwingsdk.interfaces.ChatWingJavaDelegate;
 import com.chatwingsdk.interfaces.JSInterfaceImpl;
 import com.chatwingsdk.managers.ApiManagerImpl;
 import com.chatwingsdk.managers.ChatboxModeManager;
+import com.chatwingsdk.managers.CommunicationActivityManager;
 import com.chatwingsdk.managers.ConversationModeManager;
 import com.chatwingsdk.managers.CurrentChatBoxManager;
 import com.chatwingsdk.managers.CurrentConversationManager;
@@ -81,14 +82,18 @@ public class ExtendCommunicationActivityModule {
                                                  UserManager userManager,
                                                  ApiManager apiManager,
                                                  CurrentChatBoxManager currentChatBoxManager,
-                                                 BuildManager buildManager) {
+                                                 BuildManager buildManager,
+                                                 ChatBoxIdValidator chatBoxIdValidator,
+                                                 CommunicationActivityManager communicationActivityManager) {
         return new ExtendChatBoxModeManager(
                 bus,
                 mActivity,
                 userManager,
                 apiManager,
                 currentChatBoxManager,
-                buildManager);
+                buildManager,
+                chatBoxIdValidator,
+                communicationActivityManager);
     }
 
     @Provides
@@ -96,13 +101,15 @@ public class ExtendCommunicationActivityModule {
     ConversationModeManager provideConversationModeManager(Bus bus,
                                                            UserManager userManager,
                                                            CurrentConversationManager currentConversationManager,
-                                                           ConversationIdValidator conversationIdValidator) {
+                                                           ConversationIdValidator conversationIdValidator,
+                                                           CommunicationActivityManager communicationActivityManager) {
         return new ExtendConversationModeManager(
                 bus,
                 mActivity,
                 userManager,
                 currentConversationManager,
-                conversationIdValidator);
+                conversationIdValidator,
+                communicationActivityManager);
     }
 
     @Provides

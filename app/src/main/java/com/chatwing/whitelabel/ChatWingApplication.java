@@ -1,14 +1,17 @@
 package com.chatwing.whitelabel;
 
 import android.app.Application;
+import android.view.ViewConfiguration;
 
 import com.chatwing.whitelabel.activities.ExtendCommunicationActivity;
 import com.chatwing.whitelabel.activities.LegacyLoginActivity;
 import com.chatwing.whitelabel.activities.WalkthroughActivity;
 import com.chatwingsdk.ChatWing;
 import com.chatwingsdk.modules.ChatWingModule;
+import com.chatwingsdk.utils.LogUtils;
 import com.crashlytics.android.Crashlytics;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 
@@ -31,6 +34,21 @@ public class ChatWingApplication extends Application {
         ChatWing.setIsDebugging(true);
         ChatWing.instance(this).setMainActivityClass(ExtendCommunicationActivity.class);
         ChatWing.instance(this).getChatwingGraph().plus(getModules().toArray());
+
+        workaroundOverflowMenuKey();
+    }
+
+    private void workaroundOverflowMenuKey() {
+        try {
+            ViewConfiguration config = ViewConfiguration.get(this);
+            Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
+            if(menuKeyField != null) {
+                menuKeyField.setAccessible(true);
+                menuKeyField.setBoolean(config, false);
+            }
+        } catch (Exception ex) {
+            // Ignore
+        }
     }
 
     /**

@@ -59,6 +59,7 @@ public class StartActivity extends BaseABFragmentActivity {
         if (requestCode == REQUEST_AUTHENTICATION) {
             if (resultCode == RESULT_OK) {
                 LogUtils.v("Populate user debug: populate");
+
                 //Populate fake mods
                 CreateConversationParams.SimpleUser simpleUser = new CreateConversationParams.SimpleUser("238405", "chatwing");
                 Intent service = new Intent(this, CreateConversationIntentService.class);

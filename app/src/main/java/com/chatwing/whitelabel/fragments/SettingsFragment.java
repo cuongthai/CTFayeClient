@@ -263,6 +263,7 @@ public class SettingsFragment extends PreferenceFragment
 
     @Subscribe
     public void onUpdateUserProfileEvent(UpdateUserEvent event) {
+        mDelegate.showLoading(false);
         Exception exception = event.getException();
         if (exception != null) {
             mErrorMessageView.show(exception,
@@ -277,7 +278,6 @@ public class SettingsFragment extends PreferenceFragment
         // recursively call the service and we can't keep track of old user
         // profile.
         if (event.getState() == UpdateUserEvent.STATE.SUCCESS) {
-            mDelegate.showLoading(false);
             mIsProfileChanged = false;
             Intent i = getActivity().getIntent();
             i.putExtra(SettingsFragment.LOAD_LATEST_USER_PROFILE, false);

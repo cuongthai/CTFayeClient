@@ -27,9 +27,11 @@ public class DownloadUserDetailIntentService extends ExtendBaseIntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         User user = mUserManager.getCurrentUser();
-        if (user == null) {
+        if (user == null || user.isGuest()) {
+            post(new UpdateUserEvent(UpdateUserEvent.STATE.CANCELLED));
             return;
         }
+
         setIsInProgress(true);
         LogUtils.v("Syncing user detail");
         try {

@@ -10,6 +10,7 @@ import com.chatwing.whitelabel.services.CreateBookmarkIntentService;
 import com.chatwing.whitelabel.services.DeleteBookmarkIntentService;
 import com.chatwing.whitelabel.services.DeleteMessageIntentService;
 import com.chatwing.whitelabel.services.DownloadUserDetailIntentService;
+import com.chatwing.whitelabel.services.FlagMessageIntentService;
 import com.chatwing.whitelabel.services.IgnoreUserIntentService;
 import com.chatwing.whitelabel.services.SyncBookmarkIntentService;
 import com.chatwing.whitelabel.services.UpdateAvatarIntentService;
@@ -31,6 +32,7 @@ import dagger.Provides;
                 DeleteMessageIntentService.class,
                 BlockUserIntentService.class,
                 IgnoreUserIntentService.class,
+                FlagMessageIntentService.class,
                 DownloadUserDetailIntentService.class,
                 SyncBookmarkIntentService.class,
                 CreateBookmarkIntentService.class,

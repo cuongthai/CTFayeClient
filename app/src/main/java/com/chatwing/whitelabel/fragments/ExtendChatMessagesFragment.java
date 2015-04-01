@@ -14,12 +14,14 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.chatwing.whitelabel.R;
+import com.chatwing.whitelabel.events.FlagMessageEvent;
 import com.chatwing.whitelabel.events.MessageEditEvent;
 import com.chatwing.whitelabel.events.RequestBlockEvent;
 import com.chatwing.whitelabel.events.RequestBlockIPEvent;
 import com.chatwing.whitelabel.events.RequestBlockTypeEvent;
 import com.chatwing.whitelabel.services.BlockUserIntentService;
 import com.chatwing.whitelabel.services.DeleteMessageIntentService;
+import com.chatwing.whitelabel.services.FlagMessageIntentService;
 import com.chatwing.whitelabel.services.IgnoreUserIntentService;
 import com.chatwingsdk.fragments.ChatMessagesFragment;
 import com.chatwingsdk.fragments.CommunicationMessagesFragment;
@@ -29,6 +31,7 @@ import com.chatwingsdk.pojos.BaseUser;
 import com.chatwingsdk.pojos.Message;
 import com.chatwingsdk.validators.PermissionsValidator;
 import com.chatwingsdk.views.ErrorMessageView;
+import com.chatwingsdk.views.QuickMessageView;
 import com.squareup.otto.Subscribe;
 
 import javax.inject.Inject;
@@ -43,6 +46,8 @@ public class ExtendChatMessagesFragment extends ChatMessagesFragment {
     UserManager mUserManager;
     @Inject
     ErrorMessageView mErrorMessageView;
+    @Inject
+    QuickMessageView mMessageView;
     private Message previousSelectedMessage;
     private Delegate mDelegate;
 
@@ -85,7 +90,10 @@ public class ExtendChatMessagesFragment extends ChatMessagesFragment {
         boolean showIgnoreButton = mUserManager.getCurrentUser() == null
                 ? false
                 : shouldShowIgnoreButton(previousSelectedMessage.getUserId(), previousSelectedMessage.getUserType());
-        if (!(hasAdminPermissions() || showIgnoreButton)) {
+        boolean showFlagButton = mUserManager.getCurrentUser() == null
+                ? false
+                : shouldShowFlagButton(previousSelectedMessage.getUserId(), previousSelectedMessage.getUserType());
+        if (!(hasAdminPermissions() || showIgnoreButton || showFlagButton)) {
             return;
         }
         MenuInflater menuInflater = getActivity().getMenuInflater();
@@ -109,6 +117,10 @@ public class ExtendChatMessagesFragment extends ChatMessagesFragment {
         } else {
             ignoreItem.setTitle(R.string.title_ignore);
         }
+
+        //Ignore button
+        MenuItem flagButton = menu.findItem(R.id.flag);
+        flagButton.setVisible(showFlagButton);
     }
 
     @Override
@@ -158,9 +170,18 @@ public class ExtendChatMessagesFragment extends ChatMessagesFragment {
             case R.id.ignore:
                 ignoreUser(previousSelectedMessage);
                 return true;
+            case R.id.flag:
+                flagMessage(previousSelectedMessage);
+                return true;
             default:
                 return super.onContextItemSelected(item);
         }
+    }
+
+    private void flagMessage(Message message) {
+        Intent intent = new Intent(getActivity(), FlagMessageIntentService.class);
+        intent.putExtra(FlagMessageIntentService.EXTRA_MESSAGE_ID, message.getId());
+        getActivity().startService(intent);
     }
 
     private void ignoreUser(Message message) {
@@ -221,6 +242,15 @@ public class ExtendChatMessagesFragment extends ChatMessagesFragment {
         super.onCreateMessageEvent(event);
     }
 
+    @Subscribe
+    public void onFlagMessageEvent(FlagMessageEvent event) {
+        if (event.getException() == null) {
+            mMessageView.show(R.string.message_flag);
+        } else {
+            mErrorMessageView.show(R.string.error_failed_to_flag);
+        }
+    }
+
     //////////////////////////////////////////////////////////////////
     // ContextMenu and methods related to admin/moderator features.
     //////////////////////////////////////////////////////////////////
@@ -245,6 +275,21 @@ public class ExtendChatMessagesFragment extends ChatMessagesFragment {
     }
 
     private boolean shouldShowIgnoreButton(String loginId, String userType) {
+        BaseUser mCurrentUser = mUserManager.getCurrentUser();
+        if (mCurrentUser == null) {
+            return false;
+        }
+        boolean isMe = mUserManager.isCurrentUser(
+                BaseUser.computeIdentifier(loginId, userType));
+        boolean meOrGuest = isMe
+                || BaseUser.isGuest(userType)
+                || mCurrentUser.isGuest();
+
+
+        return !meOrGuest;
+    }
+
+    private boolean shouldShowFlagButton(String loginId, String userType) {
         BaseUser mCurrentUser = mUserManager.getCurrentUser();
         if (mCurrentUser == null) {
             return false;

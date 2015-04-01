@@ -68,6 +68,8 @@ public class GuestLoginFragment extends Fragment {
         getView().findViewById(R.id.btn_login_guest).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                int supportCheckedItemPosition = gridView.getSupportCheckedItemPosition();
+                if (supportCheckedItemPosition == -1) return;
                 EditText guestName = (EditText) getView().findViewById(R.id.guest_name);
                 if (TextUtils.isEmpty(guestName.getText())) {
                     guestName.setError(getString(R.string.error_invalid_guest_name));
@@ -79,7 +81,7 @@ public class GuestLoginFragment extends Fragment {
                 GuestOAuthParams params = new GuestOAuthParams(
                         guestName.getText().toString(),
                         String.format(ApiManager.SUBMITTED_GUEST_AVATAR_URL,
-                                adapter.getAvatarAt(gridView.getSupportCheckedItemPosition())
+                                adapter.getAvatarAt(supportCheckedItemPosition)
                         ));
                 UserAuthenticationEvent event
                         = UserAuthenticationEvent.succeedEvent("", params);
