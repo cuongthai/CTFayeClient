@@ -153,7 +153,7 @@ public class ExtendCommunicationActivity
                 user.getUserName(),
                 loginType,
                 loginId,
-                mUserManager.getCurrentUser() == null || user.equals(mUserManager.getCurrentUser()));
+                mUserManager.getCurrentUser() == null || user.equals(mUserManager.getCurrentUser()) || user.isGuest()); // Prevent chat to yourself, guest
         if (!viewProfileEvent.isDenyReply()) {
             showConversation(new CreateConversationParams.SimpleUser(viewProfileEvent.getLoginId(), viewProfileEvent.getUserType()));
         }

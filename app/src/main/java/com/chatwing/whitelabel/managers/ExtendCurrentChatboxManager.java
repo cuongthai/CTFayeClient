@@ -7,8 +7,10 @@ import com.chatwing.whitelabel.events.LoadOnlineUsersFailedEvent;
 import com.chatwing.whitelabel.events.LoadOnlineUsersSuccessEvent;
 import com.chatwing.whitelabel.pojos.responses.LoadOnlineUsersResponse;
 import com.chatwing.whitelabel.tasks.LoadOnlineUsersTask;
+import com.chatwingsdk.events.internal.ResumeOpenChatBoxEvent;
 import com.chatwingsdk.events.internal.TaskFinishedEvent;
 import com.chatwingsdk.managers.CurrentChatBoxManager;
+import com.chatwingsdk.managers.PasswordManager;
 import com.chatwingsdk.validators.ChatBoxIdValidator;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -25,8 +27,9 @@ public class ExtendCurrentChatboxManager extends CurrentChatBoxManager {
     public ExtendCurrentChatboxManager(Context context,
                                        Bus bus,
                                        ChatBoxIdValidator chatBoxIdValidator,
-                                       Provider<LoadOnlineUsersTask> onlineUsersTaskProvider) {
-        super(context, bus, chatBoxIdValidator);
+                                       Provider<LoadOnlineUsersTask> onlineUsersTaskProvider,
+                                       PasswordManager passwordManager) {
+        super(context, bus, chatBoxIdValidator, passwordManager);
         mOnlineUsersTaskProvider = onlineUsersTaskProvider;
 
     }
@@ -34,6 +37,11 @@ public class ExtendCurrentChatboxManager extends CurrentChatBoxManager {
     @com.squareup.otto.Subscribe
     public void onLoadChatBoxDetailsEvent(com.chatwingsdk.events.internal.LoadChatBoxDetailsEvent event) {
         super.onLoadChatBoxDetailsEvent(event);
+    }
+
+    @Subscribe
+    public void onResumeSetCurrentChatbox(ResumeOpenChatBoxEvent chatboxEvent){
+        super.onResumeSetCurrentChatbox(chatboxEvent);
     }
 
 

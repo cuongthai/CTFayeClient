@@ -16,15 +16,13 @@ import com.chatwing.whitelabel.managers.ExtendConversationModeManager;
 import com.chatwing.whitelabel.managers.ExtendCurrentChatboxManager;
 import com.chatwing.whitelabel.managers.WLApiManagerImpl;
 import com.chatwing.whitelabel.tasks.LoadOnlineUsersTask;
-import com.chatwingsdk.activities.CommunicationActivity;
 import com.chatwingsdk.interfaces.ChatWingJavaDelegate;
-import com.chatwingsdk.interfaces.JSInterfaceImpl;
-import com.chatwingsdk.managers.ApiManagerImpl;
 import com.chatwingsdk.managers.ChatboxModeManager;
 import com.chatwingsdk.managers.CommunicationActivityManager;
 import com.chatwingsdk.managers.ConversationModeManager;
 import com.chatwingsdk.managers.CurrentChatBoxManager;
 import com.chatwingsdk.managers.CurrentConversationManager;
+import com.chatwingsdk.managers.PasswordManager;
 import com.chatwingsdk.managers.UserManager;
 import com.chatwingsdk.modules.CommunicationActivityModule;
 import com.chatwingsdk.validators.ChatBoxIdValidator;
@@ -116,11 +114,13 @@ public class ExtendCommunicationActivityModule {
     @Singleton
     CurrentChatBoxManager provideCurrentChatboxManager(Bus bus,
                                                        ChatBoxIdValidator chatBoxIdValidator,
-                                                       Provider<LoadOnlineUsersTask> taskProvider) {
+                                                       Provider<LoadOnlineUsersTask> taskProvider,
+                                                       PasswordManager passwordManager) {
         return new ExtendCurrentChatboxManager(mActivity,
                 bus,
                 chatBoxIdValidator,
-                taskProvider);
+                taskProvider,
+                passwordManager);
     }
 
 

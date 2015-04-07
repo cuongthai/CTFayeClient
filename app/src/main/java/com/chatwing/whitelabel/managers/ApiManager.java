@@ -63,7 +63,8 @@ public interface ApiManager extends com.chatwingsdk.managers.ApiManager {
             UserUnauthenticatedException,
             InvalidIdentityException,
             InvalidAccessTokenException,
-            RequiredPermissionException;
+            RequiredPermissionException,
+            NotVerifiedEmailException;
 
     BlackListResponse blockUser(User user,
                                 ExtendChatMessagesFragment.BLOCK block,
@@ -76,13 +77,15 @@ public interface ApiManager extends com.chatwingsdk.managers.ApiManager {
             UserUnauthenticatedException,
             ValidationException,
             InvalidAccessTokenException,
-            RequiredPermissionException;
+            RequiredPermissionException,
+            NotVerifiedEmailException;
 
     ResetPasswordResponse resetPassword(String email)
             throws ApiException,
             HttpRequest.HttpRequestException,
             EmailValidator.InvalidEmailException,
-            ValidationException;
+            ValidationException,
+            NotVerifiedEmailException;
 
     IgnoreUserResponse ignoreUser(User user,
                                   String userId,
@@ -91,7 +94,8 @@ public interface ApiManager extends com.chatwingsdk.managers.ApiManager {
             throws UserUnauthenticatedException,
             HttpRequest.HttpRequestException,
             ApiException,
-            InvalidAccessTokenException;
+            InvalidAccessTokenException,
+            NotVerifiedEmailException;
 
     RegisterResponse register(String email,
                               String password,
@@ -109,12 +113,14 @@ public interface ApiManager extends com.chatwingsdk.managers.ApiManager {
             throws UserUnauthenticatedException,
             ApiException,
             HttpRequest.HttpRequestException,
-            InvalidAccessTokenException;
+            InvalidAccessTokenException,
+            NotVerifiedEmailException;
 
     LoadOnlineUsersResponse loadOnlineUsers(int chatBoxId)
             throws ApiException,
             HttpRequest.HttpRequestException,
-            ChatBoxIdValidator.InvalidIdException;
+            ChatBoxIdValidator.InvalidIdException,
+            NotVerifiedEmailException;
 
     int getLoginTypeImageResId(String type);
 
@@ -125,30 +131,35 @@ public interface ApiManager extends com.chatwingsdk.managers.ApiManager {
             HttpRequest.HttpRequestException,
             UserUnauthenticatedException,
             ValidationException,
-            InvalidAccessTokenException;
+            InvalidAccessTokenException,
+            NotVerifiedEmailException;
 
     JSUserResponse updateAvatar(User currentUser,
                               String path)
             throws UserUnauthenticatedException,
             HttpRequest.HttpRequestException,
-            ApiException;
+            ApiException,
+            NotVerifiedEmailException;
 
     void verifyEmail(User user)
             throws UserUnauthenticatedException,
-            HttpRequest.HttpRequestException, ApiException;
+            HttpRequest.HttpRequestException,
+            ApiException,
+            NotVerifiedEmailException;
 
     SearchChatBoxResponse searchChatBox(String query,
                                         int offset,
                                         int limit)
             throws ApiException,
-            ValidationException;
+            ValidationException, NotVerifiedEmailException;
 
     CreateChatBoxResponse createChatBox(User user,
                                         String name)
             throws UserUnauthenticatedException,
             ApiException,
             InvalidIdentityException,
-            InvalidAccessTokenException;
+            InvalidAccessTokenException,
+            NotVerifiedEmailException;
 
     String getFullChatBoxAliasUrl(String alias);
 
@@ -158,7 +169,8 @@ public interface ApiManager extends com.chatwingsdk.managers.ApiManager {
             HttpRequest.HttpRequestException,
             UserUnauthenticatedException,
             InvalidAccessTokenException,
-            InvalidIdentityException;
+            InvalidIdentityException,
+            NotVerifiedEmailException;
 
     CreateBookmarkResponse createBookmark(User user,
                                           int chatboxId)
@@ -167,20 +179,23 @@ public interface ApiManager extends com.chatwingsdk.managers.ApiManager {
             UserUnauthenticatedException,
             ChatBoxIdValidator.InvalidIdException,
             InvalidAccessTokenException,
-            InvalidIdentityException;
+            InvalidIdentityException,
+            NotVerifiedEmailException;
 
     BookmarkResponse loadBookmarks(User user)
             throws ApiException,
             HttpRequest.HttpRequestException,
             UserUnauthenticatedException,
             InvalidAccessTokenException,
-            InvalidIdentityException;
+            InvalidIdentityException,
+            NotVerifiedEmailException;
 
     FlagMessageResponse flagMessage(User currentUser, String messageID)
             throws UserUnauthenticatedException,
             HttpRequest.HttpRequestException,
             ApiException,
-            InvalidAccessTokenException ;
+            InvalidAccessTokenException,
+            NotVerifiedEmailException;
 
     public static class RequiredPermissionException extends Exception {
     }

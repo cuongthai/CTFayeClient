@@ -79,7 +79,8 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
             throws ApiException,
             HttpRequest.HttpRequestException,
             EmailValidator.InvalidEmailException,
-            ValidationException {
+            ValidationException,
+            NotVerifiedEmailException {
         mEmailValidator.validate(email);
 
         Gson gson = new Gson();
@@ -142,6 +143,10 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
             throw ApiException.createException(e);
         } catch (InvalidAccessTokenException e) {
             throw ApiException.createException(e);
+        } catch (NotVerifiedEmailException e) {
+            e.printStackTrace();
+            throw ApiException.createException(new Exception("No way"));
+            //Noway
         }
     }
 
@@ -155,7 +160,8 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
             throws UserUnauthenticatedException,
             HttpRequest.HttpRequestException,
             ApiException,
-            InvalidAccessTokenException {
+            InvalidAccessTokenException,
+            NotVerifiedEmailException {
         validate(user);
 
         Gson gson = new Gson();
@@ -179,7 +185,8 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
     public LoadOnlineUsersResponse loadOnlineUsers(int chatBoxId)
             throws ApiException,
             HttpRequest.HttpRequestException,
-            ChatBoxIdValidator.InvalidIdException {
+            ChatBoxIdValidator.InvalidIdException,
+            NotVerifiedEmailException {
         mChatBoxIdValidator.validate(chatBoxId);
 
         Gson gson = new Gson();
@@ -208,7 +215,8 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
             HttpRequest.HttpRequestException,
             UserUnauthenticatedException,
             ValidationException,
-            InvalidAccessTokenException {
+            InvalidAccessTokenException,
+            NotVerifiedEmailException {
         validate(user);
 
         Gson gson = new Gson();
@@ -233,7 +241,8 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
     public void verifyEmail(User user)
             throws UserUnauthenticatedException,
             HttpRequest.HttpRequestException,
-            ApiException {
+            ApiException,
+            NotVerifiedEmailException {
         validate(user);
 
         Gson gson = new Gson();
@@ -304,7 +313,8 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
             throws UserUnauthenticatedException,
             HttpRequest.HttpRequestException,
             ApiException,
-            InvalidAccessTokenException {
+            InvalidAccessTokenException,
+            NotVerifiedEmailException {
         validate(user);
 
         Gson gson = new Gson();
@@ -342,7 +352,8 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
             UserUnauthenticatedException,
             InvalidIdentityException,
             InvalidAccessTokenException,
-            RequiredPermissionException {
+            RequiredPermissionException,
+            NotVerifiedEmailException {
         validate(user);
         mChatBoxIdValidator.validate(chatBoxId);
         mMessageIdValidator.validate(messageId);
@@ -382,7 +393,8 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
             UserUnauthenticatedException,
             ValidationException,
             InvalidAccessTokenException,
-            RequiredPermissionException {
+            RequiredPermissionException,
+            NotVerifiedEmailException {
         validate(user);
         Gson gson = new Gson();
 
@@ -428,7 +440,8 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
                                      String path)
             throws UserUnauthenticatedException,
             HttpRequest.HttpRequestException,
-            ApiException {
+            ApiException,
+            NotVerifiedEmailException {
         validate(user);
 
         HttpRequest request = HttpRequest.post(UPLOAD_AVATAR);
@@ -458,7 +471,8 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
                                                int limit)
             throws ApiException,
             HttpRequest.HttpRequestException,
-            ValidationException {
+            ValidationException,
+            NotVerifiedEmailException {
         if (TextUtils.isEmpty(query)) {
             throw new ValidationException(
                     new ChatWingError(ChatWingError.ERROR_CODE_VALIDATION_ERR,
@@ -490,7 +504,8 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
             ApiException,
             HttpRequest.HttpRequestException,
             InvalidAccessTokenException,
-            InvalidIdentityException {
+            InvalidIdentityException,
+            NotVerifiedEmailException {
         validate(user);
         if (!mPermissionsValidator.canCreateChatBox(user)) {
             throw new InvalidIdentityException(new ChatWingError(
@@ -531,7 +546,8 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
             HttpRequest.HttpRequestException,
             UserUnauthenticatedException,
             InvalidAccessTokenException,
-            InvalidIdentityException {
+            InvalidIdentityException,
+            NotVerifiedEmailException {
         validate(user);
 
         if (bookmarkId == null) {
@@ -575,7 +591,8 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
             UserUnauthenticatedException,
             ChatBoxIdValidator.InvalidIdException,
             InvalidAccessTokenException,
-            InvalidIdentityException {
+            InvalidIdentityException,
+            NotVerifiedEmailException {
         validate(user);
         mChatBoxIdValidator.validate(chatboxId);
 
@@ -615,7 +632,8 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
             HttpRequest.HttpRequestException,
             UserUnauthenticatedException,
             InvalidAccessTokenException,
-            InvalidIdentityException {
+            InvalidIdentityException,
+            NotVerifiedEmailException {
         validate(user);
 
         if (!mPermissionsValidator.canBookmark(user)) {
@@ -647,7 +665,8 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
             throws UserUnauthenticatedException,
             HttpRequest.HttpRequestException,
             ApiException,
-            InvalidAccessTokenException {
+            InvalidAccessTokenException,
+            NotVerifiedEmailException {
         validate(user);
 
         Gson gson = new Gson();

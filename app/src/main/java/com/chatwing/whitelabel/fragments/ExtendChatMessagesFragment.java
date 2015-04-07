@@ -23,6 +23,9 @@ import com.chatwing.whitelabel.services.BlockUserIntentService;
 import com.chatwing.whitelabel.services.DeleteMessageIntentService;
 import com.chatwing.whitelabel.services.FlagMessageIntentService;
 import com.chatwing.whitelabel.services.IgnoreUserIntentService;
+import com.chatwingsdk.events.internal.PasswordEnteredEvent;
+import com.chatwingsdk.events.internal.PasswordRefusedEvent;
+import com.chatwingsdk.events.internal.RequestOpenChatBoxEvent;
 import com.chatwingsdk.fragments.ChatMessagesFragment;
 import com.chatwingsdk.fragments.CommunicationMessagesFragment;
 import com.chatwingsdk.managers.CurrentChatBoxManager;
@@ -220,6 +223,21 @@ public class ExtendChatMessagesFragment extends ChatMessagesFragment {
     @com.squareup.otto.Subscribe
     public void onAppendEmoticonEvent(com.chatwingsdk.events.internal.AppendEmoticonEvent event) {
         super.onAppendEmoticonEvent(event);
+    }
+
+    @Subscribe
+    public void onRequestOpenChatBoxEvent(final RequestOpenChatBoxEvent event) {
+        super.onRequestOpenChatBoxEvent(event);
+    }
+
+    @Subscribe
+    public void onPasswordEntered(PasswordEnteredEvent event) {
+        super.onPasswordEntered(event);
+    }
+
+    @Subscribe
+    public void onPasswordRefused(PasswordRefusedEvent event) {
+        super.onPasswordRefused(event);
     }
 
     @com.squareup.otto.Subscribe

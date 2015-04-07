@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.widget.TextView;
@@ -18,7 +19,6 @@ import com.chatwingsdk.contentproviders.ChatWingContentProvider;
 import com.chatwingsdk.fragments.CommunicationDrawerFragment;
 import com.chatwingsdk.managers.UserManager;
 import com.chatwingsdk.tables.ChatBoxTable;
-import com.chatwingsdk.utils.LogUtils;
 import com.squareup.otto.Subscribe;
 
 import javax.inject.Inject;
@@ -109,7 +109,8 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
             mNextView.setVisibility(View.GONE);
 
             mWebsiteTv.setVisibility(View.VISIBLE);
-            mWebsiteTv.setText("http://wildcatsociety.com/");
+            //TODO FIXME only apply for Kentucky!
+            mWebsiteTv.setText(Html.fromHtml("<a href='http://wildcatsociety.com/'>http://wildcatsociety.com/</a>"));
             mWebsiteTv.setMovementMethod(LinkMovementMethod.getInstance());
         }
 

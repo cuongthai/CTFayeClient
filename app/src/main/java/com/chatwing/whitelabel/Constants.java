@@ -1,4 +1,4 @@
-package com.chatwing.whitelabel;
+    package com.chatwing.whitelabel;
 
 import com.chatwingsdk.ChatWing;
 
