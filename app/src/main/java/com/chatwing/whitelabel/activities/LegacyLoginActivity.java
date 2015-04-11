@@ -446,7 +446,8 @@ public class LegacyLoginActivity extends AuthenticateActivity
                 return;
             }
             //Error Google
-            if (params.getType().equals(com.chatwingsdk.Constants.TYPE_GOOGLE)) {
+            if (params.getType().equals(com.chatwingsdk.Constants.TYPE_GOOGLE)
+                    && event.getException() instanceof com.chatwingsdk.managers.ApiManager.InvalidExternalAccessTokenException) {
                 ChatWingError error = ((com.chatwingsdk.managers.ApiManager.InvalidExternalAccessTokenException) event.getException()).getError();
                 AuthenticationParamsError errorDetail = new Gson().fromJson(
                         error.getParams(),

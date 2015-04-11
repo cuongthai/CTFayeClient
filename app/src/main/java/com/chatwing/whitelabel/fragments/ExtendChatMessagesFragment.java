@@ -182,12 +182,14 @@ public class ExtendChatMessagesFragment extends ChatMessagesFragment {
     }
 
     private void flagMessage(Message message) {
+        if (message == null) return;
         Intent intent = new Intent(getActivity(), FlagMessageIntentService.class);
         intent.putExtra(FlagMessageIntentService.EXTRA_MESSAGE_ID, message.getId());
         getActivity().startService(intent);
     }
 
     private void ignoreUser(Message message) {
+        if (message == null) return;
         Intent intent = new Intent(getActivity(), IgnoreUserIntentService.class);
         intent.putExtra(IgnoreUserIntentService.EXTRA_USER_ID, message.getUserId());
         intent.putExtra(IgnoreUserIntentService.EXTRA_USER_TYPE, message.getUserType());
@@ -196,6 +198,7 @@ public class ExtendChatMessagesFragment extends ChatMessagesFragment {
     }
 
     private void deleteMessage(Message message) {
+        if (message == null) return;
         // Double check for permission.
         // If user doesn't have the permission, the UI element shouldn't be showed anyway.
         if (!hasPermission(PermissionsValidator.Permission.DELETE_MESSAGE)) {
@@ -210,6 +213,8 @@ public class ExtendChatMessagesFragment extends ChatMessagesFragment {
     }
 
     private void blockUser(Message message) {
+        if (message == null) return;
+
         // Double check for permission.
         // If user doesn't have the permission, the UI element shouldn't be showed anyway.
         if (!hasPermission(PermissionsValidator.Permission.BLOCK_USER)) {
