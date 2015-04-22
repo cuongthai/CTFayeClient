@@ -7,6 +7,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -26,6 +27,7 @@ import com.chatwing.whitelabel.fragments.PhotoPickerDialogFragment;
 import com.chatwing.whitelabel.fragments.SettingsFragment;
 import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.managers.BuildManager;
+import com.chatwing.whitelabel.managers.ChatboxUnreadDownloadManager;
 import com.chatwing.whitelabel.managers.ExtendChatBoxModeManager;
 import com.chatwing.whitelabel.managers.ExtendCommunicationModeManager;
 import com.chatwing.whitelabel.modules.ExtendCommunicationActivityModule;
@@ -79,6 +81,8 @@ public class ExtendCommunicationActivity
     com.chatwingsdk.managers.UserManager mUserManager;
     @Inject
     BuildManager mBuildManager;
+    @Inject
+    ChatboxUnreadDownloadManager chatboxUnreadDownloadManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,6 +141,7 @@ public class ExtendCommunicationActivity
     public void onAllSyncsCompleted(com.chatwingsdk.events.internal.AllSyncsCompletedEvent
                                             event) {
         super.onAllSyncsCompleted(event);
+        chatboxUnreadDownloadManager.downloadUnread();
     }
 
     @Subscribe
@@ -401,9 +406,13 @@ public class ExtendCommunicationActivity
         mNotSubscribeToChannels = true;
         //clean up irrelevant data
         try {
+            mGcmManager.clearRegistrationId();
+
             getContentResolver().applyBatch(ChatWingContentProvider.AUTHORITY,
                     ChatWingContentProvider.getClearAllDataBatch());
             startSyncingCommunications(true);
+
+            deployGCM();
             invalidateOptionsMenu();
         } catch (Exception e) {
             LogUtils.e(e);

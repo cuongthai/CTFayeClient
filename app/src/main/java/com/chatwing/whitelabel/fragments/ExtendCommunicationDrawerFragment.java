@@ -16,6 +16,7 @@ import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.events.AccountSwitchEvent;
 import com.chatwing.whitelabel.managers.BuildManager;
 import com.chatwingsdk.contentproviders.ChatWingContentProvider;
+import com.chatwingsdk.events.internal.SyncChatboxUnreadComplete;
 import com.chatwingsdk.fragments.CommunicationDrawerFragment;
 import com.chatwingsdk.managers.UserManager;
 import com.chatwingsdk.tables.ChatBoxTable;
@@ -190,6 +191,12 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
     @com.squareup.otto.Subscribe
     public void onUpdateUserEvent(com.chatwingsdk.events.internal.UpdateUserEvent event) {
         super.onUpdateUserEvent(event);
+    }
+
+    @Subscribe
+    public void onSyncChatboxUnreadComplete(SyncChatboxUnreadComplete event){
+        super.onSyncChatboxUnreadComplete(event);
+        getLoaderManager().restartLoader(LOADER_ID_SYNCED_BOOKMARKS, null, this);
     }
 
     @Subscribe
