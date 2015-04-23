@@ -31,7 +31,7 @@ public class ChatWingApplication extends Application {
         ChatWing.initialize(this, "android", "", new String[]{"1873"}, isOfficialChatWingApp()
                 ? WalkthroughActivity.class
                 : LegacyLoginActivity.class);
-        ChatWing.setIsDebugging(true);
+        ChatWing.setIsDebugging(false);
         ChatWing.instance(this).setMainActivityClass(ExtendCommunicationActivity.class);
         ChatWing.instance(this).getChatwingGraph().plus(getModules().toArray());
 
