@@ -29,7 +29,6 @@ import android.view.MenuItem;
 
 import com.chatwing.whitelabel.Constants;
 import com.chatwing.whitelabel.R;
-import com.chatwing.whitelabel.activities.RegisterActivity;
 import com.chatwing.whitelabel.fragments.AuthenticateFragment;
 import com.chatwing.whitelabel.fragments.ForgotPasswordFragment;
 import com.chatwing.whitelabel.fragments.GooglePlusDialogFragment;
@@ -297,6 +296,7 @@ public class LegacyLoginActivity extends AuthenticateActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_login, menu);
+        menu.findItem(R.id.register).setVisible(mBuildManager.isSupportedRegister());
         return super.onCreateOptionsMenu(menu);
     }
 

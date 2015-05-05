@@ -22,4 +22,8 @@ public class BuildManager {
     public boolean isOfficialChatWingApp() {
         return mContext.getResources().getBoolean(R.bool.official);
     }
+
+    public boolean isSupportedRegister() {
+        return mContext.getResources().getBoolean(R.bool.allow_register);
+    }
 }

@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.Window;
 
 import com.chatwing.whitelabel.R;
+import com.chatwing.whitelabel.managers.BuildManager;
 import com.chatwing.whitelabel.modules.StartActivityModule;
 import com.chatwingsdk.activities.BaseABFragmentActivity;
 import com.chatwingsdk.managers.UserManager;
@@ -27,6 +28,8 @@ public class StartActivity extends BaseABFragmentActivity {
     private static final int REQUEST_AUTHENTICATION = 1990;
     @Inject
     UserManager mUserManager;
+    @Inject
+    BuildManager mBuildManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,12 +48,18 @@ public class StartActivity extends BaseABFragmentActivity {
             }
         });
 
-        findViewById(R.id.btn_register).setOnClickListener(new View.OnClickListener() {
+        View registerButton = findViewById(R.id.btn_register);
+        registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivityForResult(new Intent(StartActivity.this, RegisterActivity.class), REQUEST_AUTHENTICATION);
             }
         });
+        
+        if(!mBuildManager.isSupportedRegister()){
+            registerButton.setVisibility(View.GONE);
+        }
+
     }
 
     @Override

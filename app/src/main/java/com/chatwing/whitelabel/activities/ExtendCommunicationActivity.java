@@ -39,6 +39,7 @@ import com.chatwingsdk.activities.BaseABFragmentActivity;
 import com.chatwingsdk.activities.CommunicationActivity;
 import com.chatwingsdk.contentproviders.ChatWingContentProvider;
 import com.chatwingsdk.events.internal.SyncCommunicationBoxEvent;
+import com.chatwingsdk.events.internal.SyncUnreadEvent;
 import com.chatwingsdk.events.internal.UpdateUserEvent;
 import com.chatwingsdk.events.internal.ViewProfileEvent;
 import com.chatwingsdk.fragments.CommunicationMessagesFragment;
@@ -112,6 +113,13 @@ public class ExtendCommunicationActivity
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        chatboxUnreadDownloadManager.downloadUnread();
+
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
         if (requestCode == Crop.REQUEST_CROP && resultCode == RESULT_OK) {
@@ -141,7 +149,14 @@ public class ExtendCommunicationActivity
     public void onAllSyncsCompleted(com.chatwingsdk.events.internal.AllSyncsCompletedEvent
                                             event) {
         super.onAllSyncsCompleted(event);
+
         chatboxUnreadDownloadManager.downloadUnread();
+        syncRefreshAnimationState();
+    }
+
+    @Subscribe
+    public void onSyncUnreadEvent(SyncUnreadEvent event){
+        syncRefreshAnimationState();
     }
 
     @Subscribe
@@ -497,20 +512,22 @@ public class ExtendCommunicationActivity
             // A sync operation is running. Just wait for it.
             return;
         }
+        super.mSyncManager.addToQueue(SyncBookmarkIntentService.class);
 
         getActivity().startService(new Intent(getActivity(), SyncBookmarkIntentService.class));
     }
 
     @Override
     protected boolean syncingInProcess() {
-        return SyncCommunicationBoxesIntentService.isInProgress() || SyncBookmarkIntentService.isInProgress();
+        return SyncCommunicationBoxesIntentService.isInProgress() || SyncBookmarkIntentService.isInProgress() || ChatboxUnreadDownloadManager.isRunning();
     }
 
     @Override
     protected boolean startSyncingCommunications(boolean needReload) {
         boolean result = super.startSyncingCommunications(needReload);
-        super.mSyncManager.addToQueue(SyncBookmarkIntentService.class);
-        super.mSyncManager.addToQueue(DownloadUserDetailIntentService.class);
+        if(result) {
+            super.mSyncManager.addToQueue(DownloadUserDetailIntentService.class);
+        }
         return result;
     }
 

@@ -14,12 +14,13 @@ import android.widget.TextView;
 
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.events.AccountSwitchEvent;
+import com.chatwingsdk.events.internal.SyncUnreadEvent;
 import com.chatwing.whitelabel.managers.BuildManager;
 import com.chatwingsdk.contentproviders.ChatWingContentProvider;
-import com.chatwingsdk.events.internal.SyncChatboxUnreadComplete;
 import com.chatwingsdk.fragments.CommunicationDrawerFragment;
 import com.chatwingsdk.managers.UserManager;
 import com.chatwingsdk.tables.ChatBoxTable;
+import com.chatwingsdk.utils.LogUtils;
 import com.squareup.otto.Subscribe;
 
 import javax.inject.Inject;
@@ -93,7 +94,6 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
 
         mBookmarksUnreadCountView = (TextView) view.findViewById(R.id.bookmarks_unread_count);
 
-
     }
 
     @Override
@@ -109,14 +109,11 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
             bookmarkView.setVisibility(View.GONE);
             mNextView.setVisibility(View.GONE);
 
-            mWebsiteTv.setVisibility(View.VISIBLE);
+            mWebsiteTv.setVisibility(View.GONE);
             //TODO FIXME only apply for Kentucky!
             mWebsiteTv.setText(Html.fromHtml("<a href='http://wildcatsociety.com/'>http://wildcatsociety.com/</a>"));
             mWebsiteTv.setMovementMethod(LinkMovementMethod.getInstance());
         }
-
-
-
     }
 
     @Override
@@ -194,9 +191,10 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
     }
 
     @Subscribe
-    public void onSyncChatboxUnreadComplete(SyncChatboxUnreadComplete event){
+    public void onSyncChatboxUnreadComplete(SyncUnreadEvent event){
         super.onSyncChatboxUnreadComplete(event);
         getLoaderManager().restartLoader(LOADER_ID_SYNCED_BOOKMARKS, null, this);
+        getLoaderManager().restartLoader(LOADER_ID_CHATBOXES, null, this);
     }
 
     @Subscribe
@@ -204,7 +202,7 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
         updateUserViews();
     }
 
-    public static interface Listener extends CommunicationDrawerFragment.Listener {
+    public  interface Listener extends CommunicationDrawerFragment.Listener {
         void showSettings();
 
         void updateAvatar();
