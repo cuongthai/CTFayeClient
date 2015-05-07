@@ -445,6 +445,15 @@ public class LegacyLoginActivity extends AuthenticateActivity
                 mLoginFragment.setEmailError(getString(R.string.error_invalid_username_password));
                 return;
             }
+
+            if(Constants.TYPE_APP.equals(params.getType())
+                    && event.getException() instanceof ApiManager.ValidationException
+                    && ChatWingError.hasValidationError(((ApiManager.ValidationException) event.getException()).getError())
+                    && mLoginFragment.isAdded()) {
+                mLoginFragment.setEmailError(getString(R.string.error_app_invalid_username_password));
+                return;
+            }
+
             //Error Google
             if (params.getType().equals(com.chatwingsdk.Constants.TYPE_GOOGLE)
                     && event.getException() instanceof com.chatwingsdk.managers.ApiManager.InvalidExternalAccessTokenException) {

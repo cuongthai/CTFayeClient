@@ -17,11 +17,14 @@ import android.widget.TextView;
 
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.adapters.EmailsAdapterFactory;
+import com.chatwing.whitelabel.managers.BuildManager;
+import com.chatwing.whitelabel.pojos.oauth.AppOAuthParams;
 import com.chatwing.whitelabel.pojos.oauth.ChatwingOAuthParams;
 import com.chatwing.whitelabel.validators.EmailValidator;
 import com.chatwing.whitelabel.validators.PasswordValidator;
 import com.chatwingsdk.events.internal.UserAuthenticationEvent;
 import com.chatwingsdk.fragments.InjectableFragmentDelegate;
+import com.chatwingsdk.pojos.params.oauth.AuthenticationParams;
 import com.squareup.otto.Bus;
 
 import javax.inject.Inject;
@@ -43,6 +46,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     EmailsAdapterFactory mEmailsAdapterFactory;
     @Inject
     Provider<Typeface> mIconTypefaceProvider;
+    @Inject
+    BuildManager mBuildManager;
     private Delegate mDelegate;
     private AutoCompleteTextView mEmailEditText;
     private EditText mPasswordEditText;
@@ -128,7 +133,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         try {
             mEmailValidator.validate(email);
             mPasswordValidator.validate(password);
-            ChatwingOAuthParams params = new ChatwingOAuthParams(email, password);
+            AuthenticationParams params = mBuildManager.isCustomLoginType()
+                    ? new AppOAuthParams(email, password)
+                    : new ChatwingOAuthParams(email, password);
             UserAuthenticationEvent event
                     = UserAuthenticationEvent.succeedEvent("", params);
             mBus.post(event);

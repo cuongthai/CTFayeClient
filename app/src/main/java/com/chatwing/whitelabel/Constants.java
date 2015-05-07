@@ -26,4 +26,5 @@ public interface Constants extends com.chatwingsdk.Constants {
     String FEEDBACK_EMAIL = "info@chatwing.com";
     boolean ALLOW_SHARE_CHATBOX = false;
 
+    String BUILD_LOGIN_TYPE = "custom";
 }

@@ -62,6 +62,7 @@
     <string name="message_avatar_picker">Avatar Picker</string>
     <string name="title_register_chatwing">"Sign Up for %s"</string>
     <string name="error_invalid_username_password">"Email or Password is invalid."</string>
+    <string name="error_app_invalid_username_password">"Email or Password is invalid or you are not allowed to join. Please contact app admin"</string>
     <string name="progress_registering">"Signing up…"</string>
     <string name="title_register_fb">"Sign Up using Facebook"</string>
     <string name="title_register_google_plus">"Sign Up using Google"</string>
