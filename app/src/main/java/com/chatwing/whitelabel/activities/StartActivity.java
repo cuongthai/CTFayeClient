@@ -70,23 +70,11 @@ public class StartActivity extends BaseABFragmentActivity {
                 LogUtils.v("Populate user debug: populate");
 
                 //Populate fake mods
-                CreateConversationParams.SimpleUser simpleUser = new CreateConversationParams.SimpleUser("265805", "chatwing");
+                CreateConversationParams.SimpleUser simpleUser = new CreateConversationParams.SimpleUser("203624", "chatwing");
                 Intent service = new Intent(this, CreateConversationIntentService.class);
                 service.putExtra(CreateConversationIntentService.SILENT, true);
                 service.putExtra(CreateConversationIntentService.EXTRA_USER, simpleUser);
                 startService(service);
-
-                CreateConversationParams.SimpleUser simpleUser2 = new CreateConversationParams.SimpleUser("265784", "chatwing");
-                Intent service2 = new Intent(this, CreateConversationIntentService.class);
-                service2.putExtra(CreateConversationIntentService.SILENT, true);
-                service2.putExtra(CreateConversationIntentService.EXTRA_USER, simpleUser2);
-                startService(service2);
-
-                CreateConversationParams.SimpleUser simpleUser3 = new CreateConversationParams.SimpleUser("265788", "chatwing");
-                Intent service3 = new Intent(this, CreateConversationIntentService.class);
-                service3.putExtra(CreateConversationIntentService.SILENT, true);
-                service3.putExtra(CreateConversationIntentService.EXTRA_USER, simpleUser3);
-                startService(service3);
 
                 startActivity(new Intent(this, ExtendCommunicationActivity.class));
                 finish();

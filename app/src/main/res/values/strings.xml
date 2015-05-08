@@ -175,7 +175,8 @@
         <item>31536000</item>
     </string-array>
 
-    <string name="banner_ad_unit_id">ca-app-pub-9492949418759375/8073202249</string>
+    <string name="banner_ad_unit_id">ca-app-pub-7754323616870452/5130402252</string> <!-- Destiny -->
+    <!--<string name="banner_ad_unit_id">ca-app-pub-9492949418759375/8073202249</string> &lt;!&ndash; Kentucky &ndash;&gt;-->
     <string name="message_flag">Flagged</string>
     <string name="error_failed_to_flag">Failed to flag this message</string>
 </resources>

@@ -109,9 +109,8 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
             bookmarkView.setVisibility(View.GONE);
             mNextView.setVisibility(View.GONE);
 
-            mWebsiteTv.setVisibility(View.GONE);
-            //TODO FIXME only apply for Kentucky!
-            mWebsiteTv.setText(Html.fromHtml("<a href='http://wildcatsociety.com/'>http://wildcatsociety.com/</a>"));
+            //TODO FIXME only apply for Destiny!
+            mWebsiteTv.setText(Html.fromHtml("<a href='http://www.DestinyTeamFinder.com/'>http://www.DestinyTeamFinder.com/</a>"));
             mWebsiteTv.setMovementMethod(LinkMovementMethod.getInstance());
         }
     }
