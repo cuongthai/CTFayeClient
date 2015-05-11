@@ -23,6 +23,8 @@ import com.chatwing.whitelabel.services.BlockUserIntentService;
 import com.chatwing.whitelabel.services.DeleteMessageIntentService;
 import com.chatwing.whitelabel.services.FlagMessageIntentService;
 import com.chatwing.whitelabel.services.IgnoreUserIntentService;
+import com.chatwing.whitelabel.utils.StatisticTracker;
+import com.chatwingsdk.events.internal.CurrentChatBoxEvent;
 import com.chatwingsdk.events.internal.PasswordEnteredEvent;
 import com.chatwingsdk.events.internal.PasswordRefusedEvent;
 import com.chatwingsdk.events.internal.RequestOpenChatBoxEvent;
@@ -67,6 +69,12 @@ public class ExtendChatMessagesFragment extends ChatMessagesFragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mDelegate = (Delegate) activity;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        StatisticTracker.stopChatBoxEvent();
     }
 
     @Override
@@ -247,7 +255,11 @@ public class ExtendChatMessagesFragment extends ChatMessagesFragment {
 
     @com.squareup.otto.Subscribe
     public void onCurrentChatBoxChanged(com.chatwingsdk.events.internal.CurrentChatBoxEvent event) {
+        CurrentChatBoxEvent.Status status = event.getStatus();
         super.onCurrentChatBoxChanged(event);
+        if (status == CurrentChatBoxEvent.Status.LOADED) {
+            StatisticTracker.startChatBoxEvent(event.getChatbox());
+        }
     }
 
     @Subscribe

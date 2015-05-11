@@ -19,12 +19,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.chatwing.whitelabel.ChatWingApplication;
+import com.chatwing.whitelabel.Constants;
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.adapters.SearchChatBoxResultsAdapter;
 import com.chatwing.whitelabel.contentproviders.SearchChatBoxSuggestionsProvider;
 import com.chatwing.whitelabel.listeners.EndlessOnScrollListener;
 import com.chatwing.whitelabel.modules.ExtendChatWingModule;
 import com.chatwing.whitelabel.modules.SearchChatBoxActivityModule;
+import com.chatwing.whitelabel.utils.StatisticTracker;
 import com.chatwingsdk.pojos.LightWeightChatBox;
 import com.chatwing.whitelabel.pojos.responses.CreateChatBoxResponse;
 import com.chatwing.whitelabel.pojos.responses.SearchChatBoxResponse;
@@ -33,6 +35,7 @@ import com.chatwing.whitelabel.tasks.SearchChatBoxTask;
 import com.chatwingsdk.events.internal.TaskFinishedEvent;
 import com.chatwingsdk.managers.UserManager;
 import com.chatwingsdk.views.ErrorMessageView;
+import com.flurry.android.FlurryAgent;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -103,6 +106,7 @@ public class SearchChatBoxActivity extends ActionBarActivity implements View.OnC
     @Override
     protected void onStart() {
         super.onStart();
+        FlurryAgent.onStartSession(this, Constants.FLURRY_API_KEY);
     }
 
     @Override
@@ -121,6 +125,7 @@ public class SearchChatBoxActivity extends ActionBarActivity implements View.OnC
     protected void onStop() {
         super.onStop();
         stopCurrentTask();
+        FlurryAgent.onEndSession(this);
     }
 
     @Override
@@ -353,7 +358,7 @@ public class SearchChatBoxActivity extends ActionBarActivity implements View.OnC
             mProgressFooterView.setVisibility(View.GONE);
             showLoadingIndicator(R.string.progress_searching);
         }
-
+        StatisticTracker.trackChatBoxSearch(mCurrentQuery);
         SearchChatBoxTask task = mSearchChatBoxTaskProvider.get();
         task.setParams(mCurrentQuery, offset, SEARCH_RESULTS_LIMIT);
         startTask(task.execute());

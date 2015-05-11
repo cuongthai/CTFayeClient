@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.chatwing.whitelabel.Constants;
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.events.AccountSwitchEvent;
 import com.chatwing.whitelabel.events.BlockedEvent;
@@ -51,6 +52,7 @@ import com.chatwingsdk.pojos.params.CreateConversationParams;
 import com.chatwingsdk.pojos.responses.ChatBoxDetailsResponse;
 import com.chatwingsdk.services.SyncCommunicationBoxesIntentService;
 import com.chatwingsdk.utils.LogUtils;
+import com.flurry.android.FlurryAgent;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.gson.Gson;
@@ -110,6 +112,18 @@ public class ExtendCommunicationActivity
                     .add(R.id.ads_container, new AdFragment(), adsFragmentTag)
                     .commit();
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FlurryAgent.onStartSession(this, Constants.FLURRY_API_KEY);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        FlurryAgent.onEndSession(this);
     }
 
     @Override

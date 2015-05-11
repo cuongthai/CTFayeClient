@@ -27,4 +27,7 @@ public interface Constants extends com.chatwingsdk.Constants {
     boolean ALLOW_SHARE_CHATBOX = false;
 
     String BUILD_LOGIN_TYPE = "custom";
+
+    String FLURRY_API_KEY = "TJXB56MR5DYMQY5HN85P";
+
 }

@@ -10,6 +10,7 @@ import com.chatwingsdk.ChatWing;
 import com.chatwingsdk.modules.ChatWingModule;
 import com.chatwingsdk.utils.LogUtils;
 import com.crashlytics.android.Crashlytics;
+import com.flurry.android.FlurryAgent;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -35,6 +36,7 @@ public class ChatWingApplication extends Application {
         ChatWing.instance(this).setMainActivityClass(ExtendCommunicationActivity.class);
         ChatWing.instance(this).getChatwingGraph().plus(getModules().toArray());
 
+        FlurryAgent.init(this, Constants.FLURRY_API_KEY);
         workaroundOverflowMenuKey();
     }
 

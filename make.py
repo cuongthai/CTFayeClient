@@ -142,7 +142,7 @@ def generate_gradle_properties():
     template = open("gradle.properties_template").read()
     config_str = template % {"app_name":config_json.get("display_name","Unknown"),
                              "package_name":config_json.get("package_name","com.chatwing.unknown_package_name"),
-                             "release_key_path":"%s/whitelabel.keystore"%OUT_APP_PATH,
+                             "release_key_path":"../%s/whitelabel.keystore"%OUT_APP_PATH,
                              "release_key_password":config_json.get("key_password",""),
                              "release_key_alias":config_json.get("key_alias",""),
                              "facebook_app_id":config_json.get("facebook_app_id",""),
@@ -159,17 +159,17 @@ def generate_gradle_properties():
 
 
 
-ensure_out_folder()
-generate_gradle_properties()
+#ensure_out_folder()
+#generate_gradle_properties()
 
-# os.system("./gradlew clean")
-# ensure_build_type_folders()
-# write_string_xml()
-# write_bool_xml()
-# write_ic_launcher()
-# write_color_theme()
+os.system("./gradlew clean")
+ensure_build_type_folders()
+write_string_xml()
+write_bool_xml()
+write_ic_launcher()
+write_color_theme()
 # #create_certs()
 #
-# print(get_value(config, "APP_NAME"))
-# os.system("./gradlew assembleRelease")
+print(get_value(config, "APP_NAME"))
+os.system("./gradlew assembleRelease")
 
