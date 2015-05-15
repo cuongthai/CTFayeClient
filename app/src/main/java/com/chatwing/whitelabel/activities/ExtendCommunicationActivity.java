@@ -1,13 +1,16 @@
 package com.chatwing.whitelabel.activities;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -26,6 +29,7 @@ import com.chatwing.whitelabel.fragments.ExtendCommunicationDrawerFragment;
 import com.chatwing.whitelabel.fragments.OnlineUsersFragment;
 import com.chatwing.whitelabel.fragments.PhotoPickerDialogFragment;
 import com.chatwing.whitelabel.fragments.SettingsFragment;
+import com.chatwing.whitelabel.interfaces.MediaControlInterface;
 import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.managers.BuildManager;
 import com.chatwing.whitelabel.managers.ChatboxUnreadDownloadManager;
@@ -34,6 +38,7 @@ import com.chatwing.whitelabel.managers.ExtendCommunicationModeManager;
 import com.chatwing.whitelabel.modules.ExtendCommunicationActivityModule;
 import com.chatwing.whitelabel.pojos.responses.DeleteBookmarkResponse;
 import com.chatwing.whitelabel.services.DownloadUserDetailIntentService;
+import com.chatwing.whitelabel.services.MusicService;
 import com.chatwing.whitelabel.services.SyncBookmarkIntentService;
 import com.chatwing.whitelabel.services.UpdateAvatarIntentService;
 import com.chatwingsdk.activities.BaseABFragmentActivity;
@@ -46,6 +51,7 @@ import com.chatwingsdk.events.internal.ViewProfileEvent;
 import com.chatwingsdk.fragments.CommunicationMessagesFragment;
 import com.chatwingsdk.modules.CommunicationActivityModule;
 import com.chatwingsdk.pojos.Message;
+import com.chatwingsdk.pojos.Song;
 import com.chatwingsdk.pojos.errors.ChatWingError;
 import com.chatwingsdk.pojos.jspojos.JSUserResponse;
 import com.chatwingsdk.pojos.params.CreateConversationParams;
@@ -72,11 +78,13 @@ public class ExtendCommunicationActivity
         implements ExtendCommunicationDrawerFragment.Listener,
         OnlineUsersFragment.OnlineUsersFragmentDelegate,
         ExtendChatMessagesFragment.Delegate,
-        ExtendCommunicationModeManager.Delegate {
+        ExtendCommunicationModeManager.Delegate,
+        MediaControlInterface{
 
     public static final String AVATAR_PICKER_DIALOG_FRAGMENT_TAG = "AvatarPickerDialogFragment";
     public static final String BLOCK_USER_DIALOG_FRAGMENT_TAG = "BlockUserDialogFragment";
     public static final String ACCOUNT_DIALOG_FRAGMENT_TAG = "AccountDialogFragmentTag";
+    public static final String ACTION_STOP_MEDIA = "ACTION_STOP_MEDIA";
 
     @Inject
     com.chatwingsdk.managers.ApiManager mApiManager;
@@ -87,9 +95,18 @@ public class ExtendCommunicationActivity
     @Inject
     ChatboxUnreadDownloadManager chatboxUnreadDownloadManager;
 
+    private MusicService musicService;
+    private Intent playIntent;
+    private boolean musicBound = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        String action = getIntent().getAction();
+        if(ACTION_STOP_MEDIA.equals(action)){
+            startService(new Intent(MusicService.ACTION_STOP));
+        }
 
         if (!mBuildManager.isOfficialChatWingApp() && userManager.getCurrentUser() == null) {
             startActivity(new Intent(this, StartActivity.class));
@@ -117,6 +134,11 @@ public class ExtendCommunicationActivity
     @Override
     protected void onStart() {
         super.onStart();
+        if (playIntent == null) {
+            playIntent = new Intent(this, MusicService.class);
+            bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
+            startService(playIntent);
+        }
         FlurryAgent.onStartSession(this, Constants.FLURRY_API_KEY);
     }
 
@@ -374,7 +396,7 @@ public class ExtendCommunicationActivity
                 ACCOUNT_DIALOG_FRAGMENT_TAG);
         if (oldFragment == null
                 && isActive()) { // To prevent showdialog when activity is paused.
-                                 // Better Workaround http://stackoverflow.com/questions/8040280/how-to-handle-handler-messages-when-activity-fragment-is-paused
+            // Better Workaround http://stackoverflow.com/questions/8040280/how-to-handle-handler-messages-when-activity-fragment-is-paused
             AccountDialogFragment accountDialogFragment = AccountDialogFragment.newInstance(message);
             accountDialogFragment.show(getSupportFragmentManager(),
                     ACCOUNT_DIALOG_FRAGMENT_TAG);
@@ -448,6 +470,46 @@ public class ExtendCommunicationActivity
         }
     }
 
+    @Override
+    public MusicService.STATUS getMediaStatus() {
+        if (musicBound) {
+            return musicService.getStatus();
+        }
+        return null;
+    }
+
+    @Override
+    public void pauseCurrentPlayingMedia() {
+        startService(new Intent(MusicService.ACTION_PAUSE));
+    }
+
+    @Override
+    public void resumeMedia() {
+        startService(new Intent(MusicService.ACTION_PLAY));
+    }
+
+    @Override
+    public boolean isBindMediaService() {
+        return musicBound;
+    }
+
+    @Override
+    public void playMedia(Song song) {
+        Intent i = new Intent(MusicService.ACTION_URL);
+        i.putExtra(MusicService.SONG_EXTRA, song);
+        startService(i);
+    }
+
+    @Override
+    public void updateUIForPlayerPreparing(boolean preparing) {
+        if (preparing) {
+            startRefreshAnimation();
+        } else {
+            stopRefreshAnimation();
+            syncRefreshAnimationState(); // Make sure if sync is in progress, continue show
+        }
+    }
+
     /**
      * This class makes the ad request and loads the ad.
      */
@@ -511,6 +573,7 @@ public class ExtendCommunicationActivity
          */
         @Override
         public void onDestroy() {
+
             if (mAdView != null) {
                 mAdView.destroy();
             }
@@ -539,7 +602,7 @@ public class ExtendCommunicationActivity
     @Override
     protected boolean startSyncingCommunications(boolean needReload) {
         boolean result = super.startSyncingCommunications(needReload);
-        if(result) {
+        if (result) {
             super.mSyncManager.addToQueue(DownloadUserDetailIntentService.class);
         }
         return result;
@@ -626,4 +689,21 @@ public class ExtendCommunicationActivity
         mErrorMessageView.show(event.getException());
         return true;
     }
+
+    //connect to the service
+    private ServiceConnection musicConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            MusicService.MusicBinder binder = (MusicService.MusicBinder) service;
+            //get service
+            musicService = binder.getService();
+            musicBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            musicBound = false;
+        }
+    };
 }

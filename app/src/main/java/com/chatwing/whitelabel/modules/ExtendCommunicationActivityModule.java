@@ -86,6 +86,7 @@ public class ExtendCommunicationActivityModule {
         return new ExtendChatBoxModeManager(
                 bus,
                 mActivity,
+                mActivity,
                 userManager,
                 apiManager,
                 currentChatBoxManager,
