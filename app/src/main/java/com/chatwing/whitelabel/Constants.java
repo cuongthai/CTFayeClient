@@ -1,6 +1,6 @@
     package com.chatwing.whitelabel;
 
-import com.chatwingsdk.ChatWing;
+import com.pkmmte.pkrss.Category;
 
 import java.util.Arrays;
 import java.util.List;
@@ -30,4 +30,8 @@ public interface Constants extends com.chatwingsdk.Constants {
 
     String FLURRY_API_KEY = "TJXB56MR5DYMQY5HN85P";
 
+    public static final List<Category> CATEGORIES = new Category.ListBuilder()
+            .add("Android Central", "http://www.mobilenations.com/rss/mb.xml")
+            .add("Wildcat", "http://wildcatsociety.com/category/kentucky-wildcats/feed/")
+            .build();
 }

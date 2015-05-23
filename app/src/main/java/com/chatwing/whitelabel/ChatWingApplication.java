@@ -6,9 +6,9 @@ import android.view.ViewConfiguration;
 import com.chatwing.whitelabel.activities.ExtendCommunicationActivity;
 import com.chatwing.whitelabel.activities.LegacyLoginActivity;
 import com.chatwing.whitelabel.activities.WalkthroughActivity;
+import com.chatwing.whitelabel.utils.Utils;
 import com.chatwingsdk.ChatWing;
 import com.chatwingsdk.modules.ChatWingModule;
-import com.chatwingsdk.utils.LogUtils;
 import com.crashlytics.android.Crashlytics;
 import com.flurry.android.FlurryAgent;
 
@@ -38,6 +38,9 @@ public class ChatWingApplication extends Application {
 
         FlurryAgent.init(this, Constants.FLURRY_API_KEY);
         workaroundOverflowMenuKey();
+
+        // Build Custom Singleton, required by PkRSS
+        Utils.buildSingleton(this);
     }
 
     private void workaroundOverflowMenuKey() {

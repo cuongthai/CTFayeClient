@@ -43,6 +43,7 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
     UserManager mUserManager;
     private View mNextView;
     private TextView mWebsiteTv;
+    private View feedView;
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -80,6 +81,14 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
             @Override
             public void onClick(View v) {
                 mListener.showBookmarks();
+            }
+        });
+
+        feedView = view.findViewById(R.id.feeds);
+        feedView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.showFeedsSources();
             }
         });
 
@@ -214,6 +223,8 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
         void showBookmarks();
 
         void openAccountPicker();
+
+        void showFeedsSources();
     }
 
 }

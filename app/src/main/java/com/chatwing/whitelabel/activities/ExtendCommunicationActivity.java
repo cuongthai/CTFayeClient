@@ -26,6 +26,8 @@ import com.chatwing.whitelabel.fragments.BlockUserDialogFragment;
 import com.chatwing.whitelabel.fragments.BookmarkedChatBoxesDrawerFragment;
 import com.chatwing.whitelabel.fragments.ExtendChatMessagesFragment;
 import com.chatwing.whitelabel.fragments.ExtendCommunicationDrawerFragment;
+import com.chatwing.whitelabel.fragments.FeedDrawerFragment;
+import com.chatwing.whitelabel.fragments.FeedFragment;
 import com.chatwing.whitelabel.fragments.OnlineUsersFragment;
 import com.chatwing.whitelabel.fragments.PhotoPickerDialogFragment;
 import com.chatwing.whitelabel.fragments.SettingsFragment;
@@ -35,6 +37,7 @@ import com.chatwing.whitelabel.managers.BuildManager;
 import com.chatwing.whitelabel.managers.ChatboxUnreadDownloadManager;
 import com.chatwing.whitelabel.managers.ExtendChatBoxModeManager;
 import com.chatwing.whitelabel.managers.ExtendCommunicationModeManager;
+import com.chatwing.whitelabel.managers.FeedModeManager;
 import com.chatwing.whitelabel.modules.ExtendCommunicationActivityModule;
 import com.chatwing.whitelabel.pojos.responses.DeleteBookmarkResponse;
 import com.chatwing.whitelabel.services.DownloadUserDetailIntentService;
@@ -94,6 +97,8 @@ public class ExtendCommunicationActivity
     BuildManager mBuildManager;
     @Inject
     ChatboxUnreadDownloadManager chatboxUnreadDownloadManager;
+    @Inject
+    protected FeedModeManager mFeedModeManager;
 
     private MusicService musicService;
     private Intent playIntent;
@@ -375,6 +380,16 @@ public class ExtendCommunicationActivity
     }
 
     @Override
+    public void showFeedsSources() {
+        setTitle(getActivity().getString(R.string.title_feeds));
+        invalidateOptionsMenu();
+        if (!isInFeedMode()) {
+            setupFeedMode();
+        }
+        addToLeftDrawer(new FeedDrawerFragment());
+    }
+
+    @Override
     public void showSettings() {
         Intent i = new Intent(this, MainPreferenceActivity.class);
         i.putExtra(SettingsFragment.LOAD_LATEST_USER_PROFILE, true);
@@ -415,6 +430,15 @@ public class ExtendCommunicationActivity
             //This to prevent duplication dialog. This should be used together with findFragmentByTag
             getSupportFragmentManager().executePendingTransactions();
         }
+    }
+
+    private boolean isInFeedMode() {
+        return mCurrentCommunicationMode == null || mCurrentCommunicationMode instanceof FeedModeManager;
+    }
+
+    private void setupFeedMode() {
+        setupMode(mFeedModeManager, FeedFragment.newInstance());
+        setContentShown(true);
     }
 
     private void startUpdateAvatar(String filePath) {

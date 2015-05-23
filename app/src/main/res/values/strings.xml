@@ -182,4 +182,8 @@
     <string name="title_menu_audio_playing">Playing</string>
     <string name="title_menu_audio_pause">Pause</string>
     <string name="message_touch_to_stop">Touch to stop media</string>
+    <string name="title_feeds">Feeds</string>
+    <string name="message_select_feed_source">Please select a feed source</string>
+    <string name="empty_feeds">No feed sources</string>
+    <string name="error_feed_loading">Error loading feed. Check your internet connection and try again</string>
 </resources>
