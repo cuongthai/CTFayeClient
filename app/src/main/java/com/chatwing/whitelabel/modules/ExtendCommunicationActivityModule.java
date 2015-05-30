@@ -8,6 +8,8 @@ import com.chatwing.whitelabel.fragments.ExtendChatMessagesFragment;
 import com.chatwing.whitelabel.fragments.ExtendCommunicationDrawerFragment;
 import com.chatwing.whitelabel.fragments.FeedDrawerFragment;
 import com.chatwing.whitelabel.fragments.FeedFragment;
+import com.chatwing.whitelabel.fragments.MusicDrawerFragment;
+import com.chatwing.whitelabel.fragments.MusicFragment;
 import com.chatwing.whitelabel.fragments.OnlineUsersFragment;
 import com.chatwing.whitelabel.fragments.PhotoPickerDialogFragment;
 import com.chatwing.whitelabel.interfaces.WLJSInterfaceImpl;
@@ -17,6 +19,7 @@ import com.chatwing.whitelabel.managers.ExtendChatBoxModeManager;
 import com.chatwing.whitelabel.managers.ExtendConversationModeManager;
 import com.chatwing.whitelabel.managers.ExtendCurrentChatboxManager;
 import com.chatwing.whitelabel.managers.FeedModeManager;
+import com.chatwing.whitelabel.managers.MusicModeManager;
 import com.chatwing.whitelabel.managers.WLApiManagerImpl;
 import com.chatwing.whitelabel.tasks.LoadOnlineUsersTask;
 import com.chatwingsdk.interfaces.ChatWingJavaDelegate;
@@ -53,7 +56,9 @@ import dagger.Provides;
                 BlockUserDialogFragment.class,
                 WLJSInterfaceImpl.class,
                 FeedDrawerFragment.class,
-                FeedFragment.class
+                FeedFragment.class,
+                MusicFragment.class,
+                MusicDrawerFragment.class,
         },
 
         addsTo = CommunicationActivityModule.class,
@@ -127,6 +132,19 @@ public class ExtendCommunicationActivityModule {
                 userManager,
                 communicationActivityManager);
     }
+
+    @Provides
+    @Singleton
+    MusicModeManager provideMusicModeManager(Bus bus,
+                                           UserManager userManager,
+                                           CommunicationActivityManager communicationActivityManager) {
+        return new MusicModeManager(
+                bus,
+                mActivity,
+                userManager,
+                communicationActivityManager);
+    }
+
 
     @Provides
     @Singleton

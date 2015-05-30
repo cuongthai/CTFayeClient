@@ -124,8 +124,24 @@
                 <TextView
                     android:layout_width="0dp"
                     android:layout_weight="1"
-                    android:drawableLeft="@drawable/ic_action_important_light"
+                    android:drawableLeft="@drawable/ic_menu_today"
                     android:text="@string/title_feeds"
+                    style="@style/Theme.ChatWing.DrawerItemTitle" />
+
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/music_box"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/item_selector"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:drawableLeft="@drawable/ic_av_my_library_music"
+                    android:text="@string/title_music_box"
                     style="@style/Theme.ChatWing.DrawerItemTitle" />
 
             </LinearLayout>

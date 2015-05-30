@@ -33,6 +33,9 @@ import com.chatwingsdk.ChatWing;
 import com.chatwingsdk.pojos.Song;
 import com.chatwingsdk.utils.LogUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by steve on 12/05/2015.
  */
@@ -47,9 +50,14 @@ public class MusicService extends Service implements
             BuildConfig.APPLICATION_ID + ".action.TOGGLE_PLAYBACK";
     public static final String ACTION_PLAY = BuildConfig.APPLICATION_ID + ".action.PLAY";
     public static final String ACTION_PAUSE = BuildConfig.APPLICATION_ID + ".action.PAUSE";
+    public static final String ACTION_NEXT = BuildConfig.APPLICATION_ID + ".action.NEXT";
+    public static final String ACTION_BACK = BuildConfig.APPLICATION_ID + ".action.BACK";
     public static final String ACTION_STOP = BuildConfig.APPLICATION_ID + ".action.STOP";
     public static final String ACTION_URL = BuildConfig.APPLICATION_ID + ".action.URL";
+    public static final String ACTION_PLAY_AT_INDEX = BuildConfig.APPLICATION_ID + ".action.PLAY_INDEX";
+    public static final String ACTION_PLAY_LAST_MEDIA_IF_STOPPING = BuildConfig.APPLICATION_ID + ".action.PLAY_LAST_IF_STOPPING";
     public static final String SONG_EXTRA = "SONG_EXTRA";
+    public static final String SONG_INDEX_EXTRA = "SONG_INDEX_EXTRA";
     public static final String EVENT_CONTROL_CHANGED = "EVENT_CONTROL_CHANGED";
 
     private final IBinder musicBind = new MusicBinder();
@@ -71,6 +79,7 @@ public class MusicService extends Service implements
     AudioManager mAudioManager;
     private String mSongTitle = "";
     private String mChatboxName = "";
+    private List<Song> songs = new ArrayList<Song>();
     ComponentName mMediaButtonReceiverComponent;
     // our RemoteControlClient object, which will use remote control APIs available in
     // SDK level >= 14, if they're available.
@@ -80,6 +89,7 @@ public class MusicService extends Service implements
     public static final float DUCK_VOLUME = 0.1f;
     // Dummy album art we will pass to the remote control (if the APIs are available).
     Bitmap mDummyAlbumArt;
+    private int currentSongIndex = -1;
 
     void processTogglePlaybackRequest() {
         if (mState == STATUS.PAUSED || mState == STATUS.STOPPED) {
@@ -89,14 +99,26 @@ public class MusicService extends Service implements
         }
     }
 
+    void processPlayAtIndex(Intent intent) {
+        if (mState == STATUS.PLAYING || mState == STATUS.PAUSED || mState == STATUS.STOPPED) {
+            int index = intent.getIntExtra(SONG_INDEX_EXTRA, 0);
+            LogUtils.v("Playing at index " + index);
+            if (index < 0 || index > songs.size() - 1) {
+                return;
+            }
+            currentSongIndex = index;
+            playSong();
+        }
+    }
+
     void processAddRequest(Intent intent) {
-        // user wants to play a song directly by URL or path. The URL or path comes in the "data"
-        // part of the Intent. This Intent is sent by {@link MainActivity} after the user
-        // specifies the URL/path via an alert box.
+        //User add enqueue a song
         if (mState == STATUS.PLAYING || mState == STATUS.PAUSED || mState == STATUS.STOPPED) {
             Song song = (Song) intent.getSerializableExtra(SONG_EXTRA);
-            tryToGetAudioFocus();
-            playSong(song);
+            if (!songs.contains(song)) {
+                songs.add(song);
+                tryToGetAudioFocus();
+            }
         }
     }
 
@@ -104,8 +126,12 @@ public class MusicService extends Service implements
         tryToGetAudioFocus();
         // actually play the song
         if (mState == STATUS.STOPPED) {
-            //We do nothing
-            //We need to start the player from AddRequest
+            if (songs.size() != 0) {
+                if (currentSongIndex == -1) {
+                    currentSongIndex = 0;
+                }
+                playSong();
+            }
         } else if (mState == STATUS.PAUSED) {
             // If we're paused, just continue playback and restore the 'foreground service' state.
             mState = STATUS.PLAYING;
@@ -174,6 +200,18 @@ public class MusicService extends Service implements
             configAndStartMediaPlayer();
     }
 
+    public boolean containsSong(Song song) {
+        return songs.contains(song);
+    }
+
+    public Song getCurrentSong() {
+        if (currentSongIndex < 0 || currentSongIndex > songs.size() - 1) {
+            return null;
+        }
+        return songs.get(currentSongIndex);
+    }
+
+
     public enum STATUS {
         STOPPED,
         PLAYING,
@@ -199,11 +237,42 @@ public class MusicService extends Service implements
         if (action.equals(ACTION_TOGGLE_PLAYBACK)) processTogglePlaybackRequest();
         else if (action.equals(ACTION_PLAY)) processPlayRequest();
         else if (action.equals(ACTION_PAUSE)) processPauseRequest();
+        else if (action.equals(ACTION_NEXT)) processNextRequest();
+        else if (action.equals(ACTION_BACK)) processBackRequest();
         else if (action.equals(ACTION_STOP)) processStopRequest();
         else if (action.equals(ACTION_URL)) processAddRequest(intent);
+        else if (action.equals(ACTION_PLAY_AT_INDEX)) processPlayAtIndex(intent);
+        else if (action.equals(ACTION_PLAY_LAST_MEDIA_IF_STOPPING))
+            processPlayLastMediaIfStopping();
         return START_NOT_STICKY; // Means we started the service, but don't want it to
         // restart in case it's killed.
     }
+
+    private void processBackRequest() {
+        if (currentSongIndex < 0 || currentSongIndex > songs.size() - 1) {
+            return;
+        }
+
+        currentSongIndex = currentSongIndex == 0 ? songs.size() - 1 : currentSongIndex - 1;
+        playSong();
+    }
+
+    private void processNextRequest() {
+        if (currentSongIndex < 0 || currentSongIndex > songs.size() - 1) {
+            return;
+        }
+
+        currentSongIndex = currentSongIndex == songs.size() - 1 ? 0 : currentSongIndex + 1;
+        playSong();
+    }
+
+    private void processPlayLastMediaIfStopping() {
+        if (mState == STATUS.STOPPED) {
+            currentSongIndex = songs.size() - 1;
+            playSong();
+        }
+    }
+
 
     @Override
     public void onCreate() {
@@ -251,6 +320,17 @@ public class MusicService extends Service implements
         return mState;
     }
 
+    public int getNumberOfSongs() {
+        return songs.size();
+    }
+
+    public int getCurrentSongIndex() {
+        return currentSongIndex;
+    }
+
+    public List<Song> getSongs() {
+        return songs;
+    }
 
     public class MusicBinder extends Binder {
         public MusicService getService() {
@@ -260,6 +340,10 @@ public class MusicService extends Service implements
 
     @Override
     public void onCompletion(MediaPlayer mediaPlayer) {
+        if (currentSongIndex < songs.size() - 1) {
+            currentSongIndex++;
+            playSong();
+        }
     }
 
     @Override
@@ -289,13 +373,17 @@ public class MusicService extends Service implements
         updateNotification("Box :" + mChatboxName + "-" + mSongTitle);
     }
 
-    private void playSong(Song song) {
+    private void playSong() {
+        if (currentSongIndex == -1 || currentSongIndex >= songs.size()) {
+            return;
+        }
         try {
             mState = STATUS.STOPPED;
             relaxResources(false); // release everything except MediaPlayer
 
             createMediaPlayerIfNeeded();
             mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            Song song = songs.get(currentSongIndex);
             mPlayer.setDataSource(song.getAudioUrl());
             mSongTitle = song.getAudioName();
             mChatboxName = song.getHostedChatboxName();

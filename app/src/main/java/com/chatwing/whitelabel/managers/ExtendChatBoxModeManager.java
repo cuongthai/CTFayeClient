@@ -40,6 +40,7 @@ import com.chatwing.whitelabel.activities.SearchChatBoxActivity;
 import com.chatwing.whitelabel.events.AccountSwitchEvent;
 import com.chatwing.whitelabel.events.CreateBookmarkEvent;
 import com.chatwing.whitelabel.events.LoadOnlineUsersSuccessEvent;
+import com.chatwing.whitelabel.events.UserSelectedSongEvent;
 import com.chatwing.whitelabel.fragments.AccountDialogFragment;
 import com.chatwing.whitelabel.interfaces.MediaControlInterface;
 import com.chatwing.whitelabel.services.CreateBookmarkIntentService;
@@ -85,8 +86,7 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
     private static final long REFRESH_ONLINE_USERS_INTERVAL = 20 * DateUtils.SECOND_IN_MILLIS;
     private ExtendCommunicationModeManager.Delegate mActivityDelegate;
     BuildManager mBuildManager;
-    private MenuItem mediaPlayItem;
-    private MenuItem mediaPauseItem;
+    private MenuItem mediaAddItem;
 
     //Handle broadcast event from MusicService
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
@@ -177,27 +177,19 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
             case R.id.manage_blacklist:
                 manageBlackList();
                 return true;
-            case R.id.audio_play:
+            case R.id.audio_add:
                 ChatBox currentChatBox = mCurrentChatBoxManager.getCurrentChatBox();
                 if (currentChatBox != null) {
-                    if (mMediaControlInterface.getMediaStatus() == MusicService.STATUS.STOPPED) {
-                        mMediaControlInterface.playMedia(new Song(currentChatBox.getAudioUrl(),
-                                currentChatBox.getAudioName(),
-                                currentChatBox.getName()));
-                    } else if (mMediaControlInterface.getMediaStatus() == MusicService.STATUS.PAUSED) {
-                        mMediaControlInterface.resumeMedia();
-                    }
-                }
-                invalidateOptionsMenu();
+                    mMediaControlInterface.enqueue(new Song(currentChatBox.getAudioUrl(),
+                            currentChatBox.getAudioName(),
+                            currentChatBox.getName()));
+                    LogUtils.v("mMediaControlInterface.getMediaStatus() "+mMediaControlInterface.getMediaStatus());
+                    mMediaControlInterface.playLastMediaIfStopping();
 
-                return true;
-            case R.id.audio_pause:
-                setMediaControlState(false);
-
-                if (mMediaControlInterface.isBindMediaService()
-                        && mMediaControlInterface.getMediaStatus() == MusicService.STATUS.PLAYING) {
-                    mMediaControlInterface.pauseCurrentPlayingMedia();
+                    invalidateOptionsMenu();
+                    setMediaControlVisible(false);
                 }
+
                 return true;
             default:
                 return false;
@@ -211,8 +203,7 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
         final DrawerLayout drawerLayout = mActivityDelegate.getDrawerLayout();
         activity.getMenuInflater().inflate(R.menu.chatbox_menu, menu);
         mOnlineUsersItem = menu.findItem(R.id.online_users);
-        mediaPlayItem = menu.findItem(R.id.audio_play);
-        mediaPauseItem = menu.findItem(R.id.audio_pause);
+        mediaAddItem = menu.findItem(R.id.audio_add);
 
         /**
          * Create badge view for online user item
@@ -338,6 +329,13 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
         }
     }
 
+
+    @Subscribe
+    public void onUserSelectedSongEvent(UserSelectedSongEvent event){
+        mActivityDelegate.getDrawerLayout().closeDrawers();
+    }
+
+
     @Subscribe
     public void onUpdateSubscriptionEvent(UpdateSubscriptionEvent event) {
         super.onUpdateSubscriptionEvent(event);
@@ -395,10 +393,12 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
 
         LogUtils.v("Audio URL " + audioUrl + " isBindMediaService=" + isBindMediaService + " status " + status);
 
-        if(audioUrl==null
-                || (isBindMediaService && status == MusicService.STATUS.PREPARING)){
+        if (audioUrl == null
+                || (isBindMediaService && status == MusicService.STATUS.PREPARING)
+                || isBindMediaService && mMediaControlInterface.getMediaService()
+                .containsSong(new Song(chatbox.getAudioUrl(), chatbox.getAudioName(), chatbox.getName()))) {
             setMediaControlVisible(false);
-        }else{
+        } else {
             setMediaControlVisible(true);
         }
 
@@ -407,29 +407,10 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
         } else {
             mMediaControlInterface.updateUIForPlayerPreparing(false);
         }
-
-        if (isBindMediaService && audioUrl != null) {
-            if (status == MusicService.STATUS.PLAYING) {
-                setMediaControlState(true);
-            } else if (status == MusicService.STATUS.STOPPED || status == MusicService.STATUS.PAUSED) {
-                setMediaControlState(false);
-            }
-        }
-    }
-
-    private void setMediaControlState(boolean isPlaying) {
-        if (isPlaying) {
-            mediaPauseItem.setVisible(true);
-            mediaPlayItem.setVisible(false);
-        } else {
-            mediaPauseItem.setVisible(false);
-            mediaPlayItem.setVisible(true);
-        }
     }
 
     private void setMediaControlVisible(boolean visible) {
-        mediaPauseItem.setVisible(visible);
-        mediaPlayItem.setVisible(visible);
+        mediaAddItem.setVisible(visible);
     }
 
     @com.squareup.otto.Subscribe

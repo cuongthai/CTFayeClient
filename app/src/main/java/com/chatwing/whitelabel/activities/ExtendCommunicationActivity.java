@@ -28,6 +28,8 @@ import com.chatwing.whitelabel.fragments.ExtendChatMessagesFragment;
 import com.chatwing.whitelabel.fragments.ExtendCommunicationDrawerFragment;
 import com.chatwing.whitelabel.fragments.FeedDrawerFragment;
 import com.chatwing.whitelabel.fragments.FeedFragment;
+import com.chatwing.whitelabel.fragments.MusicDrawerFragment;
+import com.chatwing.whitelabel.fragments.MusicFragment;
 import com.chatwing.whitelabel.fragments.OnlineUsersFragment;
 import com.chatwing.whitelabel.fragments.PhotoPickerDialogFragment;
 import com.chatwing.whitelabel.fragments.SettingsFragment;
@@ -38,6 +40,7 @@ import com.chatwing.whitelabel.managers.ChatboxUnreadDownloadManager;
 import com.chatwing.whitelabel.managers.ExtendChatBoxModeManager;
 import com.chatwing.whitelabel.managers.ExtendCommunicationModeManager;
 import com.chatwing.whitelabel.managers.FeedModeManager;
+import com.chatwing.whitelabel.managers.MusicModeManager;
 import com.chatwing.whitelabel.modules.ExtendCommunicationActivityModule;
 import com.chatwing.whitelabel.pojos.responses.DeleteBookmarkResponse;
 import com.chatwing.whitelabel.services.DownloadUserDetailIntentService;
@@ -99,6 +102,8 @@ public class ExtendCommunicationActivity
     ChatboxUnreadDownloadManager chatboxUnreadDownloadManager;
     @Inject
     protected FeedModeManager mFeedModeManager;
+    @Inject
+    protected MusicModeManager mMusicModeManager;
 
     private MusicService musicService;
     private Intent playIntent;
@@ -390,6 +395,16 @@ public class ExtendCommunicationActivity
     }
 
     @Override
+    public void showMusicBox() {
+        setTitle(getActivity().getString(R.string.title_music_box));
+        invalidateOptionsMenu();
+        if (!isInMusicBoxMode()) {
+            setupMusicBoxMode();
+        }
+        addToLeftDrawer(new MusicDrawerFragment());
+    }
+
+    @Override
     public void showSettings() {
         Intent i = new Intent(this, MainPreferenceActivity.class);
         i.putExtra(SettingsFragment.LOAD_LATEST_USER_PROFILE, true);
@@ -436,8 +451,18 @@ public class ExtendCommunicationActivity
         return mCurrentCommunicationMode == null || mCurrentCommunicationMode instanceof FeedModeManager;
     }
 
+
+    private boolean isInMusicBoxMode() {
+        return mCurrentCommunicationMode == null || mCurrentCommunicationMode instanceof MusicModeManager;
+    }
+
     private void setupFeedMode() {
         setupMode(mFeedModeManager, FeedFragment.newInstance());
+        setContentShown(true);
+    }
+
+    private void setupMusicBoxMode() {
+        setupMode(mMusicModeManager, MusicFragment.newInstance());
         setContentShown(true);
     }
 
@@ -503,14 +528,19 @@ public class ExtendCommunicationActivity
     }
 
     @Override
-    public void pauseCurrentPlayingMedia() {
-        startService(new Intent(MusicService.ACTION_PAUSE));
+    public MusicService getMediaService() {
+        return musicService;
     }
 
     @Override
-    public void resumeMedia() {
-        startService(new Intent(MusicService.ACTION_PLAY));
+    public void playLastMediaIfStopping() {
+        Intent service = new Intent(MusicService.ACTION_PLAY_LAST_MEDIA_IF_STOPPING);
+        startService(service);
     }
+
+
+
+
 
     @Override
     public boolean isBindMediaService() {
@@ -518,11 +548,12 @@ public class ExtendCommunicationActivity
     }
 
     @Override
-    public void playMedia(Song song) {
+    public void enqueue(Song song) {
         Intent i = new Intent(MusicService.ACTION_URL);
         i.putExtra(MusicService.SONG_EXTRA, song);
         startService(i);
     }
+
 
     @Override
     public void updateUIForPlayerPreparing(boolean preparing) {

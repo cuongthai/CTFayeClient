@@ -121,7 +121,11 @@
                 <action android:name="${applicationId}.action.TOGGLE_PLAYBACK" />
                 <action android:name="${applicationId}.action.PLAY" />
                 <action android:name="${applicationId}.action.PAUSE" />
+                <action android:name="${applicationId}.action.NEXT" />
+                <action android:name="${applicationId}.action.BACK" />
                 <action android:name="${applicationId}.action.STOP" />
+                <action android:name="${applicationId}.action.PLAY_INDEX" />
+                <action android:name="${applicationId}.action.PLAY_LAST_IF_STOPPING" />
             </intent-filter>
             <intent-filter>
                 <action android:name="${applicationId}.action.URL" />
