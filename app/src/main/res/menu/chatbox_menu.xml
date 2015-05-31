@@ -16,6 +16,12 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/audio_add"
+        android:title="@string/title_menu_audio_playing"
+        android:icon="@drawable/ic_menu_btn_add"
+        app:showAsAction="always"
+        android:visible="false"/>
+
     <item android:id="@+id/online_users"
         android:title="@string/title_online_users"
         android:icon="@drawable/ic_action_group"

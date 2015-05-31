@@ -22,6 +22,7 @@ import android.widget.ListView;
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.adapters.BookmarkBoxesAdapter;
 import com.chatwing.whitelabel.services.DeleteBookmarkIntentService;
+import com.chatwing.whitelabel.utils.StatisticTracker;
 import com.chatwingsdk.contentproviders.ChatWingContentProvider;
 import com.chatwingsdk.tables.SyncedBookmarkTable;
 import com.chatwingsdk.events.internal.UserSelectedChatBoxEvent;
@@ -44,6 +45,8 @@ public class BookmarkedChatBoxesDrawerFragment extends ListFragment
     private BookmarkBoxesAdapter mAdapter;
     @Inject
     Bus mBus;
+    @Inject
+    UserManager mUserManager;
 
     private NavigatableFragmentListener mListener;
 
@@ -124,6 +127,7 @@ public class BookmarkedChatBoxesDrawerFragment extends ListFragment
 
     @Override
     public void onLoadFinished(android.support.v4.content.Loader<Cursor> cursorLoader, Cursor cursor) {
+        StatisticTracker.trackNumberOfBookmarksPerUser(mUserManager.getCurrentUser(), cursor.getCount());
         getListAdapter().swapCursor(cursor);
     }
 

@@ -16,4 +16,11 @@
     <color name="walkthrough_page_3_background_color">#0192FF</color>
     <color name="walkthrough_page_4_background_color">#FF5002</color>
     <color name="walkthrough_page_5_background_color">#028414</color>
+
+    <color name="feed_text_primary">#DD000000</color>
+    <color name="feed_text_secondary">#89000000</color>
+
+    <color name="feed_white_transparent_ex">#33FFFFFF</color>
+    <color name="transparent">#00000000</color>
+
 </resources>

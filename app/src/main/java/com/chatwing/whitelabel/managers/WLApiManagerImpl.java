@@ -32,6 +32,7 @@ import com.chatwing.whitelabel.pojos.responses.RegisterResponse;
 import com.chatwing.whitelabel.pojos.responses.ResetPasswordResponse;
 import com.chatwing.whitelabel.pojos.responses.SearchChatBoxResponse;
 import com.chatwing.whitelabel.pojos.responses.UpdateUserProfileResponse;
+import com.chatwing.whitelabel.utils.StatisticTracker;
 import com.chatwing.whitelabel.validators.EmailValidator;
 import com.chatwing.whitelabel.validators.MessageIdValidator;
 import com.chatwing.whitelabel.validators.PasswordValidator;
@@ -44,6 +45,8 @@ import com.chatwingsdk.pojos.errors.ChatWingError;
 import com.chatwingsdk.pojos.jspojos.JSUserResponse;
 import com.chatwingsdk.pojos.params.ConcreteParams;
 import com.chatwingsdk.pojos.params.RegisterParams;
+import com.chatwingsdk.pojos.params.oauth.AuthenticationParams;
+import com.chatwingsdk.pojos.responses.AuthenticationResponse;
 import com.chatwingsdk.pojos.responses.UserResponse;
 import com.chatwingsdk.utils.LogUtils;
 import com.chatwingsdk.validators.ChatBoxIdValidator;
@@ -73,6 +76,16 @@ public class WLApiManagerImpl extends ApiManagerImpl implements ApiManager {
     MessageIdValidator mMessageIdValidator;
     @Inject
     PermissionsValidator mPermissionsValidator;
+
+    @Override
+    public AuthenticationResponse authenticate(AuthenticationParams params)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            ValidationException,
+            InvalidExternalAccessTokenException {
+        StatisticTracker.trackLoginType(params.getType());
+        return super.authenticate(params);
+    }
 
     @Override
     public ResetPasswordResponse resetPassword(String email)

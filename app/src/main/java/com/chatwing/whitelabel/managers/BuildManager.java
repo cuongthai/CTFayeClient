@@ -2,6 +2,7 @@ package com.chatwing.whitelabel.managers;
 
 import android.content.Context;
 
+import com.chatwing.whitelabel.Constants;
 import com.chatwing.whitelabel.R;
 import com.chatwingsdk.modules.ForActivity;
 
@@ -25,5 +26,9 @@ public class BuildManager {
 
     public boolean isSupportedRegister() {
         return mContext.getResources().getBoolean(R.bool.allow_register);
+    }
+
+    public boolean isCustomLoginType() {
+        return Constants.BUILD_LOGIN_TYPE.equals(mContext.getResources().getString(R.string.build_login_type));
     }
 }

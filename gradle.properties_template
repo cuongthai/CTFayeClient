@@ -1,0 +1,56 @@
+# Project-wide Gradle settings.
+
+# IDE (e.g. Android Studio) users:
+# Settings specified in this file will override any Gradle settings
+# configured through the IDE.
+
+# For more details on how to configure your build environment visit
+# http://www.gradle.org/docs/current/userguide/build_environment.html
+
+# Specifies the JVM arguments used for the daemon process.
+# The setting is particularly useful for tweaking memory settings.
+# Default value: -Xmx10248m -XX:MaxPermSize=256m
+# org.gradle.jvmargs=-Xmx2048m -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8
+
+# When configured, Gradle will run in incubating parallel mode.
+# This option should only be used with decoupled projects. More details, visit
+# http://www.gradle.org/docs/current/userguide/multi_project_builds.html#sec:decoupled_projects
+# org.gradle.parallel=true
+
+
+APP_NAME = %(app_name)s
+PACKAGE_NAME = %(package_name)s
+RELEASE_STORE_FILE=%(release_key_path)s
+RELEASE_STORE_PASSWORD=%(release_key_password)s
+RELEASE_KEY_ALIAS=%(release_key_alias)s
+RELEASE_KEY_PASSWORD=%(release_key_password)s
+FACEBOOK_APP_ID=%(facebook_app_id)s
+IC_LAUNCHER=%(ic_launcher)s
+COLOR_THEME=%(color_theme)s
+COLOR_TEXT=#ffffff
+COLOR_ACTION_PRIMARY=%(color_action_primary)s
+ADS=No
+LOGIN_TYPE=%(login_method)s
+ALLOW_REGISTER=%(allow_register)s
+VERSION_CODE=25
+VERSION_NAME=1.3
+
+#Used ONLY in Non Official
+COLOR_ACTION_SECONDARY=#3CB2E2
+COLOR_ACTION_TEXT=#ffffff
+OFFICIAL=Yes
+
+
+#Login options
+TWITTER_CALLBACK_URL = chatwing://abc
+TWITTER_CONSUMER_KEY = YxojqfzgikvBUn9Bwj7eKg
+TWITTER_CONSUMER_SECRET = eTHpmYOaHz4gAqhsqqpQSL9TWj0rdoL0I6xK6v5g
+
+
+YAHOO_CALLBACK_URL = chatwing://yahoo
+YAHOO_API_KEY = dj0yJmk9MVdTZnFuTWtheHQ0JmQ9WVdrOWNtOTVZalZ2TnpnbWNHbzlNVGMzTkRJNE56TTJNZy0tJnM9Y29uc3VtZXJzZWNyZXQmeD1iMw--
+YAHOO_API_SECRET = b8e916120be00e50562b65262d46d6fe46278152
+
+TUMBLR_CALLBACK_URL = chatwing://tumblr
+TUMBLR_API_KEY = wxctmPjhUCkOLtHtIIJLHMGudAYBj9jePFvdMogi7cV4PuIVkt
+TUMBLR_API_SECRET = DvTffcG1WMGTrc42Kzk50dj6QJEB7e9uYjUPYb3aDdwMcE84dL

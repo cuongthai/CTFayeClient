@@ -6,10 +6,11 @@ import android.view.ViewConfiguration;
 import com.chatwing.whitelabel.activities.ExtendCommunicationActivity;
 import com.chatwing.whitelabel.activities.LegacyLoginActivity;
 import com.chatwing.whitelabel.activities.WalkthroughActivity;
+import com.chatwing.whitelabel.utils.Utils;
 import com.chatwingsdk.ChatWing;
 import com.chatwingsdk.modules.ChatWingModule;
-import com.chatwingsdk.utils.LogUtils;
 import com.crashlytics.android.Crashlytics;
+import com.flurry.android.FlurryAgent;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -28,14 +29,18 @@ public class ChatWingApplication extends Application {
         Crashlytics.start(this);
 
         //Currently support only one chatbox enter from client, it should be loaded from server
-        ChatWing.initialize(this, "android", "", new String[]{"1873"}, isOfficialChatWingApp()
+        ChatWing.initialize(this, "b4b391d0-e9bf-11e4-871f-f1829c245e2e", "", new String[]{"1873"}, isOfficialChatWingApp()
                 ? WalkthroughActivity.class
                 : LegacyLoginActivity.class);
-        ChatWing.setIsDebugging(false);
+        ChatWing.setIsDebugging(true);
         ChatWing.instance(this).setMainActivityClass(ExtendCommunicationActivity.class);
         ChatWing.instance(this).getChatwingGraph().plus(getModules().toArray());
 
+        FlurryAgent.init(this, Constants.FLURRY_API_KEY);
         workaroundOverflowMenuKey();
+
+        // Build Custom Singleton, required by PkRSS
+        Utils.buildSingleton(this);
     }
 
     private void workaroundOverflowMenuKey() {

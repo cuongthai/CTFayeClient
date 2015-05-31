@@ -114,6 +114,39 @@
                 style="@style/Theme.ChatWing.DrawerItemTitle" />
 
             <LinearLayout
+                android:id="@+id/feeds"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/item_selector"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:drawableLeft="@drawable/ic_menu_today"
+                    android:text="@string/title_feeds"
+                    style="@style/Theme.ChatWing.DrawerItemTitle" />
+
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/music_box"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/item_selector"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:drawableLeft="@drawable/ic_av_my_library_music"
+                    android:text="@string/title_music_box"
+                    style="@style/Theme.ChatWing.DrawerItemTitle" />
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/bookmarks"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -153,7 +186,6 @@
                     android:id="@+id/categories_unread_count"
                     style="@style/Theme.ChatWing.DrawerItemCounter"
                     android:visibility="gone" />
-
             </LinearLayout>
 
             <LinearLayout
@@ -163,7 +195,6 @@
                 android:orientation="horizontal"
                 android:background="@drawable/item_selector"
                 android:gravity="center_vertical">
-
                 <TextView
                     android:layout_width="0dp"
                     android:layout_weight="1"
@@ -175,7 +206,6 @@
                     android:visibility="gone"
                     android:id="@+id/conversation_unread_count"
                     style="@style/Theme.ChatWing.DrawerItemCounter" />
-
             </LinearLayout>
 
             <TextView

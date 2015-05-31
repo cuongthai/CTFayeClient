@@ -2,17 +2,21 @@ package com.chatwing.whitelabel.managers;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ContentProviderOperation;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.OperationApplicationException;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.RemoteException;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -36,8 +40,11 @@ import com.chatwing.whitelabel.activities.SearchChatBoxActivity;
 import com.chatwing.whitelabel.events.AccountSwitchEvent;
 import com.chatwing.whitelabel.events.CreateBookmarkEvent;
 import com.chatwing.whitelabel.events.LoadOnlineUsersSuccessEvent;
+import com.chatwing.whitelabel.events.UserSelectedSongEvent;
 import com.chatwing.whitelabel.fragments.AccountDialogFragment;
+import com.chatwing.whitelabel.interfaces.MediaControlInterface;
 import com.chatwing.whitelabel.services.CreateBookmarkIntentService;
+import com.chatwing.whitelabel.services.MusicService;
 import com.chatwingsdk.activities.AuthenticateActivity;
 import com.chatwingsdk.activities.BaseABFragmentActivity;
 import com.chatwingsdk.contentproviders.ChatWingContentProvider;
@@ -49,10 +56,12 @@ import com.chatwingsdk.managers.CurrentChatBoxManager;
 import com.chatwingsdk.managers.UserManager;
 import com.chatwingsdk.pojos.ChatBox;
 import com.chatwingsdk.pojos.LightWeightChatBox;
+import com.chatwingsdk.pojos.Song;
 import com.chatwingsdk.pojos.SyncedBookmark;
 import com.chatwingsdk.pojos.User;
 import com.chatwingsdk.tables.ChatBoxTable;
 import com.chatwingsdk.tables.SyncedBookmarkTable;
+import com.chatwingsdk.utils.LogUtils;
 import com.chatwingsdk.validators.ChatBoxIdValidator;
 import com.chatwingsdk.validators.PermissionsValidator;
 import com.readystatesoftware.viewbadger.BadgeView;
@@ -66,6 +75,7 @@ import java.util.ArrayList;
  */
 public class ExtendChatBoxModeManager extends ChatboxModeManager {
     public static final int DRAWER_GRAVITY_ONLINE_USER = Gravity.RIGHT;
+    private final MediaControlInterface mMediaControlInterface;
 
     private MenuItem mOnlineUsersItem;
     private BadgeView mOnlineUsersBadgeView;
@@ -76,9 +86,21 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
     private static final long REFRESH_ONLINE_USERS_INTERVAL = 20 * DateUtils.SECOND_IN_MILLIS;
     private ExtendCommunicationModeManager.Delegate mActivityDelegate;
     BuildManager mBuildManager;
+    private MenuItem mediaAddItem;
+
+    //Handle broadcast event from MusicService
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ChatBox currentChatBox = mCurrentChatBoxManager.getCurrentChatBox();
+            if (currentChatBox == null) return;
+            updateControlUI(currentChatBox);
+        }
+    };
 
     public ExtendChatBoxModeManager(Bus bus,
                                     ExtendCommunicationModeManager.Delegate delegate,
+                                    MediaControlInterface mediaControlInterface,
                                     UserManager userManager,
                                     ApiManager apiManager,
                                     CurrentChatBoxManager currentChatBoxManager,
@@ -87,6 +109,7 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
                                     CommunicationActivityManager communicationActivityManager) {
         super(bus, delegate, userManager, apiManager, currentChatBoxManager, chatBoxIdValidator, communicationActivityManager);
         mActivityDelegate = delegate;
+        mMediaControlInterface = mediaControlInterface;
         mApiManager = apiManager;
         mBuildManager = buildManager;
     }
@@ -154,6 +177,20 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
             case R.id.manage_blacklist:
                 manageBlackList();
                 return true;
+            case R.id.audio_add:
+                ChatBox currentChatBox = mCurrentChatBoxManager.getCurrentChatBox();
+                if (currentChatBox != null) {
+                    mMediaControlInterface.enqueue(new Song(currentChatBox.getAudioUrl(),
+                            currentChatBox.getAudioName(),
+                            currentChatBox.getName()));
+                    LogUtils.v("mMediaControlInterface.getMediaStatus() "+mMediaControlInterface.getMediaStatus());
+                    mMediaControlInterface.playLastMediaIfStopping();
+
+                    invalidateOptionsMenu();
+                    setMediaControlVisible(false);
+                }
+
+                return true;
             default:
                 return false;
         }
@@ -166,6 +203,7 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
         final DrawerLayout drawerLayout = mActivityDelegate.getDrawerLayout();
         activity.getMenuInflater().inflate(R.menu.chatbox_menu, menu);
         mOnlineUsersItem = menu.findItem(R.id.online_users);
+        mediaAddItem = menu.findItem(R.id.audio_add);
 
         /**
          * Create badge view for online user item
@@ -199,7 +237,6 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
                 res.getDimension(R.dimen.badge_view_text_size));
         mOnlineUsersBadgeView.setBadgeMargin(res.getDimensionPixelSize(
                 R.dimen.default_margin));
-
         mOnlineUsersItem.setActionView(container);
 
         return true;
@@ -210,6 +247,15 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
         super.activate();
         setTitle(getString(R.string.title_chat_boxes));
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Register mMessageReceiver to receive messages.
+        LocalBroadcastManager.getInstance(mActivityDelegate.getActivity()).registerReceiver(mMessageReceiver,
+                new IntentFilter(MusicService.EVENT_CONTROL_CHANGED));
+    }
+
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -268,6 +314,7 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
                 manageBlackListItem.setVisible(true);
             }
 
+            updateControlUI(chatBox);
         }
 
         return true;
@@ -275,11 +322,19 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
 
     @Override
     public void onPause() {
+        LocalBroadcastManager.getInstance(mActivityDelegate.getActivity()).unregisterReceiver(mMessageReceiver);
         super.onPause();
         if (mRefreshOnlineUsersHandler != null) {
             mRefreshOnlineUsersHandler.removeMessages(MSG_GET_ONLINE_USERS);
         }
     }
+
+
+    @Subscribe
+    public void onUserSelectedSongEvent(UserSelectedSongEvent event){
+        mActivityDelegate.getDrawerLayout().closeDrawers();
+    }
+
 
     @Subscribe
     public void onUpdateSubscriptionEvent(UpdateSubscriptionEvent event) {
@@ -325,9 +380,37 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
             setTitle(chatBox.getName());
             if (chatBox.getAlias() != null) setSubTitle(constructAliasLink(chatBox.getAlias()));
             ((ExtendCurrentChatboxManager) mCurrentChatBoxManager).loadOnlineUsers();
+
         }
 
         super.onCurrentChatBoxChanged(event);
+    }
+
+    private void updateControlUI(ChatBox chatbox) {
+        String audioUrl = chatbox.getAudioUrl();
+        boolean isBindMediaService = mMediaControlInterface.isBindMediaService();
+        MusicService.STATUS status = mMediaControlInterface.getMediaStatus();
+
+        LogUtils.v("Audio URL " + audioUrl + " isBindMediaService=" + isBindMediaService + " status " + status);
+
+        if (audioUrl == null
+                || (isBindMediaService && status == MusicService.STATUS.PREPARING)
+                || isBindMediaService && mMediaControlInterface.getMediaService()
+                .containsSong(new Song(chatbox.getAudioUrl(), chatbox.getAudioName(), chatbox.getName()))) {
+            setMediaControlVisible(false);
+        } else {
+            setMediaControlVisible(true);
+        }
+
+        if (status == MusicService.STATUS.PREPARING) {
+            mMediaControlInterface.updateUIForPlayerPreparing(true);
+        } else {
+            mMediaControlInterface.updateUIForPlayerPreparing(false);
+        }
+    }
+
+    private void setMediaControlVisible(boolean visible) {
+        mediaAddItem.setVisible(visible);
     }
 
     @com.squareup.otto.Subscribe

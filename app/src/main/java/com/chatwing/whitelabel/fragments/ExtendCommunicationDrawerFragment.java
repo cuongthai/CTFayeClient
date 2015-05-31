@@ -43,6 +43,8 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
     UserManager mUserManager;
     private View mNextView;
     private TextView mWebsiteTv;
+    private View feedView;
+    private View musicView;
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -83,7 +85,21 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
             }
         });
 
+        feedView = view.findViewById(R.id.feeds);
+        feedView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.showFeedsSources();
+            }
+        });
 
+        musicView = view.findViewById(R.id.music_box);
+        musicView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mListener.showMusicBox();
+            }
+        });
         mUserInfoContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -213,6 +229,10 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
         void showBookmarks();
 
         void openAccountPicker();
+
+        void showFeedsSources();
+
+        void showMusicBox();
     }
 
 }

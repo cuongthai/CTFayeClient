@@ -62,6 +62,7 @@
     <string name="message_avatar_picker">Avatar Picker</string>
     <string name="title_register_chatwing">"Sign Up for %s"</string>
     <string name="error_invalid_username_password">"Email or Password is invalid."</string>
+    <string name="error_app_invalid_username_password">"Email or Password is invalid or you are not allowed to join. Please contact app admin"</string>
     <string name="progress_registering">"Signing up…"</string>
     <string name="title_register_fb">"Sign Up using Facebook"</string>
     <string name="title_register_google_plus">"Sign Up using Google"</string>
@@ -179,4 +180,12 @@
     <!--<string name="banner_ad_unit_id">ca-app-pub-9492949418759375/8073202249</string> &lt;!&ndash; Kentucky &ndash;&gt;-->
     <string name="message_flag">Flagged</string>
     <string name="error_failed_to_flag">Failed to flag this message</string>
+    <string name="title_menu_audio_playing">Playing</string>
+    <string name="title_menu_audio_pause">Pause</string>
+    <string name="message_touch_to_stop">Touch to stop media</string>
+    <string name="title_feeds">Feeds</string>
+    <string name="message_select_feed_source">Please select a feed source</string>
+    <string name="empty_feeds">No feed sources</string>
+    <string name="error_feed_loading">Error loading feed. Check your internet connection and try again</string>
+    <string name="title_music_box">Music Box</string>
 </resources>
