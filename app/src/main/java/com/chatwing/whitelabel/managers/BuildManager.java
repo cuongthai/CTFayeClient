@@ -28,7 +28,17 @@ public class BuildManager {
         return mContext.getResources().getBoolean(R.bool.allow_register);
     }
 
+    public boolean isSupportedRss() {
+        return mContext.getResources().getBoolean(R.bool.support_rss);
+    }
+
+    public boolean isSupportedMusicBox() {
+        return mContext.getResources().getBoolean(R.bool.support_music_box);
+    }
+
     public boolean isCustomLoginType() {
         return Constants.BUILD_LOGIN_TYPE.equals(mContext.getResources().getString(R.string.build_login_type));
     }
+
+
 }

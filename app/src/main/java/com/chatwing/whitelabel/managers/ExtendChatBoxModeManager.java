@@ -274,6 +274,7 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
         copyAliasItem.setVisible(false);
         manageBlackListItem.setVisible(false);
         bookmarkChatBoxItem.setVisible(false);
+        mediaAddItem.setVisible(false);
 
         // Now config them
         if (mCurrentChatBoxManager.getCurrentChatBox() != null) {
@@ -305,6 +306,10 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
                             activity.getContentResolver(),
                             chatBox.getId())) {
                 bookmarkChatBoxItem.setVisible(true);
+            }
+
+            if(mBuildManager.isSupportedMusicBox()){
+                mediaAddItem.setVisible(true);
             }
 
             if (chatBox.getAlias() != null && Constants.ALLOW_SHARE_CHATBOX) {

@@ -129,6 +129,14 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
             mWebsiteTv.setText(Html.fromHtml("<a href='http://www.DestinyTeamFinder.com/'>http://www.DestinyTeamFinder.com/</a>"));
             mWebsiteTv.setMovementMethod(LinkMovementMethod.getInstance());
         }
+
+        if(!mBuildManager.isSupportedRss()){
+            feedView.setVisibility(View.GONE);
+        }
+
+        if(!mBuildManager.isSupportedMusicBox()){
+            musicView.setVisibility(View.GONE);
+        }
     }
 
     @Override
