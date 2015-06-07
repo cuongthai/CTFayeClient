@@ -183,7 +183,7 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
                     mMediaControlInterface.enqueue(new Song(currentChatBox.getAudioUrl(),
                             currentChatBox.getAudioName(),
                             currentChatBox.getName()));
-                    LogUtils.v("mMediaControlInterface.getMediaStatus() "+mMediaControlInterface.getMediaStatus());
+                    LogUtils.v("mMediaControlInterface.getMediaStatus() " + mMediaControlInterface.getMediaStatus());
                     mMediaControlInterface.playLastMediaIfStopping();
 
                     invalidateOptionsMenu();
@@ -308,7 +308,7 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
                 bookmarkChatBoxItem.setVisible(true);
             }
 
-            if(mBuildManager.isSupportedMusicBox()){
+            if (mBuildManager.isSupportedMusicBox()) {
                 mediaAddItem.setVisible(true);
             }
 
@@ -336,7 +336,7 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
 
 
     @Subscribe
-    public void onUserSelectedSongEvent(UserSelectedSongEvent event){
+    public void onUserSelectedSongEvent(UserSelectedSongEvent event) {
         mActivityDelegate.getDrawerLayout().closeDrawers();
     }
 
@@ -392,6 +392,9 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
     }
 
     private void updateControlUI(ChatBox chatbox) {
+        if (!mBuildManager.isSupportedMusicBox()) {
+            return;
+        }
         String audioUrl = chatbox.getAudioUrl();
         boolean isBindMediaService = mMediaControlInterface.isBindMediaService();
         MusicService.STATUS status = mMediaControlInterface.getMediaStatus();

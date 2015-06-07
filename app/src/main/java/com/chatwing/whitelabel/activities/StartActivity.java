@@ -2,6 +2,7 @@ package com.chatwing.whitelabel.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 
@@ -63,12 +64,25 @@ public class StartActivity extends BaseABFragmentActivity {
     }
 
     @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if ( keyCode == KeyEvent.KEYCODE_MENU ) {
+            // http://stackoverflow.com/questions/19275447/pressing-menu-button-causes-crash-in-activity-with-no-actionbar/19320065#19320065
+            // do nothing
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_AUTHENTICATION) {
             if (resultCode == RESULT_OK) {
                 LogUtils.v("Populate user debug: populate");
-
+                /***
+                 * Admin lists
+                 * Destiny nick0624@gmail.com 203624
+                 */
                 //Populate fake mods
                 CreateConversationParams.SimpleUser simpleUser = new CreateConversationParams.SimpleUser("203624", "chatwing");
                 Intent service = new Intent(this, CreateConversationIntentService.class);

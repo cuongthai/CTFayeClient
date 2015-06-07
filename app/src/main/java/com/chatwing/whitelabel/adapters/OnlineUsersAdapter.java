@@ -82,7 +82,6 @@ public class OnlineUsersAdapter extends CompatArrayAdapter<OnlineUser> {
         viewHolder.loginType.setImageResource(resId);
 
         String avatarUrl = mApiManager.getAvatarUrl(user);
-        LogUtils.v("Avatar Url " + avatarUrl);
         ImageLoader imageLoader = mVolleyManager.getImageLoader();
         viewHolder.avatar.setImageUrl(avatarUrl, imageLoader);
 

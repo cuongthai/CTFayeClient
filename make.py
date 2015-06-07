@@ -10,7 +10,7 @@ import json
 CONFIG_FILE = "gradle.properties"
 types = 'app/build-types'
 src_package = "/res/values"
-STRING_MAPPING = {"APP_NAME": "app_name","FACEBOOK_APP_ID":"fb_app_id","CUSTOM_LOGIN_TYPE":"build_login_type"}
+STRING_MAPPING = {"APP_NAME": "app_name","FACEBOOK_APP_ID":"fb_app_id","CUSTOM_LOGIN_TYPE":"build_login_type","FLURRY_API_KEY":"flurry_api_key"}
 BOOL_MAPPING = {"OFFICIAL":"official","ADS":"show_ads","ALLOW_REGISTER":"allow_register","SUPPORT_RSS":"support_rss","SUPPORT_MUSIC_BOX":"support_music_box"}
 
 APP_ID = "b4b391d0-e9bf-11e4-871f-f1829c245e2e"

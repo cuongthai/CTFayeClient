@@ -85,7 +85,7 @@ public class ExtendCommunicationActivity
         OnlineUsersFragment.OnlineUsersFragmentDelegate,
         ExtendChatMessagesFragment.Delegate,
         ExtendCommunicationModeManager.Delegate,
-        MediaControlInterface{
+        MediaControlInterface {
 
     public static final String AVATAR_PICKER_DIALOG_FRAGMENT_TAG = "AvatarPickerDialogFragment";
     public static final String BLOCK_USER_DIALOG_FRAGMENT_TAG = "BlockUserDialogFragment";
@@ -114,7 +114,7 @@ public class ExtendCommunicationActivity
         super.onCreate(savedInstanceState);
 
         String action = getIntent().getAction();
-        if(ACTION_STOP_MEDIA.equals(action)){
+        if (ACTION_STOP_MEDIA.equals(action)) {
             startService(new Intent(MusicService.ACTION_STOP));
         }
 
@@ -146,16 +146,20 @@ public class ExtendCommunicationActivity
         super.onStart();
         if (playIntent == null) {
             playIntent = new Intent(this, MusicService.class);
-            bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
             startService(playIntent);
         }
-        FlurryAgent.onStartSession(this, Constants.FLURRY_API_KEY);
+        bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
+
+        FlurryAgent.onStartSession(this, getString(R.string.flurry_api_key));
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         FlurryAgent.onEndSession(this);
+        if (isBindMediaService()) {
+            unbindService(musicConnection);
+        }
     }
 
     @Override
@@ -201,7 +205,7 @@ public class ExtendCommunicationActivity
     }
 
     @Subscribe
-    public void onSyncUnreadEvent(SyncUnreadEvent event){
+    public void onSyncUnreadEvent(SyncUnreadEvent event) {
         syncRefreshAnimationState();
     }
 
@@ -539,9 +543,6 @@ public class ExtendCommunicationActivity
     }
 
 
-
-
-
     @Override
     public boolean isBindMediaService() {
         return musicBound;
@@ -723,7 +724,10 @@ public class ExtendCommunicationActivity
         }
 
         DeleteBookmarkResponse.DeletedBookmark deletedBookmark = event.getResponse().getData();
-
+        if (deletedBookmark == null) {
+            LogUtils.e("Hmm... No data again.." + event.getResponse());
+            return;
+        }
         Uri syncedBookmarkWithChatBoxIdUri = ChatWingContentProvider
                 .getSyncedBookmarkWithChatBoxIdUri(deletedBookmark.getChatBoxId());
 

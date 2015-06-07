@@ -10,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.chatwing.whitelabel.Constants;
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.adapters.OnlineUsersAdapter;
 import com.chatwing.whitelabel.events.LoadOnlineUsersSuccessEvent;
@@ -186,6 +187,10 @@ public class OnlineUsersFragment extends ListFragment implements AdapterView.OnI
 
         if (BaseUser.computeIdentifier(onlineUser.getLoginId(), onlineUser.getLoginType()).equals(currentUser.getIdentifier())) {
             //Click on myself
+            return;
+        }
+
+        if(Constants.TYPE_GUEST.equals(onlineUser.getLoginType())){
             return;
         }
 

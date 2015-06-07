@@ -102,19 +102,27 @@ public class SyncBookmarkIntentService extends ExtendBaseIntentService {
 
     private Map<Integer, Integer> getChatboxUnreadCount() {
         Map<Integer, Integer> maps = new HashMap<Integer, Integer>();
-        Cursor query = getContentResolver().query(ChatWingContentProvider.getChatBoxesUri(),
-                new String[]{ChatBoxTable._ID, ChatBoxTable.UNREAD_COUNT},
-                null,
-                null,
-                null);
-        boolean hasNext = query.moveToFirst();
-        while (hasNext) {
-            int id = query.getInt(query.getColumnIndex(ChatBoxTable._ID));
-            int unreadCount = query.getInt(query.getColumnIndex(ChatBoxTable.UNREAD_COUNT));
-            LogUtils.v("Get last read " + id + ": unreadCount =" + unreadCount);
-            maps.put(id, unreadCount);
-            hasNext = query.moveToNext();
+        Cursor cursor = null;
+        try {
+            cursor = getContentResolver().query(ChatWingContentProvider.getChatBoxesUri(),
+                    new String[]{ChatBoxTable._ID, ChatBoxTable.UNREAD_COUNT},
+                    null,
+                    null,
+                    null);
+            boolean hasNext = cursor.moveToFirst();
+            while (hasNext) {
+                int id = cursor.getInt(cursor.getColumnIndex(ChatBoxTable._ID));
+                int unreadCount = cursor.getInt(cursor.getColumnIndex(ChatBoxTable.UNREAD_COUNT));
+                LogUtils.v("Get last read " + id + ": unreadCount =" + unreadCount);
+                maps.put(id, unreadCount);
+                hasNext = cursor.moveToNext();
+            }
+        } finally {
+            if (cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
         }
+
 
         return maps;
     }

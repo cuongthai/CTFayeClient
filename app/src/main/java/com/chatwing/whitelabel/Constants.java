@@ -28,8 +28,6 @@ public interface Constants extends com.chatwingsdk.Constants {
 
     String BUILD_LOGIN_TYPE = "custom";
 
-    String FLURRY_API_KEY = "TJXB56MR5DYMQY5HN85P";
-
     public static final List<Category> CATEGORIES = new Category.ListBuilder()
             .add("Android Central", "http://www.mobilenations.com/rss/mb.xml")
             .add("Wildcat", "http://wildcatsociety.com/category/kentucky-wildcats/feed/")

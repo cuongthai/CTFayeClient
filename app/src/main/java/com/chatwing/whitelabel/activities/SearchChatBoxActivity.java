@@ -106,7 +106,7 @@ public class SearchChatBoxActivity extends ActionBarActivity implements View.OnC
     @Override
     protected void onStart() {
         super.onStart();
-        FlurryAgent.onStartSession(this, Constants.FLURRY_API_KEY);
+        FlurryAgent.onStartSession(this, getString(R.string.flurry_api_key));
     }
 
     @Override

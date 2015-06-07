@@ -27,16 +27,19 @@ public class ChatWingApplication extends Application {
     public void onCreate() {
         super.onCreate();
         Crashlytics.start(this);
-
+        /**
+         * App IDS
+         * b4b391d0-e9bf-11e4-871f-f1829c245e2e : Test app id
+         */
         //Currently support only one chatbox enter from client, it should be loaded from server
         ChatWing.initialize(this, "b4b391d0-e9bf-11e4-871f-f1829c245e2e", "", new String[]{"1873"}, isOfficialChatWingApp()
                 ? WalkthroughActivity.class
                 : LegacyLoginActivity.class);
-        ChatWing.setIsDebugging(true);
+        ChatWing.setIsDebugging(false);
         ChatWing.instance(this).setMainActivityClass(ExtendCommunicationActivity.class);
         ChatWing.instance(this).getChatwingGraph().plus(getModules().toArray());
 
-        FlurryAgent.init(this, Constants.FLURRY_API_KEY);
+        FlurryAgent.init(this, getString(R.string.flurry_api_key));
         workaroundOverflowMenuKey();
 
         // Build Custom Singleton, required by PkRSS

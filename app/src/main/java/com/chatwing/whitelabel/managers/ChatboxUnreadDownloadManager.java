@@ -40,7 +40,7 @@ public class ChatboxUnreadDownloadManager {
     private static boolean isRunning;
 
     public synchronized void downloadUnread() {
-        LogUtils.v("downloadUnread "+isRunning+":"+mUserManager.getCurrentUser());
+        LogUtils.v("downloadUnread " + isRunning + ":" + mUserManager.getCurrentUser());
         if (isRunning || mUserManager.getCurrentUser() == null) {
             return;
         }
@@ -48,61 +48,67 @@ public class ChatboxUnreadDownloadManager {
             @Override
             public void doOnBackground() {
                 isRunning = true;
-
-                Cursor cursor = mContext.getContentResolver().query(ChatWingContentProvider.getChatBoxesUri(),
-                        new String[]{ChatBoxTable._ID},
-                        null,
-                        null,
-                        null);
-                boolean has = cursor.moveToFirst();
-                ExecutorService executorService = Executors.newFixedThreadPool(4);
-                final Map<Integer, Integer> chatboxIDUnreadMap = new HashMap<Integer, Integer>();
-                LogUtils.v("Has next "+has);
-                while (has) {
-                    final int chatboxID = cursor.getInt(0);
-
-                    AsyncJob.OnBackgroundJob fetchUnreadJob = new AsyncJob.OnBackgroundJob() {
-                        @Override
-                        public void doOnBackground() {
-                            try {
-                                int count = mApiManager.getUnreadCountForChatbox(mUserManager.getCurrentUser(), chatboxID);
-                                chatboxIDUnreadMap.put(chatboxID, count);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                LogUtils.v("Download unread task FAILED " + chatboxID);
-                            }
-                        }
-                    };
-
-                    //Execute each fetch job
-                    AsyncJob.doInBackground(fetchUnreadJob, executorService);
-
-                    LogUtils.v("Download unread task added");
-                    has = cursor.moveToNext();
-                }
-
-                executorService.shutdown();
-                LogUtils.v("Download unread waiting to shutdown service");
+                Cursor cursor = null;
                 try {
-                    executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-                } catch (InterruptedException e) {
-                    LogUtils.e(e);
-                }
-                LogUtils.v("Download unread DOWNLOADED, service SHUTDOWN");
+                    cursor = mContext.getContentResolver().query(ChatWingContentProvider.getChatBoxesUri(),
+                            new String[]{ChatBoxTable._ID},
+                            null,
+                            null,
+                            null);
+                    boolean has = cursor.moveToFirst();
+                    ExecutorService executorService = Executors.newFixedThreadPool(4);
+                    final Map<Integer, Integer> chatboxIDUnreadMap = new HashMap<Integer, Integer>();
+                    while (has) {
+                        final int chatboxID = cursor.getInt(0);
 
-                //Insert to database
-                insertToDatabase(chatboxIDUnreadMap);
+                        AsyncJob.OnBackgroundJob fetchUnreadJob = new AsyncJob.OnBackgroundJob() {
+                            @Override
+                            public void doOnBackground() {
+                                try {
+                                    int count = mApiManager.getUnreadCountForChatbox(mUserManager.getCurrentUser(), chatboxID);
+                                    chatboxIDUnreadMap.put(chatboxID, count);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    LogUtils.v("Download unread task FAILED " + chatboxID);
+                                }
+                            }
+                        };
 
-                // This toast should show a difference of 1000ms between calls
-                AsyncJob.doOnMainThread(new AsyncJob.OnMainThreadJob() {
-                    @Override
-                    public void doInUIThread() {
-                        mBus.post(new SyncUnreadEvent());
-                        LogUtils.v("Download unread: Synced Done");
+                        //Execute each fetch job
+                        AsyncJob.doInBackground(fetchUnreadJob, executorService);
+
+//                        LogUtils.v("Download unread task added");
+                        has = cursor.moveToNext();
                     }
-                });
+                    executorService.shutdown();
+//                    LogUtils.v("Download unread waiting to shutdown service");
+                    try {
+                        executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+                    } catch (InterruptedException e) {
+                        LogUtils.e(e);
+                    }
+//                    LogUtils.v("Download unread DOWNLOADED, service SHUTDOWN");
 
-                isRunning = false;
+                    //Insert to database
+                    insertToDatabase(chatboxIDUnreadMap);
+
+                    // This toast should show a difference of 1000ms between calls
+                    AsyncJob.doOnMainThread(new AsyncJob.OnMainThreadJob() {
+                        @Override
+                        public void doInUIThread() {
+                            mBus.post(new SyncUnreadEvent());
+//                            LogUtils.v("Download unread: Synced Done");
+                        }
+                    });
+
+                    isRunning = false;
+                } finally {
+                    if (cursor != null && !cursor.isClosed()) {
+                        cursor.close();
+                    }
+                }
+
+
             }
         };
 

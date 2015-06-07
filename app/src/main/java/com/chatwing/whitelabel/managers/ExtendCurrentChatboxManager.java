@@ -11,6 +11,7 @@ import com.chatwingsdk.events.internal.ResumeOpenChatBoxEvent;
 import com.chatwingsdk.events.internal.TaskFinishedEvent;
 import com.chatwingsdk.managers.CurrentChatBoxManager;
 import com.chatwingsdk.managers.PasswordManager;
+import com.chatwingsdk.utils.LogUtils;
 import com.chatwingsdk.validators.ChatBoxIdValidator;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -40,7 +41,7 @@ public class ExtendCurrentChatboxManager extends CurrentChatBoxManager {
     }
 
     @Subscribe
-    public void onResumeSetCurrentChatbox(ResumeOpenChatBoxEvent chatboxEvent){
+    public void onResumeSetCurrentChatbox(ResumeOpenChatBoxEvent chatboxEvent) {
         super.onResumeSetCurrentChatbox(chatboxEvent);
     }
 
@@ -69,6 +70,11 @@ public class ExtendCurrentChatboxManager extends CurrentChatBoxManager {
         } else {
             LoadOnlineUsersResponse response = (LoadOnlineUsersResponse) event.getResult();
             LoadOnlineUsersResponse.Data data = response.getData();
+            if (data == null) {
+                //Monitor this
+                LogUtils.e("Hm... Why no data? "+response.getError());
+                return;
+            }
             mBus.post(new LoadOnlineUsersSuccessEvent(data.getCount(), data.getList()));
         }
     }
