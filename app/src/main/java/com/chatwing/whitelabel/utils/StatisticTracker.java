@@ -27,16 +27,10 @@ public class StatisticTracker {
         FlurryAgent.endTimedEvent("OpenChatBox");
     }
 
-    public static void trackNumberOfBookmarksPerUser(User user, int count) {
+    public static void trackNumberOfBookmarksPerUser(int count) {
         Map<String, String> params = new HashMap<String, String>();
         params.put("count", String.valueOf(count));
         FlurryAgent.logEvent("BookmarksPerUser", params);
-    }
-
-    public static void trackNumberOfSyncedBookmarksPerUser(User user, int count) {
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("count", String.valueOf(count));
-        FlurryAgent.logEvent("SyncedBookmarksPerUser", params);
     }
 
     public static void trackChatBoxSearch(String query) {
@@ -66,29 +60,5 @@ public class StatisticTracker {
         Map<String, String> params = new HashMap<String, String>();
         params.put("login_type", type);
         FlurryAgent.logEvent("UserAuthenticate", params);
-    }
-
-    public static void trackNumberOfUnSyncBookmarks(List<LightWeightChatBox> unSyncedBookmarks) {
-        if (unSyncedBookmarks == null || unSyncedBookmarks.size() == 0) return;
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("count", String.valueOf(unSyncedBookmarks.size()));
-        FlurryAgent.logEvent("UnSyncBookmarks", params);
-    }
-
-    public static void trackNumberOfConveredBookmark(int count) {
-        if (count == 0) return;
-
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("count", String.valueOf(count));
-        FlurryAgent.logEvent("ConvertedBookmarks", params);
-
-    }
-
-    public static void trackRateEvent() {
-        FlurryAgent.logEvent("RateUs");
-    }
-
-    public static void trackRemindRateEvent() {
-        FlurryAgent.logEvent("RemindRateUs");
     }
 }

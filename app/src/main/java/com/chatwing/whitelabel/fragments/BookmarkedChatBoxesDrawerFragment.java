@@ -127,7 +127,7 @@ public class BookmarkedChatBoxesDrawerFragment extends ListFragment
 
     @Override
     public void onLoadFinished(android.support.v4.content.Loader<Cursor> cursorLoader, Cursor cursor) {
-        StatisticTracker.trackNumberOfBookmarksPerUser(mUserManager.getCurrentUser(), cursor.getCount());
+        StatisticTracker.trackNumberOfBookmarksPerUser(cursor.getCount());
         getListAdapter().swapCursor(cursor);
     }
 
