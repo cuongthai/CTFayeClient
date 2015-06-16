@@ -87,6 +87,9 @@ public class CreateBookmarkIntentService extends ExtendBaseIntentService {
                 CreateBookmarkResponse bookmarkResponse = mApiManager.createBookmark(mUserManager.getCurrentUser(), lightWeighChatBox.getId());
                 mCreateBookmarkEvent = new CreateBookmarkEvent(bookmarkResponse, intent.getBooleanExtra("is_upgrading", false));
 
+            } catch(com.chatwingsdk.managers.ApiManager.InvalidIdentityException iie){
+                //Ignore
+                mCreateBookmarkEvent = new CreateBookmarkEvent(iie);
             } catch (Exception e) {
                 LogUtils.e(e);
                 mCreateBookmarkEvent = new CreateBookmarkEvent(e);
