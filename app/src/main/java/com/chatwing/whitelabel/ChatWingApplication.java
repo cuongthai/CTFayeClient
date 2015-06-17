@@ -30,12 +30,13 @@ public class ChatWingApplication extends Application {
         /**
          * App IDS
          * b4b391d0-e9bf-11e4-871f-f1829c245e2e : Test app id
+         * Seattle 270c8870-14bf-11e5-a3c3-b94d1997848d
          */
         //Currently support only one chatbox enter from client, it should be loaded from server
-        ChatWing.initialize(this, "b4b391d0-e9bf-11e4-871f-f1829c245e2e", "", new String[]{"1873"}, isOfficialChatWingApp()
+        ChatWing.initialize(this, "270c8870-14bf-11e5-a3c3-b94d1997848d", "", new String[]{"1873"}, isOfficialChatWingApp()
                 ? WalkthroughActivity.class
                 : LegacyLoginActivity.class);
-        ChatWing.setIsDebugging(false);
+        ChatWing.setIsDebugging(true);
         ChatWing.instance(this).setMainActivityClass(ExtendCommunicationActivity.class);
         ChatWing.instance(this).getChatwingGraph().plus(getModules().toArray());
 

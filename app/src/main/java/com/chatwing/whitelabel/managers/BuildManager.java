@@ -37,7 +37,7 @@ public class BuildManager {
     }
 
     public boolean isCustomLoginType() {
-        return Constants.BUILD_LOGIN_TYPE.equals(mContext.getResources().getString(R.string.build_login_type));
+        return Constants.BUILD_CUSTOM_LOGIN_TYPE.equals(mContext.getResources().getString(R.string.build_login_method));
     }
 
 

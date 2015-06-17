@@ -32,7 +32,7 @@ import com.chatwing.whitelabel.pojos.responses.RegisterResponse;
 import com.chatwing.whitelabel.pojos.responses.ResetPasswordResponse;
 import com.chatwing.whitelabel.pojos.responses.SearchChatBoxResponse;
 import com.chatwing.whitelabel.pojos.responses.UpdateUserProfileResponse;
-import com.chatwing.whitelabel.utils.StatisticTracker;
+import com.chatwingsdk.utils.StatisticTracker;
 import com.chatwing.whitelabel.validators.EmailValidator;
 import com.chatwing.whitelabel.validators.MessageIdValidator;
 import com.chatwing.whitelabel.validators.PasswordValidator;

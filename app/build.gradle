@@ -119,7 +119,6 @@ dependencies {
     compile('com.pkmmte.pkrss:pkrss:1.1.3-SNAPSHOT@aar') {
         exclude group: 'com.squareup.okhttp'
     }
-    compile files('libs/flurry_5.jar')
     compile 'com.arasthel:asyncjob-library:1.0.3'
     compile 'org.scribe:scribe:1.3.5'
     compile project(':libs:UniversitySDK:chatwing-sdk')
