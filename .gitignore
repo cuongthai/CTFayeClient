@@ -10,3 +10,4 @@ todo~
 /certs/
 /app/app.iml
 *.iml
+/app/build-types
