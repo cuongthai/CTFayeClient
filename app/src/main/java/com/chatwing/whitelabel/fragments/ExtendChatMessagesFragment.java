@@ -2,7 +2,6 @@ package com.chatwing.whitelabel.fragments;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.BroadcastReceiver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -23,7 +22,7 @@ import com.chatwing.whitelabel.services.BlockUserIntentService;
 import com.chatwing.whitelabel.services.DeleteMessageIntentService;
 import com.chatwing.whitelabel.services.FlagMessageIntentService;
 import com.chatwing.whitelabel.services.IgnoreUserIntentService;
-import com.chatwing.whitelabel.utils.StatisticTracker;
+import com.chatwingsdk.utils.StatisticTracker;
 import com.chatwingsdk.events.internal.CurrentChatBoxEvent;
 import com.chatwingsdk.events.internal.PasswordEnteredEvent;
 import com.chatwingsdk.events.internal.PasswordRefusedEvent;

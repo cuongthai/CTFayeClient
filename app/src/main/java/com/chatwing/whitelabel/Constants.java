@@ -26,7 +26,7 @@ public interface Constants extends com.chatwingsdk.Constants {
     String FEEDBACK_EMAIL = "info@chatwing.com";
     boolean ALLOW_SHARE_CHATBOX = false;
 
-    String BUILD_LOGIN_TYPE = "custom";
+    String BUILD_CUSTOM_LOGIN_TYPE = "custom";
 
     public static final List<Category> CATEGORIES = new Category.ListBuilder()
             .add("Android Central", "http://www.mobilenations.com/rss/mb.xml")

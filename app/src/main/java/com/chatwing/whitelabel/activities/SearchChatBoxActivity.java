@@ -19,14 +19,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.chatwing.whitelabel.ChatWingApplication;
-import com.chatwing.whitelabel.Constants;
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.adapters.SearchChatBoxResultsAdapter;
 import com.chatwing.whitelabel.contentproviders.SearchChatBoxSuggestionsProvider;
 import com.chatwing.whitelabel.listeners.EndlessOnScrollListener;
 import com.chatwing.whitelabel.modules.ExtendChatWingModule;
 import com.chatwing.whitelabel.modules.SearchChatBoxActivityModule;
-import com.chatwing.whitelabel.utils.StatisticTracker;
+import com.chatwingsdk.utils.StatisticTracker;
 import com.chatwingsdk.pojos.LightWeightChatBox;
 import com.chatwing.whitelabel.pojos.responses.CreateChatBoxResponse;
 import com.chatwing.whitelabel.pojos.responses.SearchChatBoxResponse;

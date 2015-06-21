@@ -15,14 +15,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.adapters.BookmarkBoxesAdapter;
 import com.chatwing.whitelabel.services.DeleteBookmarkIntentService;
-import com.chatwing.whitelabel.utils.StatisticTracker;
+import com.chatwingsdk.utils.StatisticTracker;
 import com.chatwingsdk.contentproviders.ChatWingContentProvider;
 import com.chatwingsdk.tables.SyncedBookmarkTable;
 import com.chatwingsdk.events.internal.UserSelectedChatBoxEvent;
