@@ -21,17 +21,17 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.chatwing.whitelabel.BuildConfig;
+import com.chatwing.whitelabel.ChatWing;
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.activities.ExtendCommunicationActivity;
+import com.chatwing.whitelabel.pojos.Song;
 import com.chatwing.whitelabel.utils.AudioFocusHelper;
+import com.chatwing.whitelabel.utils.LogUtils;
 import com.chatwing.whitelabel.utils.MediaButtonHelper;
 import com.chatwing.whitelabel.utils.MusicFocusable;
 import com.chatwing.whitelabel.utils.MusicIntentReceiver;
 import com.chatwing.whitelabel.utils.RemoteControlClientCompat;
 import com.chatwing.whitelabel.utils.RemoteControlHelper;
-import com.chatwingsdk.ChatWing;
-import com.chatwingsdk.pojos.Song;
-import com.chatwingsdk.utils.LogUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -445,7 +445,7 @@ public class MusicService extends Service implements
                 PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(this)
-                        .setSmallIcon(com.chatwingsdk.R.drawable.ic_launcher)
+                        .setSmallIcon(R.drawable.ic_launcher)
                         .setContentTitle(text)
                         .setTicker(text)
                         .setContentText(getString(R.string.message_touch_to_stop));
@@ -472,7 +472,7 @@ public class MusicService extends Service implements
 
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(this)
-                        .setSmallIcon(com.chatwingsdk.R.drawable.ic_launcher)
+                        .setSmallIcon(R.drawable.ic_launcher)
                         .setContentTitle(text)
                         .setTicker(text)
                         .setContentText(getString(R.string.message_touch_to_stop));

@@ -4,13 +4,7 @@ import android.content.Intent;
 
 import com.chatwing.whitelabel.events.DeleteMessageEvent;
 import com.chatwing.whitelabel.managers.ApiManager;
-import com.chatwing.whitelabel.modules.ExtendChatWingModule;
 import com.chatwing.whitelabel.pojos.responses.DeleteMessageResponse;
-import com.chatwingsdk.modules.ChatWingModule;
-import com.chatwingsdk.services.BaseIntentService;
-
-import java.util.Arrays;
-import java.util.List;
 
 import javax.inject.Inject;
 

@@ -1,12 +1,11 @@
 package com.chatwing.whitelabel.modules;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.support.v4.app.FragmentManager;
 
-
 import com.chatwing.whitelabel.activities.WalkthroughActivity;
 import com.chatwing.whitelabel.timers.SafeCountDownTimer;
-import com.chatwingsdk.modules.ChatWingModule;
 
 import javax.inject.Singleton;
 
@@ -26,6 +25,7 @@ public class WalkthroughActivityModule {
     public WalkthroughActivityModule(WalkthroughActivity activity) {
         mActivity = activity;
     }
+
 
     @Provides
     @Singleton

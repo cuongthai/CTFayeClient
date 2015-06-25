@@ -3,10 +3,9 @@ package com.chatwing.whitelabel.interfaces;
 import android.os.Handler;
 
 import com.chatwing.whitelabel.events.MessageEditEvent;
+import com.chatwing.whitelabel.modules.ForMainThread;
 import com.chatwing.whitelabel.pojos.jspojos.MessageResponse;
-import com.chatwingsdk.interfaces.JSInterfaceImpl;
-import com.chatwingsdk.modules.ForMainThread;
-import com.chatwingsdk.utils.LogUtils;
+import com.chatwing.whitelabel.utils.LogUtils;
 import com.google.gson.Gson;
 import com.squareup.otto.Bus;
 

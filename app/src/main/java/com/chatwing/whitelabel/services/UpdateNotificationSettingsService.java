@@ -1,0 +1,56 @@
+package com.chatwing.whitelabel.services;
+
+import android.content.Intent;
+
+import com.chatwing.whitelabel.events.UpdateSubscriptionEvent;
+import com.chatwing.whitelabel.pojos.responses.SubscriptionResponse;
+
+
+/**
+ * Created by steve on 23/01/2015.
+ */
+public class UpdateNotificationSettingsService extends BaseIntentService {
+
+    public static final String CHATBOX_ID = "CHATBOX_ID";
+    public static final String CONVERSATION_ID = "CONVERSATION_ID";
+    public static final String ACTION_SUBSCRIBE = "ACTION_SUBSCRIBE";
+    public static final String ACTION_UNSUBSCRIBE = "ACTION_UNSUBSCRIBE";
+    public static final String TARGET = "TARGET";
+    public static final String TARGET_EMAIL = "email";
+    public static final String TARGET_PUSH = "push";
+
+    public UpdateNotificationSettingsService() {
+        super("UpdateNotificationSettingsService");
+    }
+
+    @Override
+    protected void onHandleIntent(Intent intent) {
+        int chatboxID = intent.getIntExtra(CHATBOX_ID, 0);
+        String conversationID = intent.getStringExtra(CONVERSATION_ID);
+        String target = intent.getStringExtra(TARGET);
+        String action = intent.getAction();
+        try {
+            post(UpdateSubscriptionEvent.startedEvent());
+            SubscriptionResponse subscriptionResponse;
+            if (conversationID == null) {
+                subscriptionResponse = mApiManager.
+                        updateNotificationSubscription(mUserManager.getCurrentUser(), action, chatboxID, target);
+            } else {
+                subscriptionResponse = mApiManager.
+                        updateNotificationSubscription(mUserManager.getCurrentUser(), action, conversationID, target);
+            }
+            post(UpdateSubscriptionEvent.succeedEvent(subscriptionResponse, action));
+        } catch (Exception e) {
+            post(UpdateSubscriptionEvent.failedEvent(e));
+        }
+    }
+
+    private void post(final UpdateSubscriptionEvent event) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mBus.post(event);
+            }
+        });
+    }
+}

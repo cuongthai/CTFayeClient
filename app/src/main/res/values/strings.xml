@@ -150,6 +150,11 @@
     <string name="title_ignore">Ignore</string>
     <string name="title_flag">Flag</string>
     <string name="title_unignore">Show Content</string>
+    <string name="title_menu_audio_playing">Playing</string>
+    <string name="title_menu_audio_pause">Pause</string>
+    <string name="title_music_box">Music Box</string>
+    <string name="title_back">Back</string>
+
     <string name="gcm_sender_id">341431874860</string>
     <string name="message_email_verification_sent">Please check your email for verification</string>
     <string name="hint_chat_box_name">"Name (optional)"</string>
@@ -176,16 +181,114 @@
         <item>31536000</item>
     </string-array>
 
-    <string name="banner_ad_unit_id">ca-app-pub-7754323616870452/5130402252</string> <!-- Destiny -->
+    <string name="banner_ad_unit_id">ca-app-pub-7754323616870452/5130402252</string>
     <!--<string name="banner_ad_unit_id">ca-app-pub-9492949418759375/8073202249</string> &lt;!&ndash; Kentucky &ndash;&gt;-->
     <string name="message_flag">Flagged</string>
     <string name="error_failed_to_flag">Failed to flag this message</string>
-    <string name="title_menu_audio_playing">Playing</string>
-    <string name="title_menu_audio_pause">Pause</string>
+
     <string name="message_touch_to_stop">Touch to stop media</string>
     <string name="title_feeds">Feeds</string>
     <string name="message_select_feed_source">Please select a feed source</string>
     <string name="empty_feeds">No feed sources</string>
     <string name="error_feed_loading">Error loading feed. Check your internet connection and try again</string>
-    <string name="title_music_box">Music Box</string>
+
+
+
+    <string name="action_login">Login</string>
+    <string name="action_logout">Logout</string>
+
+    <string name="ic_bold">\ue454</string>
+    <string name="ic_italic">\ue456</string>
+    <string name="ic_underline">\ue455</string>
+    <string name="ic_strikethrough">\ue457</string>
+    <string name="ic_color">\ue461</string>
+    <string name="ic_background_color">\ue462</string>
+    <string name="ic_img">\ue02c</string>
+    <string name="ic_video">\ue04a</string>
+    <string name="ic_url">\ue2c9</string>
+    <string name="ic_email">\ue046</string>
+
+    <string name="title_bbcodes">"BBCodes"</string>
+    <string name="title_emoticons">"Emoticons"</string>
+    <string name="title_add">"Add"</string>
+
+    <string name="tag_communication_messages">tag_communication_messages</string>
+
+    <string name="title_pick_color">"Pick Color"</string>
+    <string name="title_ok">OK</string>
+
+    <string name="message_loading_chatbox">Loading chatbox&#8230;</string>
+    <string name="message_loading_conversation">Loading conversation&#8230;</string>
+    <string name="message_drawer_open">"Drawer opened"</string>
+    <string name="message_drawer_close">"Drawer closed"</string>
+    <string name="message_select_conversation">"Please select a conversation."</string>
+    <string name="message_select_chat_box">"Please select a chat box."</string>
+    <string name="message_need_login">You need to login to access this chatbox</string>
+    <string name="message_hint_input_password_chatbox">"Password"</string>
+    <string name="message_remember_password_chatbox">"Remember"</string>
+    <string name="message_input_password_chatbox">"Chatbox Authentication"</string>
+    <string name="message_published">"Published."</string>
+    <string name="message_error">"Error: "</string>
+    <string name="message_subscribed_to_channel">"Subscribed to channel "</string>
+    <string name="message_connected_to_server">"Connected to server."</string>
+    <string name="message_disconnected_from_server">"Disconnected from server."</string>
+    <string name="message_event">"Event "</string>
+    <string name="message_updating_profile">Updating your profile</string>
+    <string name="message_loading">Loading&#8230;</string>
+
+    <string name="error_required_login_except_guest">"You need to login with a ChatWing/Social/Custom accounts to use these awesome features."</string>
+    <string name="error_network_connection">"Network failure. Please check your network connection"</string>
+    <string name="error_unknown">"There was an error while processing your request. Please try again or report to ChatWing"</string>
+    <string name="error_while_creating_conversation">There was an error while creating conversation.</string>
+    <string name="error_failed_to_load_chat_box_details">"Failed to load chat box details"</string>
+    <string name="error_obtain_access_token">"There was an error while authenticating with external service"</string>
+    <string name="error_required_login">"You need to login to use these awesome features."</string>
+    <string name="error_empty_message">"Empty message."</string>
+    <string name="error_too_long_message">"The message is too long."</string>
+    <string name="error_illegal_input">"Please don't hurt us!"</string>
+    <string name="error_while_sending_message">"There was an error while sending message."</string>
+    <string name="error_auth_required">"You need to login to use these awesome features."</string>
+    <string name="error_invalid_access_token">"Your session has expired. Please login again to use this feature"</string>
+    <string name="error_invalid_external_access_token">"There was an error while exchanging credentials with ChatWing"</string>
+    <string name="error_email_verify">Email is missing or not verified. Please update it before update notification setting</string>
+    <string name="error_failed_to_sync_data">"Failed to sync data"</string>
+    <string name="error_failed_to_load_chatboxes">There was an error while loading chatboxes</string>
+
+
+    <!-- Color Picker -->
+    <string name="dialog_color_picker">Color Picker</string>
+    <string name="press_color_to_apply">Press on Color to apply</string>
+
+    <string name="hint_hex">HEX</string>
+    <string name="title_color_picker_down">↓</string>
+    <string name="title_color_picker_right">→</string>
+    <string name="description_send">Send</string>
+    <string name="description_attach">Attach</string>
+    <string name="description_emo">Emoticons</string>
+    <string name="description_cancel">Cancel</string>
+    <string name="description_emoticon">Emoticon</string>
+    <string name="empty_conversations">No conversations</string>
+    <string name="empty_chat_boxes">"No chat boxes found."</string>
+    <string name="conversations">Conversations</string>
+
+
+    <string name="progress_starting_session">"Starting session…"</string>
+    <string name="title_chat_boxes">"Chat boxes"</string>
+    <string name="title_profile_tab">Profile</string>
+
+    <string name="progress_loading_chat_box_detail">"Loading chatbox detail."</string>
+
+
+
+    <string name="title_activity_notification">Notification Settings</string>
+    <string name="push_notification">Push</string>
+    <string name="email_notification">Email</string>
+    <string name="cancel">Cancel</string>
+    <string name="update">Update</string>
+
+    <string name="current_mode_state">current_mode_state</string>
+    <string name="current_chatbox_id">current_chatbox_id</string>
+    <string name="current_conversation_key">current_conversation_key</string>
+    <string name="broadcast_tag">[Broadcast]</string>
+
 </resources>

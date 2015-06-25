@@ -8,7 +8,31 @@ import java.util.List;
 /**
  * Created by cuongthai on 26/10/2014.
  */
-public interface Constants extends com.chatwingsdk.Constants {
+public interface Constants {
+    boolean DEBUG = ChatWing.isDebugging();
+    String CHATWING_SDK_TAG = "ChatWingSDK";
+    String CHATWING_BASE_URL =  "http://staging.chatwing.com";
+    String FAYE_CLIENT_URL = CHATWING_BASE_URL + "/mobile/client/1";
+
+    String MAIN_COLOR = "#05b0ff";
+
+    int MAX_NUMBER_OF_CONVERSATIONS = 100;
+
+    /**
+     * Authentication types
+     */
+    String TYPE_APP = "app"; //Predefined user list from dashboard
+    String TYPE_CHATWING = "chatwing";
+    String TYPE_GUEST = "guest";
+    String TYPE_FACEBOOK = "facebook";
+    String TYPE_TWITTER = "twitter";
+    String TYPE_GOOGLE = "google";
+    String TYPE_YAHOO = "yahoo";
+    String TYPE_TUMBLR = "tumblr";
+    String TYPE_ENTERPRISE = "enterprise";
+
+    int AVATAR_SIZE = 64;
+    boolean SHOW_CHAT_BOX_URL = false;
 
     String FILTER_REPLACE_SEQUENCE = "*";
 

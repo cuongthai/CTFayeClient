@@ -12,12 +12,10 @@ import com.android.volley.toolbox.NetworkImageView;
 import com.chatwing.whitelabel.Constants;
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.managers.ApiManager;
+import com.chatwing.whitelabel.managers.VolleyManager;
+import com.chatwing.whitelabel.modules.ForActivity;
 import com.chatwing.whitelabel.pojos.OnlineUser;
 import com.chatwing.whitelabel.utils.StringUtils;
-import com.chatwingsdk.managers.VolleyManager;
-import com.chatwingsdk.modules.ForActivity;
-import com.chatwingsdk.utils.LogUtils;
-
 
 import java.util.List;
 

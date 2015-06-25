@@ -3,11 +3,9 @@ package com.chatwing.whitelabel.services;
 import android.content.Intent;
 
 import com.chatwing.whitelabel.events.FlagMessageEvent;
-import com.chatwing.whitelabel.events.IgnoreUserEvent;
 import com.chatwing.whitelabel.managers.ApiManager;
+import com.chatwing.whitelabel.pojos.User;
 import com.chatwing.whitelabel.pojos.responses.FlagMessageResponse;
-import com.chatwing.whitelabel.pojos.responses.IgnoreUserResponse;
-import com.chatwingsdk.pojos.User;
 
 import javax.inject.Inject;
 

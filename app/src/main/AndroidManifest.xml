@@ -2,6 +2,20 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.chatwing.whitelabel">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <!-- GCM permissions -->
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
+    <!-- GCM requires a Google account. -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <!-- Keeps the processor from sleeping when a message is received. -->
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+
+    <!-- Permission to prevent other apps from registering and receiving our messages -->
+    <!-- The permission must exactly match the pattern:  applicationPackage + ".permission.C2D_MESSAGE" -->
+
     <!-- Upload avatar from sd card-->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -17,8 +31,7 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/Theme.ChatWing"
-        tools:replace="icon, label, theme">
+        android:theme="@style/Theme.ChatWing">
         <activity
             android:name=".activities.ExtendCommunicationActivity"
             android:icon="@drawable/ic_launcher"
@@ -106,6 +119,23 @@
             android:theme="@style/Theme.ChatWing" />
         <activity android:name="com.soundcloud.android.crop.CropImageActivity" />
 
+        <activity android:name=".activities.CommunicationActivity"
+            android:theme="@style/Theme.ChatWing"
+            android:icon="@drawable/ic_chatwing"/>
+
+        <service android:name=".services.CreateConversationIntentService" />
+        <service android:name=".services.LoadChatBoxDetailsService" />
+        <service android:name=".services.CreateMessageIntentService" />
+        <service android:name=".services.SyncCommunicationBoxesIntentService" />
+        <service android:name=".services.AckConversationIntentService" />
+        <service android:name=".services.AckChatboxIntentService" />
+        <service android:name=".services.UpdateGcmIntentService" />
+        <service android:name=".services.OfflineIntentService" />
+        <service android:name=".services.NotificationIntentService" />
+        <service android:name=".services.NotificationStatusIntentService" />
+        <service android:name=".services.UpdateNotificationSettingsService" />
+
+
         <service android:name=".services.UpdateAvatarIntentService" />
         <service android:name=".services.UpdateUserProfileService" />
         <service android:name=".services.DeleteMessageIntentService" />
@@ -142,7 +172,7 @@
         <activity android:name="com.facebook.LoginActivity" />
         <!-- End of Fb 3.0 section -->
         <provider
-            android:name="com.chatwingsdk.contentproviders.ChatWingContentProvider"
+            android:name=".contentproviders.ChatWingContentProvider"
             android:authorities="${applicationId}.provider"
             android:exported="false"
             tools:replace="android:authorities" />
@@ -152,13 +182,13 @@
             android:authorities="${applicationId}.SearchChatBoxSuggestionsProvider"
             android:exported="false" />
 
+
         <receiver
-            android:name="com.chatwingsdk.receivers.GcmBroadcastReceiver"
+            android:name=".receivers.GcmBroadcastReceiver"
             android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-
-                <category android:name="${applicationId}" />
+                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
+                <category android:name="${applicationId}"/>
             </intent-filter>
         </receiver>
 

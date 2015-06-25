@@ -5,14 +5,8 @@ import android.content.Intent;
 import com.chatwing.whitelabel.events.BlockedEvent;
 import com.chatwing.whitelabel.fragments.ExtendChatMessagesFragment;
 import com.chatwing.whitelabel.managers.ApiManager;
-import com.chatwing.whitelabel.modules.ExtendChatWingModule;
+import com.chatwing.whitelabel.pojos.Message;
 import com.chatwing.whitelabel.pojos.responses.BlackListResponse;
-import com.chatwingsdk.modules.ChatWingModule;
-import com.chatwingsdk.pojos.Message;
-import com.chatwingsdk.services.BaseIntentService;
-
-import java.util.Arrays;
-import java.util.List;
 
 import javax.inject.Inject;
 

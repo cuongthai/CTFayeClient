@@ -6,8 +6,7 @@ import android.content.Context;
 import android.util.Patterns;
 import android.widget.ArrayAdapter;
 
-
-import com.chatwingsdk.modules.ForActivity;
+import com.chatwing.whitelabel.modules.ForActivity;
 
 import java.util.ArrayList;
 import java.util.HashSet;

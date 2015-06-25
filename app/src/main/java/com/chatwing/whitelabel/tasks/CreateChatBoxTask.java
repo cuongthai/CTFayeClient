@@ -1,9 +1,8 @@
 package com.chatwing.whitelabel.tasks;
 
 import com.chatwing.whitelabel.managers.ApiManager;
+import com.chatwing.whitelabel.managers.UserManager;
 import com.chatwing.whitelabel.pojos.responses.CreateChatBoxResponse;
-import com.chatwingsdk.managers.UserManager;
-import com.chatwingsdk.tasks.CallbackTask;
 import com.squareup.otto.Bus;
 
 import javax.inject.Inject;

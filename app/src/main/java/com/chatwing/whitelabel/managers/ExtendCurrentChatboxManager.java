@@ -3,16 +3,15 @@ package com.chatwing.whitelabel.managers;
 import android.content.Context;
 import android.os.AsyncTask;
 
+import com.chatwing.whitelabel.events.LoadChatBoxDetailsEvent;
 import com.chatwing.whitelabel.events.LoadOnlineUsersFailedEvent;
 import com.chatwing.whitelabel.events.LoadOnlineUsersSuccessEvent;
+import com.chatwing.whitelabel.events.ResumeOpenChatBoxEvent;
+import com.chatwing.whitelabel.events.TaskFinishedEvent;
 import com.chatwing.whitelabel.pojos.responses.LoadOnlineUsersResponse;
 import com.chatwing.whitelabel.tasks.LoadOnlineUsersTask;
-import com.chatwingsdk.events.internal.ResumeOpenChatBoxEvent;
-import com.chatwingsdk.events.internal.TaskFinishedEvent;
-import com.chatwingsdk.managers.CurrentChatBoxManager;
-import com.chatwingsdk.managers.PasswordManager;
-import com.chatwingsdk.utils.LogUtils;
-import com.chatwingsdk.validators.ChatBoxIdValidator;
+import com.chatwing.whitelabel.utils.LogUtils;
+import com.chatwing.whitelabel.validators.ChatBoxIdValidator;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -36,7 +35,7 @@ public class ExtendCurrentChatboxManager extends CurrentChatBoxManager {
     }
 
     @com.squareup.otto.Subscribe
-    public void onLoadChatBoxDetailsEvent(com.chatwingsdk.events.internal.LoadChatBoxDetailsEvent event) {
+    public void onLoadChatBoxDetailsEvent(LoadChatBoxDetailsEvent event) {
         super.onLoadChatBoxDetailsEvent(event);
     }
 
@@ -72,7 +71,7 @@ public class ExtendCurrentChatboxManager extends CurrentChatBoxManager {
             LoadOnlineUsersResponse.Data data = response.getData();
             if (data == null) {
                 //Monitor this
-                LogUtils.e("Hm... Why no data? "+response.getError());
+                LogUtils.e("Hm... Why no data? " + response.getError());
                 return;
             }
             mBus.post(new LoadOnlineUsersSuccessEvent(data.getCount(), data.getList()));

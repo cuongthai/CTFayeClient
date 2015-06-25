@@ -29,6 +29,8 @@ import android.view.MenuItem;
 
 import com.chatwing.whitelabel.Constants;
 import com.chatwing.whitelabel.R;
+import com.chatwing.whitelabel.events.TaskFinishedEvent;
+import com.chatwing.whitelabel.events.UserAuthenticationEvent;
 import com.chatwing.whitelabel.fragments.AuthenticateFragment;
 import com.chatwing.whitelabel.fragments.ForgotPasswordFragment;
 import com.chatwing.whitelabel.fragments.GooglePlusDialogFragment;
@@ -38,28 +40,24 @@ import com.chatwing.whitelabel.fragments.LoginScribeFragment;
 import com.chatwing.whitelabel.fragments.LoginTwitterFragment;
 import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.managers.BuildManager;
+import com.chatwing.whitelabel.managers.UserManager;
 import com.chatwing.whitelabel.modules.ExtendChatWingModule;
 import com.chatwing.whitelabel.modules.LegacyActivityModule;
+import com.chatwing.whitelabel.pojos.User;
+import com.chatwing.whitelabel.pojos.errors.AuthenticationParamsError;
+import com.chatwing.whitelabel.pojos.errors.ChatWingError;
+import com.chatwing.whitelabel.pojos.params.oauth.AuthenticationParams;
+import com.chatwing.whitelabel.pojos.params.oauth.OAuth2Params;
 import com.chatwing.whitelabel.pojos.responses.ResetPasswordResponse;
 import com.chatwing.whitelabel.scribeconfigs.TumblrConfig;
 import com.chatwing.whitelabel.scribeconfigs.YahooConfig;
 import com.chatwing.whitelabel.tasks.GetGooglePlusAccessTokenTask;
 import com.chatwing.whitelabel.tasks.ResetPasswordTask;
+import com.chatwing.whitelabel.tasks.StartSessionTask;
+import com.chatwing.whitelabel.utils.LogUtils;
+import com.chatwing.whitelabel.utils.NetworkUtils;
 import com.chatwing.whitelabel.validators.EmailValidator;
-import com.chatwingsdk.activities.AuthenticateActivity;
-import com.chatwingsdk.events.internal.TaskFinishedEvent;
-import com.chatwingsdk.events.internal.UserAuthenticationEvent;
-import com.chatwingsdk.managers.ProgressViewsManager;
-import com.chatwingsdk.managers.UserManager;
-import com.chatwingsdk.pojos.User;
-import com.chatwingsdk.pojos.errors.AuthenticationParamsError;
-import com.chatwingsdk.pojos.errors.ChatWingError;
-import com.chatwingsdk.pojos.params.oauth.AuthenticationParams;
-import com.chatwingsdk.pojos.params.oauth.OAuth2Params;
-import com.chatwingsdk.tasks.StartSessionTask;
-import com.chatwingsdk.utils.LogUtils;
-import com.chatwingsdk.utils.NetworkUtils;
-import com.chatwingsdk.views.QuickMessageView;
+import com.chatwing.whitelabel.views.QuickMessageView;
 import com.facebook.Session;
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
@@ -455,9 +453,9 @@ public class LegacyLoginActivity extends AuthenticateActivity
             }
 
             //Error Google
-            if (params.getType().equals(com.chatwingsdk.Constants.TYPE_GOOGLE)
-                    && event.getException() instanceof com.chatwingsdk.managers.ApiManager.InvalidExternalAccessTokenException) {
-                ChatWingError error = ((com.chatwingsdk.managers.ApiManager.InvalidExternalAccessTokenException) event.getException()).getError();
+            if (params.getType().equals(Constants.TYPE_GOOGLE)
+                    && event.getException() instanceof ApiManager.InvalidExternalAccessTokenException) {
+                ChatWingError error = ((ApiManager.InvalidExternalAccessTokenException) event.getException()).getError();
                 AuthenticationParamsError errorDetail = new Gson().fromJson(
                         error.getParams(),
                         AuthenticationParamsError.class);

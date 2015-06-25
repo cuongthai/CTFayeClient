@@ -7,10 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-
-import com.chatwingsdk.managers.UserManager;
-import com.chatwingsdk.modules.ForActivity;
-import com.chatwingsdk.pojos.User;
+import com.chatwing.whitelabel.managers.UserManager;
+import com.chatwing.whitelabel.modules.ForActivity;
+import com.chatwing.whitelabel.pojos.User;
 
 import javax.inject.Inject;
 

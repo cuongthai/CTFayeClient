@@ -1,7 +1,6 @@
 package com.chatwing.whitelabel.events;
 
 import com.chatwing.whitelabel.pojos.responses.DeleteMessageResponse;
-import com.chatwingsdk.events.internal.MessageEvent;
 
 /**
  * Created by nguyenthanhhuy on 12/21/13.

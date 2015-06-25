@@ -16,13 +16,10 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.chatwing.whitelabel.R;
-import com.chatwingsdk.fragments.InjectableFragmentDelegate;
-import com.chatwingsdk.utils.LogUtils;
 import com.soundcloud.android.crop.Crop;
 import com.squareup.otto.Bus;
 
 import java.io.File;
-import java.io.IOException;
 
 import javax.inject.Inject;
 

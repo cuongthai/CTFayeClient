@@ -8,12 +8,11 @@ import android.view.Window;
 
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.managers.BuildManager;
+import com.chatwing.whitelabel.managers.UserManager;
 import com.chatwing.whitelabel.modules.StartActivityModule;
-import com.chatwingsdk.activities.BaseABFragmentActivity;
-import com.chatwingsdk.managers.UserManager;
-import com.chatwingsdk.pojos.params.CreateConversationParams;
-import com.chatwingsdk.services.CreateConversationIntentService;
-import com.chatwingsdk.utils.LogUtils;
+import com.chatwing.whitelabel.pojos.params.CreateConversationParams;
+import com.chatwing.whitelabel.services.CreateConversationIntentService;
+import com.chatwing.whitelabel.utils.LogUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,8 +33,8 @@ public class StartActivity extends BaseABFragmentActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
         if (mUserManager.getCurrentUser() != null) {
             startActivity(new Intent(this, ExtendCommunicationActivity.class));

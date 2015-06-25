@@ -4,7 +4,7 @@ import android.app.SearchManager;
 import android.content.Context;
 
 import com.chatwing.whitelabel.managers.ApiManager;
-import com.chatwing.whitelabel.managers.WLApiManagerImpl;
+import com.chatwing.whitelabel.managers.ApiManagerImpl;
 import com.chatwing.whitelabel.services.BlockUserIntentService;
 import com.chatwing.whitelabel.services.CreateBookmarkIntentService;
 import com.chatwing.whitelabel.services.DeleteBookmarkIntentService;
@@ -16,7 +16,6 @@ import com.chatwing.whitelabel.services.SyncBookmarkIntentService;
 import com.chatwing.whitelabel.services.UpdateAvatarIntentService;
 import com.chatwing.whitelabel.services.UpdateUserProfileService;
 import com.chatwing.whitelabel.services.VerifyEmailIntentService;
-import com.chatwingsdk.modules.ChatWingModule;
 
 import javax.inject.Singleton;
 
@@ -53,7 +52,7 @@ public class ExtendChatWingModule {
 
     @Provides
     @Singleton
-    ApiManager provideApiManager(WLApiManagerImpl impl) {
+    ApiManager provideApiManager(ApiManagerImpl impl) {
         return impl;
     }
 

@@ -6,10 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-
 import com.chatwing.whitelabel.managers.ApiManager;
-import com.chatwingsdk.pojos.LightWeightChatBox;
-import com.chatwingsdk.modules.ForActivity;
+import com.chatwing.whitelabel.modules.ForActivity;
+import com.chatwing.whitelabel.pojos.LightWeightChatBox;
 
 import javax.inject.Inject;
 

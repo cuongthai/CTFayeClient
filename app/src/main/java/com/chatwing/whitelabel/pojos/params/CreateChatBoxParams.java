@@ -1,8 +1,6 @@
 package com.chatwing.whitelabel.pojos.params;
 
 
-import com.chatwingsdk.pojos.params.Params;
-
 /**
  * Created by nguyenthanhhuy on 10/26/13.
  */

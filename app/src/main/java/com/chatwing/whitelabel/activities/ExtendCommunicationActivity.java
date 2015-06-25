@@ -16,14 +16,25 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.chatwing.whitelabel.Constants;
 import com.chatwing.whitelabel.R;
+import com.chatwing.whitelabel.contentproviders.ChatWingContentProvider;
 import com.chatwing.whitelabel.events.AccountSwitchEvent;
+import com.chatwing.whitelabel.events.AllSyncsCompletedEvent;
 import com.chatwing.whitelabel.events.BlockedEvent;
 import com.chatwing.whitelabel.events.DeleteBookmarkEvent;
+import com.chatwing.whitelabel.events.SyncCommunicationBoxEvent;
+import com.chatwing.whitelabel.events.SyncUnreadEvent;
+import com.chatwing.whitelabel.events.TouchUserInfoEvent;
+import com.chatwing.whitelabel.events.UpdateUserEvent;
+import com.chatwing.whitelabel.events.ViewProfileEvent;
+import com.chatwing.whitelabel.events.faye.ChannelSubscriptionChangedEvent;
+import com.chatwing.whitelabel.events.faye.FayePublishEvent;
+import com.chatwing.whitelabel.events.faye.MessageReceivedEvent;
+import com.chatwing.whitelabel.events.faye.ServerConnectionChangedEvent;
 import com.chatwing.whitelabel.fragments.AccountDialogFragment;
 import com.chatwing.whitelabel.fragments.BlockUserDialogFragment;
 import com.chatwing.whitelabel.fragments.BookmarkedChatBoxesDrawerFragment;
+import com.chatwing.whitelabel.fragments.CommunicationMessagesFragment;
 import com.chatwing.whitelabel.fragments.ExtendChatMessagesFragment;
 import com.chatwing.whitelabel.fragments.ExtendCommunicationDrawerFragment;
 import com.chatwing.whitelabel.fragments.FeedDrawerFragment;
@@ -41,29 +52,22 @@ import com.chatwing.whitelabel.managers.ExtendChatBoxModeManager;
 import com.chatwing.whitelabel.managers.ExtendCommunicationModeManager;
 import com.chatwing.whitelabel.managers.FeedModeManager;
 import com.chatwing.whitelabel.managers.MusicModeManager;
+import com.chatwing.whitelabel.managers.UserManager;
+import com.chatwing.whitelabel.modules.CommunicationActivityModule;
 import com.chatwing.whitelabel.modules.ExtendCommunicationActivityModule;
+import com.chatwing.whitelabel.pojos.Message;
+import com.chatwing.whitelabel.pojos.Song;
+import com.chatwing.whitelabel.pojos.errors.ChatWingError;
+import com.chatwing.whitelabel.pojos.jspojos.JSUserResponse;
+import com.chatwing.whitelabel.pojos.params.CreateConversationParams;
+import com.chatwing.whitelabel.pojos.responses.ChatBoxDetailsResponse;
 import com.chatwing.whitelabel.pojos.responses.DeleteBookmarkResponse;
 import com.chatwing.whitelabel.services.DownloadUserDetailIntentService;
 import com.chatwing.whitelabel.services.MusicService;
 import com.chatwing.whitelabel.services.SyncBookmarkIntentService;
+import com.chatwing.whitelabel.services.SyncCommunicationBoxesIntentService;
 import com.chatwing.whitelabel.services.UpdateAvatarIntentService;
-import com.chatwingsdk.activities.BaseABFragmentActivity;
-import com.chatwingsdk.activities.CommunicationActivity;
-import com.chatwingsdk.contentproviders.ChatWingContentProvider;
-import com.chatwingsdk.events.internal.SyncCommunicationBoxEvent;
-import com.chatwingsdk.events.internal.SyncUnreadEvent;
-import com.chatwingsdk.events.internal.UpdateUserEvent;
-import com.chatwingsdk.events.internal.ViewProfileEvent;
-import com.chatwingsdk.fragments.CommunicationMessagesFragment;
-import com.chatwingsdk.modules.CommunicationActivityModule;
-import com.chatwingsdk.pojos.Message;
-import com.chatwingsdk.pojos.Song;
-import com.chatwingsdk.pojos.errors.ChatWingError;
-import com.chatwingsdk.pojos.jspojos.JSUserResponse;
-import com.chatwingsdk.pojos.params.CreateConversationParams;
-import com.chatwingsdk.pojos.responses.ChatBoxDetailsResponse;
-import com.chatwingsdk.services.SyncCommunicationBoxesIntentService;
-import com.chatwingsdk.utils.LogUtils;
+import com.chatwing.whitelabel.utils.LogUtils;
 import com.flurry.android.FlurryAgent;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -93,9 +97,9 @@ public class ExtendCommunicationActivity
     public static final String ACTION_STOP_MEDIA = "ACTION_STOP_MEDIA";
 
     @Inject
-    com.chatwingsdk.managers.ApiManager mApiManager;
+    ApiManager mApiManager;
     @Inject
-    com.chatwingsdk.managers.UserManager mUserManager;
+    UserManager mUserManager;
     @Inject
     BuildManager mBuildManager;
     @Inject
@@ -196,7 +200,7 @@ public class ExtendCommunicationActivity
     }
 
     @Subscribe
-    public void onAllSyncsCompleted(com.chatwingsdk.events.internal.AllSyncsCompletedEvent
+    public void onAllSyncsCompleted(AllSyncsCompletedEvent
                                             event) {
         super.onAllSyncsCompleted(event);
 
@@ -210,7 +214,7 @@ public class ExtendCommunicationActivity
     }
 
     @Subscribe
-    public void onTouchUserInfoEvent(com.chatwingsdk.events.internal.TouchUserInfoEvent event) {
+    public void onTouchUserInfoEvent(TouchUserInfoEvent event) {
         JSUserResponse user = event.getUser();
         String loginType = user.getLoginType();
         String loginId = user.getLoginId();
@@ -239,13 +243,13 @@ public class ExtendCommunicationActivity
 
     @com.squareup.otto.Subscribe
     public void onServerConnectionChangedEvent
-            (com.chatwingsdk.events.faye.ServerConnectionChangedEvent event) {
+            (ServerConnectionChangedEvent event) {
         super.onServerConnectionChangedEvent(event);
     }
 
     @com.squareup.otto.Subscribe
     public void onSyncCommunicationBoxEvent
-            (com.chatwingsdk.events.internal.SyncCommunicationBoxEvent event) {
+            (SyncCommunicationBoxEvent event) {
         super.onSyncCommunicationBoxEvent(event);
         SyncCommunicationBoxEvent.Status status = event.getStatus();
 
@@ -260,17 +264,17 @@ public class ExtendCommunicationActivity
 
     @Subscribe
     public void onChannelSubscriptionChanged
-            (com.chatwingsdk.events.faye.ChannelSubscriptionChangedEvent event) {
+            (ChannelSubscriptionChangedEvent event) {
         super.onChannelSubscriptionChanged(event);
     }
 
     @Subscribe
-    public void onFayePublished(com.chatwingsdk.events.faye.FayePublishEvent event) {
+    public void onFayePublished(FayePublishEvent event) {
         super.onFayePublished(event);
     }
 
     @Subscribe
-    public void onMessageReceived(com.chatwingsdk.events.faye.MessageReceivedEvent event) {
+    public void onMessageReceived(MessageReceivedEvent event) {
         super.onMessageReceived(event);
     }
 

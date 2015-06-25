@@ -11,11 +11,10 @@ import android.widget.EditText;
 
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.adapters.GuestAvatarAdapter;
+import com.chatwing.whitelabel.events.UserAuthenticationEvent;
 import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.pojos.oauth.GuestOAuthParams;
 import com.chatwing.whitelabel.views.CompatibleGridView;
-import com.chatwingsdk.events.internal.UserAuthenticationEvent;
-import com.chatwingsdk.fragments.InjectableFragmentDelegate;
 import com.squareup.otto.Bus;
 
 import javax.inject.Inject;

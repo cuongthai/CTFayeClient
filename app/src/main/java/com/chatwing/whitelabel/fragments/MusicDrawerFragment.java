@@ -16,7 +16,6 @@ import com.chatwing.whitelabel.events.UserSelectedFeedSource;
 import com.chatwing.whitelabel.events.UserSelectedSongEvent;
 import com.chatwing.whitelabel.interfaces.MediaControlInterface;
 import com.chatwing.whitelabel.services.MusicService;
-import com.chatwingsdk.fragments.NavigatableFragmentListener;
 import com.squareup.otto.Bus;
 
 import javax.inject.Inject;

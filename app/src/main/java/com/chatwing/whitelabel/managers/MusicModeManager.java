@@ -6,11 +6,8 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Gravity;
 
 import com.chatwing.whitelabel.R;
-import com.chatwingsdk.fragments.NotificationFragment;
-import com.chatwingsdk.managers.CommunicationActivityManager;
-import com.chatwingsdk.managers.CommunicationModeManager;
-import com.chatwingsdk.managers.UserManager;
-import com.chatwingsdk.pojos.Message;
+import com.chatwing.whitelabel.fragments.NotificationFragment;
+import com.chatwing.whitelabel.pojos.Message;
 import com.squareup.otto.Bus;
 
 /**
@@ -44,9 +41,9 @@ public class MusicModeManager extends CommunicationModeManager {
         final DrawerLayout drawerLayout = mActivityDelegate.getDrawerLayout();
         return new ActionBarDrawerToggle(activity,
                 drawerLayout,
-                com.chatwingsdk.R.drawable.ic_drawer,
-                com.chatwingsdk.R.string.message_drawer_open,
-                com.chatwingsdk.R.string.message_drawer_close) {
+                R.drawable.ic_drawer,
+                R.string.message_drawer_open,
+                R.string.message_drawer_close) {
             @Override
             public void onDrawerStateChanged(int newState) {
                 if (newState == DrawerLayout.STATE_IDLE) {

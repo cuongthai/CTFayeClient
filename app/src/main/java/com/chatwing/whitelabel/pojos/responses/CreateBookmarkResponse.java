@@ -1,8 +1,7 @@
 package com.chatwing.whitelabel.pojos.responses;
 
 
-import com.chatwingsdk.pojos.SyncedBookmark;
-import com.chatwingsdk.pojos.responses.BaseResponse;
+import com.chatwing.whitelabel.pojos.SyncedBookmark;
 
 /**
  * Created by steve on 23/06/2014.

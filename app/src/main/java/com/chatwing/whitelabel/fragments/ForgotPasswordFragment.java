@@ -16,7 +16,6 @@ import android.widget.TextView;
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.adapters.EmailsAdapterFactory;
 import com.chatwing.whitelabel.validators.EmailValidator;
-import com.chatwingsdk.fragments.InjectableFragmentDelegate;
 
 import javax.inject.Inject;
 

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/loading"
+        style="@style/Widget.AppCompat.ProgressBar"
+        android:layout_gravity="center"/>
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/content"
+        android:visibility="invisible">
+
+        <RelativeLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/chat_box"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_alignTop="@+id/pushSwitch"
+                android:layout_alignBottom="@+id/emailSwitch"
+                android:layout_toLeftOf="@id/pushSwitch"
+                android:padding="@dimen/item_padding" />
+
+
+            <ToggleButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/push_notification"
+                android:id="@+id/pushSwitch"
+                android:layout_alignParentRight="true" />
+
+            <ToggleButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/email_notification"
+                android:id="@+id/emailSwitch"
+                android:layout_below="@id/pushSwitch"
+                android:layout_alignParentRight="true" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                style="@style/ButtonChatWing"
+                android:background="@color/action_secondary_color"
+                android:layout_weight="1"
+                android:text="@string/cancel"
+                android:id="@+id/cancelBtn" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                style="@style/ButtonChatWing"
+                android:text="@string/update"
+                android:id="@+id/updateBtn" />
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

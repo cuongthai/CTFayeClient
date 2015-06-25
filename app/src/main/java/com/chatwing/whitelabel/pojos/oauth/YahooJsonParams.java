@@ -1,6 +1,6 @@
 package com.chatwing.whitelabel.pojos.oauth;
 
-import com.chatwingsdk.pojos.params.oauth.JsonParams;
+import com.chatwing.whitelabel.pojos.params.oauth.JsonParams;
 import com.google.gson.annotations.SerializedName;
 
 /**

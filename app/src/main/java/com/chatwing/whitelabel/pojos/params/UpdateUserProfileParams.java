@@ -1,7 +1,6 @@
 package com.chatwing.whitelabel.pojos.params;
 
-import com.chatwingsdk.pojos.UserProfile;
-import com.chatwingsdk.pojos.params.Params;
+import com.chatwing.whitelabel.pojos.UserProfile;
 import com.google.gson.annotations.SerializedName;
 
 /**

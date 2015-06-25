@@ -17,14 +17,13 @@ import android.widget.TextView;
 
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.adapters.EmailsAdapterFactory;
+import com.chatwing.whitelabel.events.UserAuthenticationEvent;
 import com.chatwing.whitelabel.managers.BuildManager;
 import com.chatwing.whitelabel.pojos.oauth.AppOAuthParams;
 import com.chatwing.whitelabel.pojos.oauth.ChatwingOAuthParams;
+import com.chatwing.whitelabel.pojos.params.oauth.AuthenticationParams;
 import com.chatwing.whitelabel.validators.EmailValidator;
 import com.chatwing.whitelabel.validators.PasswordValidator;
-import com.chatwingsdk.events.internal.UserAuthenticationEvent;
-import com.chatwingsdk.fragments.InjectableFragmentDelegate;
-import com.chatwingsdk.pojos.params.oauth.AuthenticationParams;
 import com.squareup.otto.Bus;
 
 import javax.inject.Inject;

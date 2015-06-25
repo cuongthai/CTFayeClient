@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/item_selector"
+                android:gravity="center_vertical">
+    <!-- Unread count indicator -->
+    <TextView android:id="@android:id/text2"
+              style="@style/Theme.ChatWing.DrawerItemCounter"
+              android:layout_alignParentRight="true"
+              android:layout_centerVertical="true"/>
+
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:orientation="vertical"
+                  android:layout_toLeftOf="@android:id/text2">
+        <!-- Chat Box name -->
+        <TextView android:id="@android:id/text1"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  style="@style/Theme.ChatWing.DrawerItemTitle"
+                  android:background="@android:color/transparent"
+                  android:paddingBottom="0dp"/>
+        <TextView android:id="@android:id/summary"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  style="@style/Theme.ChatWing.DrawerItemSubTitle"
+                  android:background="@android:color/transparent"/>
+    </LinearLayout>
+
+
+</RelativeLayout>

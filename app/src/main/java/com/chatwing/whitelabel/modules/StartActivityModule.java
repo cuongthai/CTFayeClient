@@ -3,8 +3,6 @@ package com.chatwing.whitelabel.modules;
 import android.content.Context;
 
 import com.chatwing.whitelabel.activities.StartActivity;
-import com.chatwingsdk.modules.ChatWingModule;
-import com.chatwingsdk.modules.ForActivity;
 
 import javax.inject.Singleton;
 
@@ -24,16 +22,11 @@ public class StartActivityModule {
 
     private final StartActivity mActivity;
 
-    @Provides
-    @Singleton
-    @ForActivity
-    Context provideContext() {
-        return mActivity;
-    }
-
     public StartActivityModule(StartActivity startActivity) {
         mActivity = startActivity;
     }
+
+
 
 
 }

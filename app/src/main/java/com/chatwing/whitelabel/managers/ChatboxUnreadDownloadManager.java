@@ -6,12 +6,11 @@ import android.content.Context;
 import android.database.Cursor;
 
 import com.arasthel.asyncjob.AsyncJob;
-import com.chatwingsdk.events.internal.SyncUnreadEvent;
-import com.chatwingsdk.contentproviders.ChatWingContentProvider;
-import com.chatwingsdk.managers.UserManager;
-import com.chatwingsdk.modules.ForApplication;
-import com.chatwingsdk.tables.ChatBoxTable;
-import com.chatwingsdk.utils.LogUtils;
+import com.chatwing.whitelabel.contentproviders.ChatWingContentProvider;
+import com.chatwing.whitelabel.events.SyncUnreadEvent;
+import com.chatwing.whitelabel.modules.ForApplication;
+import com.chatwing.whitelabel.tables.ChatBoxTable;
+import com.chatwing.whitelabel.utils.LogUtils;
 import com.squareup.otto.Bus;
 
 import java.util.ArrayList;

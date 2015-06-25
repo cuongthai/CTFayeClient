@@ -19,15 +19,13 @@ import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.activities.WalkthroughActivity;
 import com.chatwing.whitelabel.adapters.AccountPickerAdapter;
 import com.chatwing.whitelabel.events.AccountSwitchEvent;
-import com.chatwingsdk.events.internal.UpdateUserEvent;
-import com.chatwingsdk.fragments.InjectableFragmentDelegate;
-import com.chatwingsdk.managers.UserManager;
-import com.chatwingsdk.pojos.User;
-import com.chatwingsdk.utils.LogUtils;
-import com.chatwingsdk.views.ErrorMessageView;
+import com.chatwing.whitelabel.events.UpdateUserEvent;
+import com.chatwing.whitelabel.managers.UserManager;
+import com.chatwing.whitelabel.pojos.User;
+import com.chatwing.whitelabel.utils.LogUtils;
+import com.chatwing.whitelabel.views.ErrorMessageView;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
-
 
 import java.util.Collection;
 

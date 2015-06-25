@@ -34,36 +34,34 @@ import android.widget.Toast;
 
 import com.chatwing.whitelabel.Constants;
 import com.chatwing.whitelabel.R;
+import com.chatwing.whitelabel.activities.AuthenticateActivity;
+import com.chatwing.whitelabel.activities.BaseABFragmentActivity;
 import com.chatwing.whitelabel.activities.CreateChatBoxActivity;
 import com.chatwing.whitelabel.activities.NoMenuWebViewActivity;
 import com.chatwing.whitelabel.activities.SearchChatBoxActivity;
+import com.chatwing.whitelabel.contentproviders.ChatWingContentProvider;
 import com.chatwing.whitelabel.events.AccountSwitchEvent;
 import com.chatwing.whitelabel.events.CreateBookmarkEvent;
+import com.chatwing.whitelabel.events.CurrentChatBoxEvent;
+import com.chatwing.whitelabel.events.LoadCurrentChatBoxFailedEvent;
 import com.chatwing.whitelabel.events.LoadOnlineUsersSuccessEvent;
+import com.chatwing.whitelabel.events.UpdateSubscriptionEvent;
+import com.chatwing.whitelabel.events.UserSelectedChatBoxEvent;
 import com.chatwing.whitelabel.events.UserSelectedSongEvent;
 import com.chatwing.whitelabel.fragments.AccountDialogFragment;
 import com.chatwing.whitelabel.interfaces.MediaControlInterface;
+import com.chatwing.whitelabel.pojos.ChatBox;
+import com.chatwing.whitelabel.pojos.LightWeightChatBox;
+import com.chatwing.whitelabel.pojos.Song;
+import com.chatwing.whitelabel.pojos.SyncedBookmark;
+import com.chatwing.whitelabel.pojos.User;
 import com.chatwing.whitelabel.services.CreateBookmarkIntentService;
 import com.chatwing.whitelabel.services.MusicService;
-import com.chatwingsdk.activities.AuthenticateActivity;
-import com.chatwingsdk.activities.BaseABFragmentActivity;
-import com.chatwingsdk.contentproviders.ChatWingContentProvider;
-import com.chatwingsdk.events.internal.CurrentChatBoxEvent;
-import com.chatwingsdk.events.internal.UpdateSubscriptionEvent;
-import com.chatwingsdk.managers.ChatboxModeManager;
-import com.chatwingsdk.managers.CommunicationActivityManager;
-import com.chatwingsdk.managers.CurrentChatBoxManager;
-import com.chatwingsdk.managers.UserManager;
-import com.chatwingsdk.pojos.ChatBox;
-import com.chatwingsdk.pojos.LightWeightChatBox;
-import com.chatwingsdk.pojos.Song;
-import com.chatwingsdk.pojos.SyncedBookmark;
-import com.chatwingsdk.pojos.User;
-import com.chatwingsdk.tables.ChatBoxTable;
-import com.chatwingsdk.tables.SyncedBookmarkTable;
-import com.chatwingsdk.utils.LogUtils;
-import com.chatwingsdk.validators.ChatBoxIdValidator;
-import com.chatwingsdk.validators.PermissionsValidator;
+import com.chatwing.whitelabel.tables.ChatBoxTable;
+import com.chatwing.whitelabel.tables.SyncedBookmarkTable;
+import com.chatwing.whitelabel.utils.LogUtils;
+import com.chatwing.whitelabel.validators.ChatBoxIdValidator;
+import com.chatwing.whitelabel.validators.PermissionsValidator;
 import com.readystatesoftware.viewbadger.BadgeView;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -372,7 +370,7 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
     }
 
     @com.squareup.otto.Subscribe
-    public void onCurrentChatBoxChanged(com.chatwingsdk.events.internal.CurrentChatBoxEvent event) {
+    public void onCurrentChatBoxChanged(CurrentChatBoxEvent event) {
         CurrentChatBoxEvent.Status status = event.getStatus();
         ChatBox chatBox = event.getChatbox();
         if (status == CurrentChatBoxEvent.Status.REMOVED) {
@@ -422,12 +420,12 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
     }
 
     @com.squareup.otto.Subscribe
-    public void onLoadCurrentChatBoxFailed(com.chatwingsdk.events.internal.LoadCurrentChatBoxFailedEvent event) {
+    public void onLoadCurrentChatBoxFailed(LoadCurrentChatBoxFailedEvent event) {
         super.onLoadCurrentChatBoxFailed(event);
     }
 
     @com.squareup.otto.Subscribe
-    public void onUserSelectedChatBox(com.chatwingsdk.events.internal.UserSelectedChatBoxEvent event) {
+    public void onUserSelectedChatBox(UserSelectedChatBoxEvent event) {
         super.onUserSelectedChatBox(event);
     }
 

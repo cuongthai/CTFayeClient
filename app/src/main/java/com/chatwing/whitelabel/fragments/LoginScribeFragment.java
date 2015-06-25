@@ -16,14 +16,13 @@ import android.webkit.WebViewClient;
 import android.widget.TextView;
 
 import com.chatwing.whitelabel.R;
+import com.chatwing.whitelabel.events.TaskFinishedEvent;
+import com.chatwing.whitelabel.events.UserAuthenticationEvent;
+import com.chatwing.whitelabel.pojos.params.oauth.AuthenticationParams;
 import com.chatwing.whitelabel.scribeconfigs.ScribeConfig;
 import com.chatwing.whitelabel.scribeconfigs.YahooConfig;
 import com.chatwing.whitelabel.tasks.GetScribeAccessTokenTask;
 import com.chatwing.whitelabel.tasks.GetScribeRequestTokenTask;
-import com.chatwingsdk.events.internal.TaskFinishedEvent;
-import com.chatwingsdk.events.internal.UserAuthenticationEvent;
-import com.chatwingsdk.fragments.InjectableFragmentDelegate;
-import com.chatwingsdk.pojos.params.oauth.AuthenticationParams;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 

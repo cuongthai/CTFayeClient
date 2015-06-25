@@ -1,8 +1,7 @@
 package com.chatwing.whitelabel.services;
 
+import com.chatwing.whitelabel.modules.ChatWingModule;
 import com.chatwing.whitelabel.modules.ExtendChatWingModule;
-import com.chatwingsdk.modules.ChatWingModule;
-import com.chatwingsdk.services.BaseIntentService;
 
 import java.util.Arrays;
 import java.util.List;

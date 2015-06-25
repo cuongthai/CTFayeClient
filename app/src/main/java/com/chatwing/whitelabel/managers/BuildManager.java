@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.chatwing.whitelabel.Constants;
 import com.chatwing.whitelabel.R;
-import com.chatwingsdk.modules.ForActivity;
+import com.chatwing.whitelabel.modules.ForApplication;
 
 import javax.inject.Inject;
 
@@ -12,9 +12,12 @@ import javax.inject.Inject;
  * Created by steve on 19/03/2015.
  */
 public class BuildManager {
-    @Inject
-    @ForActivity
     Context mContext;
+
+    @Inject
+    public BuildManager(@ForApplication Context context) {
+        this.mContext = context;
+    }
 
     public boolean isSupportedAds() {
         return mContext.getResources().getBoolean(R.bool.show_ads);

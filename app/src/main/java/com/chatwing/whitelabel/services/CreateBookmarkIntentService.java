@@ -5,17 +5,16 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 
-
+import com.chatwing.whitelabel.contentproviders.ChatWingContentProvider;
 import com.chatwing.whitelabel.events.CreateBookmarkEvent;
 import com.chatwing.whitelabel.managers.ApiManager;
-import com.chatwingsdk.pojos.LightWeightChatBox;
-import com.chatwingsdk.pojos.SyncedBookmark;
+import com.chatwing.whitelabel.pojos.ChatBox;
+import com.chatwing.whitelabel.pojos.LightWeightChatBox;
+import com.chatwing.whitelabel.pojos.SyncedBookmark;
 import com.chatwing.whitelabel.pojos.responses.CreateBookmarkResponse;
-import com.chatwingsdk.tables.SyncedBookmarkTable;
-import com.chatwingsdk.contentproviders.ChatWingContentProvider;
-import com.chatwingsdk.pojos.ChatBox;
-import com.chatwingsdk.tables.ChatBoxTable;
-import com.chatwingsdk.utils.LogUtils;
+import com.chatwing.whitelabel.tables.ChatBoxTable;
+import com.chatwing.whitelabel.tables.SyncedBookmarkTable;
+import com.chatwing.whitelabel.utils.LogUtils;
 
 import java.util.ArrayList;
 
@@ -87,7 +86,7 @@ public class CreateBookmarkIntentService extends ExtendBaseIntentService {
                 CreateBookmarkResponse bookmarkResponse = mApiManager.createBookmark(mUserManager.getCurrentUser(), lightWeighChatBox.getId());
                 mCreateBookmarkEvent = new CreateBookmarkEvent(bookmarkResponse, intent.getBooleanExtra("is_upgrading", false));
 
-            } catch(com.chatwingsdk.managers.ApiManager.InvalidIdentityException iie){
+            } catch(ApiManager.InvalidIdentityException iie){
                 //Ignore
                 mCreateBookmarkEvent = new CreateBookmarkEvent(iie);
             } catch (Exception e) {

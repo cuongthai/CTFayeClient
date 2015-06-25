@@ -2,12 +2,10 @@ package com.chatwing.whitelabel.services;
 
 import android.content.Intent;
 
+import com.chatwing.whitelabel.events.VerifyEmailEvent;
 import com.chatwing.whitelabel.managers.ApiManager;
-import com.chatwingsdk.events.internal.UpdateUserEvent;
-import com.chatwingsdk.events.internal.VerifyEmailEvent;
-import com.chatwingsdk.pojos.User;
-import com.chatwingsdk.pojos.responses.UserResponse;
-import com.chatwingsdk.utils.LogUtils;
+import com.chatwing.whitelabel.pojos.User;
+import com.chatwing.whitelabel.utils.LogUtils;
 
 import javax.inject.Inject;
 

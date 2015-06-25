@@ -9,16 +9,15 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.chatwing.whitelabel.R;
+import com.chatwing.whitelabel.events.TaskFinishedEvent;
+import com.chatwing.whitelabel.managers.ProgressViewsManager;
+import com.chatwing.whitelabel.managers.UserManager;
 import com.chatwing.whitelabel.modules.CreateChatBoxActivityModule;
 import com.chatwing.whitelabel.modules.ExtendChatWingModule;
-import com.chatwingsdk.pojos.LightWeightChatBox;
+import com.chatwing.whitelabel.pojos.LightWeightChatBox;
 import com.chatwing.whitelabel.pojos.responses.CreateChatBoxResponse;
 import com.chatwing.whitelabel.tasks.CreateChatBoxTask;
-import com.chatwingsdk.activities.BaseABFragmentActivity;
-import com.chatwingsdk.events.internal.TaskFinishedEvent;
-import com.chatwingsdk.managers.ProgressViewsManager;
-import com.chatwingsdk.managers.UserManager;
-import com.chatwingsdk.views.ErrorMessageView;
+import com.chatwing.whitelabel.views.ErrorMessageView;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 

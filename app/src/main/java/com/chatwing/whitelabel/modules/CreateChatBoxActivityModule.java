@@ -1,11 +1,11 @@
 package com.chatwing.whitelabel.modules;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.res.Resources;
 
 
 import com.chatwing.whitelabel.activities.CreateChatBoxActivity;
-import com.chatwingsdk.modules.ChatWingModule;
 
 import javax.inject.Singleton;
 
@@ -27,6 +27,7 @@ public class CreateChatBoxActivityModule {
     public CreateChatBoxActivityModule(Activity activity) {
         this.mActivity = activity;
     }
+
 
     @Provides
     @Singleton

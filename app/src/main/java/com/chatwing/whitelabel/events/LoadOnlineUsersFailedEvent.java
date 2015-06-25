@@ -1,6 +1,5 @@
 package com.chatwing.whitelabel.events;
 
-import com.chatwingsdk.events.internal.ExceptionEvent;
 
 /**
  * Created by nguyenthanhhuy on 1/8/14.

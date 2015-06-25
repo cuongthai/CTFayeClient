@@ -5,4 +5,24 @@
     <string name="preference_feedback">"feedback"</string>
     <string name="preference_version">"version"</string>
     <string name="fragment_tag_web_view">"web-view-fragment"</string>
+
+    <integer name="emoticons_per_page">16</integer>
+    <integer name="emoticons_per_row">6</integer>
+    <string name="preference_users">"users"</string>
+    <string name="preference_current_user_id">"current_user_key"</string>
+    <string name="preference_style">"style"</string>
+    <string name="preference_play_new_message_sound">"enable_sound"</string>
+    <string name="preference_scroll_to_latest_message">"scroll_to_latest_message"</string>
+    <string name="preference_remember_previous_style">"remember_previous_style"</string>
+    <string name="preference_name">"name"</string>
+    <string name="preference_email">"email"</string>
+    <string name="preference_username">"username"</string>
+    <string name="preference_gcm_registration_id">"gcm_registration_id"</string>
+    <string name="preference_gcm_app_version">"gcm_app_version"</string>
+    <string name="preference_chat_boxes_password_remembered">"chat_boxes_password_remembered"</string>
+
+    <bool name="default_play_new_message_sound">false</bool>
+    <bool name="default_remember_previous_style">true</bool>
+    <bool name="default_scroll_to_latest_message">true</bool>
+    <string name="fragment_tag_conversations">"conversations-fragment"</string>
 </resources>

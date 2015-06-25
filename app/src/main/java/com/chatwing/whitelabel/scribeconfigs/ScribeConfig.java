@@ -1,7 +1,7 @@
 package com.chatwing.whitelabel.scribeconfigs;
 
 
-import com.chatwingsdk.pojos.params.oauth.AuthenticationParams;
+import com.chatwing.whitelabel.pojos.params.oauth.AuthenticationParams;
 
 import org.scribe.builder.api.Api;
 import org.scribe.model.Token;

@@ -7,6 +7,7 @@ buildscript {
 
     dependencies {
         classpath 'com.crashlytics.tools.gradle:crashlytics-gradle:1.+'
+        classpath 'com.github.dcendents:android-maven-plugin:1.2'
     }
 }
 
@@ -29,8 +30,8 @@ android {
         exclude 'LICENSE'
         exclude 'META-INF/NOTICE.txt'
     }
-    compileSdkVersion 20
-    buildToolsVersion "20.0.0"
+    compileSdkVersion 21
+    buildToolsVersion "22.0.1"
 
     defaultConfig {
         applicationId PACKAGE_NAME
@@ -105,7 +106,7 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.soundcloud.android:android-crop:0.9.10@aar'
     compile 'com.viewpagerindicator:library:2.4.2-SNAPSHOT@aar'
-    compile 'com.android.support:appcompat-v7:20.0.0'
+    compile 'com.android.support:appcompat-v7:22.2.0'
     compile 'com.facebook:facebook-android-sdk:3.5.2@aar'
     compile 'com.crashlytics.android:crashlytics:1.+'
     compile 'org.twitter4j:twitter4j-core:4.0.0'
@@ -115,11 +116,17 @@ dependencies {
     compile 'com.google.android.gms:play-services-base:6.5.87'
     compile 'com.google.android.gms:play-services-plus:6.5.87'
     compile 'com.viewpagerindicator:library:2.4.2-SNAPSHOT@aar'
-//    compile 'com.github.chatwing:library:0.5.106-SNAPSHOT@aar'
+    compile 'com.android.support:design:22.2.0'
+
+    compile 'com.android.support:support-v4:22.2'
+    compile 'pl.droidsonroids.gif:android-gif-drawable:1.1.+'
+    compile 'com.github.bumptech.glide:glide:3.5.2'
+    compile group: 'com.squareup.okhttp', name: 'okhttp', version: '2.0.0'
+    compile group: 'com.squareup.okhttp', name: 'okhttp-urlconnection', version: '2.0.0'
     compile('com.pkmmte.pkrss:pkrss:1.1.3-SNAPSHOT@aar') {
         exclude group: 'com.squareup.okhttp'
     }
     compile 'com.arasthel:asyncjob-library:1.0.3'
     compile 'org.scribe:scribe:1.3.5'
-    compile project(':libs:UniversitySDK:chatwing-sdk')
+//    compile project(':cholibs:UniversitySDK:chatwing-sdk')
 }

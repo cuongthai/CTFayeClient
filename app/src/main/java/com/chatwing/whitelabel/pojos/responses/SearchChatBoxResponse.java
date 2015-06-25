@@ -1,7 +1,7 @@
 package com.chatwing.whitelabel.pojos.responses;
 
-import com.chatwingsdk.pojos.LightWeightChatBox;
-import com.chatwingsdk.pojos.responses.BaseResponse;
+
+import com.chatwing.whitelabel.pojos.LightWeightChatBox;
 
 import java.util.ArrayList;
 

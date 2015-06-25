@@ -23,4 +23,10 @@
     <color name="feed_white_transparent_ex">#33FFFFFF</color>
     <color name="transparent">#00000000</color>
 
+    <color name="vertical_divider">#ccc</color>
+    <color name="holo_light_background">@android:color/transparent</color>
+    <color name="holo_light_selected">#ff7cc9e5</color>
+    <color name="darker_white">#fff1f1f1</color>
+    <color name="profile_name_bg_color">#60000000</color>
+
 </resources>

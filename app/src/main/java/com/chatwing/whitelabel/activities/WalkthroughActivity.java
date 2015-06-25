@@ -12,13 +12,11 @@ import android.view.ViewTreeObserver;
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.adapters.WalkthroughPagerAdapter;
 import com.chatwing.whitelabel.fragments.WalkthroughPageFragment;
+import com.chatwing.whitelabel.managers.UserManager;
 import com.chatwing.whitelabel.modules.WalkthroughActivityModule;
+import com.chatwing.whitelabel.pojos.User;
 import com.chatwing.whitelabel.timers.SafeCountDownTimer;
-import com.chatwingsdk.activities.AuthenticateActivity;
-import com.chatwingsdk.activities.BaseABFragmentActivity;
-import com.chatwingsdk.managers.UserManager;
-import com.chatwingsdk.pojos.User;
-import com.chatwingsdk.validators.ChatBoxKeyValidator;
+import com.chatwing.whitelabel.validators.ChatBoxKeyValidator;
 import com.viewpagerindicator.CirclePageIndicator;
 
 import java.util.Arrays;

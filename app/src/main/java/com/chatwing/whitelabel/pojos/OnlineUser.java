@@ -1,6 +1,5 @@
 package com.chatwing.whitelabel.pojos;
 
-import com.chatwingsdk.pojos.BaseUser;
 import com.google.gson.annotations.SerializedName;
 
 /**

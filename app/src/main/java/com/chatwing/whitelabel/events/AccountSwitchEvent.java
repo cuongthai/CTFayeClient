@@ -1,7 +1,7 @@
 package com.chatwing.whitelabel.events;
 
 
-import com.chatwingsdk.pojos.User;
+import com.chatwing.whitelabel.pojos.User;
 
 /**
  * Created by steve on 07/07/2014.

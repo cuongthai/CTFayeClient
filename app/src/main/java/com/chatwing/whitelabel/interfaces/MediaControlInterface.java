@@ -1,13 +1,13 @@
 package com.chatwing.whitelabel.interfaces;
 
+import com.chatwing.whitelabel.fragments.InjectableFragmentDelegate;
+import com.chatwing.whitelabel.pojos.Song;
 import com.chatwing.whitelabel.services.MusicService;
-import com.chatwingsdk.fragments.InjectableFragmentDelegate;
-import com.chatwingsdk.pojos.Song;
 
 /**
  * Created by steve on 15/05/2015.
  */
-public interface MediaControlInterface extends InjectableFragmentDelegate{
+public interface MediaControlInterface extends InjectableFragmentDelegate {
     MusicService.STATUS getMediaStatus();
 
     boolean isBindMediaService();

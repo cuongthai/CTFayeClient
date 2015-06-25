@@ -1,6 +1,5 @@
 package com.chatwing.whitelabel.pojos.params;
 
-import com.chatwingsdk.pojos.params.BaseChatBoxParams;
 import com.google.gson.annotations.SerializedName;
 
 /**

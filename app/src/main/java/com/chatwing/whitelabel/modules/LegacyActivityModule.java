@@ -12,8 +12,6 @@ import com.chatwing.whitelabel.fragments.GuestLoginFragment;
 import com.chatwing.whitelabel.fragments.LoginFragment;
 import com.chatwing.whitelabel.fragments.LoginScribeFragment;
 import com.chatwing.whitelabel.fragments.LoginTwitterFragment;
-import com.chatwingsdk.modules.ChatWingModule;
-import com.chatwingsdk.modules.ForActivity;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.plus.Plus;
 

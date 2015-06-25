@@ -1,7 +1,7 @@
 package com.chatwing.whitelabel.events;
 
 
-import com.chatwingsdk.pojos.Message;
+import com.chatwing.whitelabel.pojos.Message;
 
 /**
  * Created by stevethai

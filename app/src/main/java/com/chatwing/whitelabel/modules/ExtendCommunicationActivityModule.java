@@ -12,27 +12,26 @@ import com.chatwing.whitelabel.fragments.MusicDrawerFragment;
 import com.chatwing.whitelabel.fragments.MusicFragment;
 import com.chatwing.whitelabel.fragments.OnlineUsersFragment;
 import com.chatwing.whitelabel.fragments.PhotoPickerDialogFragment;
+import com.chatwing.whitelabel.interfaces.ChatWingJavaDelegate;
 import com.chatwing.whitelabel.interfaces.WLJSInterfaceImpl;
 import com.chatwing.whitelabel.managers.ApiManager;
+import com.chatwing.whitelabel.managers.ApiManagerImpl;
 import com.chatwing.whitelabel.managers.BuildManager;
+import com.chatwing.whitelabel.managers.ChatboxModeManager;
+import com.chatwing.whitelabel.managers.CommunicationActivityManager;
+import com.chatwing.whitelabel.managers.ConversationModeManager;
+import com.chatwing.whitelabel.managers.CurrentChatBoxManager;
+import com.chatwing.whitelabel.managers.CurrentConversationManager;
 import com.chatwing.whitelabel.managers.ExtendChatBoxModeManager;
 import com.chatwing.whitelabel.managers.ExtendConversationModeManager;
 import com.chatwing.whitelabel.managers.ExtendCurrentChatboxManager;
 import com.chatwing.whitelabel.managers.FeedModeManager;
 import com.chatwing.whitelabel.managers.MusicModeManager;
-import com.chatwing.whitelabel.managers.WLApiManagerImpl;
+import com.chatwing.whitelabel.managers.PasswordManager;
+import com.chatwing.whitelabel.managers.UserManager;
 import com.chatwing.whitelabel.tasks.LoadOnlineUsersTask;
-import com.chatwingsdk.interfaces.ChatWingJavaDelegate;
-import com.chatwingsdk.managers.ChatboxModeManager;
-import com.chatwingsdk.managers.CommunicationActivityManager;
-import com.chatwingsdk.managers.ConversationModeManager;
-import com.chatwingsdk.managers.CurrentChatBoxManager;
-import com.chatwingsdk.managers.CurrentConversationManager;
-import com.chatwingsdk.managers.PasswordManager;
-import com.chatwingsdk.managers.UserManager;
-import com.chatwingsdk.modules.CommunicationActivityModule;
-import com.chatwingsdk.validators.ChatBoxIdValidator;
-import com.chatwingsdk.validators.ConversationIdValidator;
+import com.chatwing.whitelabel.validators.ChatBoxIdValidator;
+import com.chatwing.whitelabel.validators.ConversationIdValidator;
 import com.squareup.otto.Bus;
 
 import javax.inject.Provider;
@@ -79,7 +78,7 @@ public class ExtendCommunicationActivityModule {
 
     @Provides
     @Singleton
-    ApiManager provideApiManager(WLApiManagerImpl impl) {
+    ApiManager provideApiManager(ApiManagerImpl impl) {
         return impl;
     }
 

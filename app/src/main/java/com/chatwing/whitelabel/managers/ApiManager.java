@@ -1,36 +1,94 @@
 package com.chatwing.whitelabel.managers;
 
+import com.chatwing.whitelabel.ChatWing;
+import com.chatwing.whitelabel.Constants;
 import com.chatwing.whitelabel.fragments.ExtendChatMessagesFragment;
+import com.chatwing.whitelabel.pojos.Message;
 import com.chatwing.whitelabel.pojos.OnlineUser;
+import com.chatwing.whitelabel.pojos.User;
+import com.chatwing.whitelabel.pojos.errors.ChatWingError;
+import com.chatwing.whitelabel.pojos.errors.CreateMessageParamsError;
+import com.chatwing.whitelabel.pojos.jspojos.JSUserResponse;
+import com.chatwing.whitelabel.pojos.params.oauth.AuthenticationParams;
+import com.chatwing.whitelabel.pojos.responses.AuthenticationResponse;
 import com.chatwing.whitelabel.pojos.responses.BlackListResponse;
 import com.chatwing.whitelabel.pojos.responses.BookmarkResponse;
+import com.chatwing.whitelabel.pojos.responses.ChatBoxDetailsResponse;
+import com.chatwing.whitelabel.pojos.responses.ChatBoxListResponse;
 import com.chatwing.whitelabel.pojos.responses.CreateBookmarkResponse;
 import com.chatwing.whitelabel.pojos.responses.CreateChatBoxResponse;
+import com.chatwing.whitelabel.pojos.responses.CreateConversationResponse;
+import com.chatwing.whitelabel.pojos.responses.CreateMessageResponse;
 import com.chatwing.whitelabel.pojos.responses.DeleteBookmarkResponse;
 import com.chatwing.whitelabel.pojos.responses.DeleteMessageResponse;
 import com.chatwing.whitelabel.pojos.responses.FlagMessageResponse;
 import com.chatwing.whitelabel.pojos.responses.IgnoreUserResponse;
+import com.chatwing.whitelabel.pojos.responses.LoadConversationsResponse;
 import com.chatwing.whitelabel.pojos.responses.LoadOnlineUsersResponse;
 import com.chatwing.whitelabel.pojos.responses.RegisterResponse;
 import com.chatwing.whitelabel.pojos.responses.ResetPasswordResponse;
 import com.chatwing.whitelabel.pojos.responses.SearchChatBoxResponse;
+import com.chatwing.whitelabel.pojos.responses.SubscriptionResponse;
+import com.chatwing.whitelabel.pojos.responses.SubscriptionStatusResponse;
+import com.chatwing.whitelabel.pojos.responses.UpdateGcmResponse;
 import com.chatwing.whitelabel.pojos.responses.UpdateUserProfileResponse;
+import com.chatwing.whitelabel.pojos.responses.UserResponse;
+import com.chatwing.whitelabel.utils.LogUtils;
+import com.chatwing.whitelabel.validators.ChatBoxIdValidator;
+import com.chatwing.whitelabel.validators.ConversationIdValidator;
 import com.chatwing.whitelabel.validators.EmailValidator;
 import com.chatwing.whitelabel.validators.MessageIdValidator;
 import com.chatwing.whitelabel.validators.PasswordValidator;
-import com.chatwingsdk.ChatWing;
-import com.chatwingsdk.Constants;
-import com.chatwingsdk.pojos.Message;
-import com.chatwingsdk.pojos.User;
-import com.chatwingsdk.pojos.jspojos.JSUserResponse;
-import com.chatwingsdk.pojos.responses.UserResponse;
-import com.chatwingsdk.validators.ChatBoxIdValidator;
 import com.github.kevinsawicki.http.HttpRequest;
+
+import java.util.regex.Pattern;
 
 /**
  * Created by cuongthai on 26/10/2014.
  */
-public interface ApiManager extends com.chatwingsdk.managers.ApiManager {
+public interface ApiManager {
+    String GCM_ACTION_ADD = "add";
+    String GCM_ACTION_REMOVE = "remove";
+
+    public final String API_VERSION = "/api/3";
+    public final String URL_END_POINT = Constants.CHATWING_BASE_URL + API_VERSION;
+
+    public final String DEFAULT_AVATAR_URL = Constants.CHATWING_BASE_URL + "/images/no-avatar.gif";
+    public final String AVATAR_PATH = Constants.CHATWING_BASE_URL + "/user/avatar/%s/%s?size=" + Constants.AVATAR_SIZE;
+
+
+    public final String CHATBOX_URL = Constants.CHATWING_BASE_URL + "/chatbox/%s/message-list";
+
+    public final String CONVERSATION_CREATE_URL = URL_END_POINT + "/chat-user/conversation/create";
+    public final String CONVERSATION_SUBSCRIBE_URL = URL_END_POINT + "/chat-user/conversation/notification/subscribe";
+    public final String CONVERSATION_UNSUBSCRIBE_URL = URL_END_POINT + "/chat-user/conversation/notification/unsubscribe";
+    public final String CONVERSATION_NOTIFICATION_STATUS_URL = URL_END_POINT + "/chat-user/conversation/notification/status";
+    public final String AUTHENTICATE_URL = URL_END_POINT + "/chat-user/authenticate";
+    public final String CHAT_BOX_LIST_URL = URL_END_POINT + "/chatbox/list";
+    public final String CHAT_BOX_DETAIL_URL = URL_END_POINT + "/chatbox/read";
+    public final String CHAT_BOX_SUBSCRIBE_URL = URL_END_POINT + "/chatbox/notification/subscribe";
+    public final String CHAT_BOX_UNSUBSCRIBE_URL = URL_END_POINT + "/chatbox/notification/unsubscribe";
+    public final String CHAT_BOX_NOTIFICATION_STATUS_URL = URL_END_POINT + "/chatbox/notification/status";
+
+
+    public final String CONVERSATION_LIST_URL = URL_END_POINT + "/chat-user/conversation/list";
+    public final String ADD_GCM_URL = URL_END_POINT + "/chat-user/gcm/add";
+    public final String REMOVE_GCM_URL = URL_END_POINT + "/chat-user/gcm/remove";
+    public final String PING_URL = URL_END_POINT + "/chat-user/ping";
+    public final String OFFLINE_URL = URL_END_POINT + "/chat-user/offline";
+
+    public final String CHAT_BOX_CREATE_MESSAGE_URL = URL_END_POINT + "/chatbox/message/create";
+    public final String CHAT_BOX_MESSAGES_COUNT_URL = URL_END_POINT + "/chatbox/message/unread";
+    public final String CONVERSATION_CREATE_MESSAGE_URL = URL_END_POINT + "/chat-user/conversation/message/create";
+
+    public final String CUSTOM_LOGIN_URL = Constants.CHATWING_BASE_URL + "/chatbox/custom";
+    public final Pattern CUSTOM_LOGIN_URL_PATTERN = Pattern.compile("^" + Constants.CHATWING_BASE_URL + "/chatbox/([a-zA-Z0-9-])*/custom");
+
+    public final String DEFAULT_EMOTICON_URL = "";
+    public final String CONVERSATION_URL = Constants.CHATWING_BASE_URL + "/conversation/%s/message-list";
+    public final String CONVERSATION_ACK_URL = URL_END_POINT + "/chat-user/conversation/ack";
+    public final String CHATBOX_ACK_URL = URL_END_POINT + "/chatbox/ack";
+
     String GUEST_AVATAR_URL = Constants.CHATWING_BASE_URL + "/images/avatars/%s";
     String SUBMITTED_GUEST_AVATAR_URL = "avatars/%s";
     String REGISTER_URL = URL_END_POINT + "/chat-user/register";
@@ -196,6 +254,333 @@ public interface ApiManager extends com.chatwingsdk.managers.ApiManager {
             ApiException,
             InvalidAccessTokenException,
             NotVerifiedEmailException;
+
+    UpdateGcmResponse updateGcm(User user,
+                                String gcmRegId,
+                                String action)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            UserUnauthenticatedException,
+            InvalidAccessTokenException,
+            NotVerifiedEmailException;
+
+
+    ChatBoxListResponse loadChatBoxes()
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            NotVerifiedEmailException;
+
+    public String getFullEmoticonUrl(String emoticonPath);
+
+    public AuthenticationResponse authenticate(AuthenticationParams params)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            ValidationException,
+            InvalidExternalAccessTokenException;
+
+    public CreateConversationResponse createConversation(User user,
+                                                         String loginId,
+                                                         String loginType)
+            throws ApiException,
+            UserUnauthenticatedException,
+            HttpRequest.HttpRequestException,
+            InvalidAccessTokenException,
+            InvalidIdentityException,
+            NotVerifiedEmailException;
+
+    public ChatBoxDetailsResponse loadChatBoxDetails(User user,
+                                                     int chatBoxId)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            ChatBoxIdValidator.InvalidIdException,
+            ValidationException,
+            InvalidIdentityException,
+            NotVerifiedEmailException;
+
+
+
+    /**
+     * Creates a new message.
+     * Reference: http://docs.chatwing.com/api/1/chatbox/message/create.html
+     *
+     * @param user          current user.
+     * @param messageParams information of the new message. It should only contains
+     *                      chat box id, content and a random key (optional). If random key
+     *                      is not provided, a new random key will be created and returned
+     *                      by the server.
+     * @return response from server.
+     * If succeed, the response contains a new {@link com.chatwing.whitelabel.pojos.Message} which
+     * contains updated information from the server.
+     * If failed, appropriate exception will be thrown.
+     * The exception contains general {@link com.chatwing.whitelabel.pojos.errors.ChatWingError}
+     * which contains params can be parsed to {@link com.chatwing.whitelabel.pojos.errors.CreateMessageParamsError}.
+     * The original provided {@link com.chatwing.whitelabel.pojos.Message} (params) will be
+     * manually added to the response. It can be used while handling
+     * the error (remove from view, for example). Thus, it is important
+     * that the client of this method checks for error before message.
+     * @throws UserUnauthenticatedException
+     * @throws ApiException
+     * @throws HttpRequest.HttpRequestException
+     * @throws ChatBoxIdValidator.InvalidIdException
+     * @throws com.chatwing.whitelabel.validators.ConversationIdValidator.InvalidIdException
+     * @throws InvalidIdentityException
+     * @throws InvalidAccessTokenException
+     * @throws CreateMessageException
+     */
+    public CreateMessageResponse createMessage(User user,
+                                               Message messageParams)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            UserUnauthenticatedException,
+            ChatBoxIdValidator.InvalidIdException,
+            ConversationIdValidator.InvalidIdException,
+            InvalidIdentityException,
+            InvalidAccessTokenException,
+            CreateMessageException,
+            NotVerifiedEmailException;
+
+    public LoadConversationsResponse loadConversations(User user,
+                                                       int limit,
+                                                       int offset)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            UserUnauthenticatedException,
+            InvalidAccessTokenException,
+            InvalidIdentityException,
+            NotVerifiedEmailException;
+
+    public String getAvatarUrl(User user);
+
+    public String getAvatarUrl(String userType, String userID, String avatar);
+
+    String getConversationUrl(User user, String url) throws UserUnauthenticatedException;
+
+    String getChatboxUrl(User user, String url);
+
+    String getUserProfileUrl(String loginId, String loginType);
+
+    String getDisplayUserLoginType(String loginType);
+
+    void ackConversation(User user,
+                         String conversationId)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            UserUnauthenticatedException,
+            ConversationIdValidator.InvalidIdException,
+            InvalidAccessTokenException,
+            InvalidIdentityException,
+            NotVerifiedEmailException;
+
+    void ackChatbox(User user,
+                    Integer chatboxID)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            UserUnauthenticatedException,
+            ChatBoxIdValidator.InvalidIdException,
+            InvalidAccessTokenException,
+            InvalidIdentityException,
+            NotVerifiedEmailException;
+
+
+    public SubscriptionStatusResponse loadCommunicationSetting(User user,
+                                                               int chatboxID)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            UserUnauthenticatedException,
+            ChatBoxIdValidator.InvalidIdException,
+            InvalidAccessTokenException,
+            InvalidIdentityException,
+            NotVerifiedEmailException;
+
+    public SubscriptionStatusResponse loadCommunicationSetting(User user,
+                                                               String conversationID)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            UserUnauthenticatedException,
+            ConversationIdValidator.InvalidIdException,
+            InvalidAccessTokenException,
+            InvalidIdentityException,
+            NotVerifiedEmailException;
+
+    SubscriptionResponse updateNotificationSubscription(User user,
+                                                        String action,
+                                                        int chatboxID,
+                                                        String target)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            UserUnauthenticatedException,
+            ChatBoxIdValidator.InvalidIdException,
+            InvalidAccessTokenException,
+            NotVerifiedEmailException;
+
+    SubscriptionResponse updateNotificationSubscription(User user,
+                                                        String action,
+                                                        String conversationID,
+                                                        String target)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            UserUnauthenticatedException,
+            ConversationIdValidator.InvalidIdException,
+            InvalidAccessTokenException,
+            NotVerifiedEmailException;
+
+    void ping(User user)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            UserUnauthenticatedException;
+
+    void offline(User currentUser)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            UserUnauthenticatedException;
+
+    int getUnreadCountForChatbox(User user,
+                                 Integer chatboxId)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            UserUnauthenticatedException,
+            NotVerifiedEmailException;
+
+
+    /**
+     * This exception should be due to HTTP response code is not 200.
+     * When this happens, we should not give any detail to user since it's likely due to api/server failure
+     */
+    public static class ApiException extends Exception {
+        public static ApiException createJsonSyntaxException(Exception e, String json) {
+            if (json != null) {
+                //hmm... We cant parse json, something wrong, let's report to server
+                LogUtils.e("Failed to parse this json " + json);
+            }
+            return createException(e);
+        }
+
+        public static ApiException createException(Exception e) {
+            if (Constants.DEBUG) {
+                return new ApiException(e.getMessage());
+            }
+            return new ApiException("There was an error while requesting to ChatWing. Please try again later");
+        }
+
+        private ApiException() {
+        }
+
+        private ApiException(String detailMessage) {
+            super(detailMessage);
+        }
+
+        public ApiException(Throwable throwable) {
+            super(throwable);
+        }
+    }
+
+    public static class InvalidAgreeConditionsException extends ApiException {
+        public InvalidAgreeConditionsException(String msg) {
+            super(msg);
+        }
+    }
+
+
+
+    /**
+     * thrown when there is no account associate with the app.
+     * This is for client-side checking. Usually, a friendly message would be displayed to user
+     */
+    public static class UserUnauthenticatedException extends Exception {
+    }
+
+    /**
+     * thrown when access token is expired.
+     * Since access token is not expired for normal account but Guest.
+     * The account associate with this access token need to be recreated
+     */
+    public static class InvalidAccessTokenException extends Exception {
+    }
+
+    /**
+     * thrown when user needs another identity to access resource.
+     * Eg. Needs differnt login type
+     */
+    public static class InvalidIdentityException extends Exception {
+        private final ChatWingError error;
+
+        public InvalidIdentityException(ChatWingError error) {
+            super(error.getMessage());
+            this.error = error;
+        }
+
+        public ChatWingError getError() {
+            return error;
+        }
+    }
+
+    public static class ValidationException extends Exception {
+        private final ChatWingError error;
+
+        public ValidationException(ChatWingError error) {
+            super(error.getMessage());
+            this.error = error;
+        }
+
+        public ChatWingError getError() {
+            return error;
+        }
+    }
+
+    /**
+     * thrown when server fails to fetch data from social accounts
+     */
+    public static class InvalidExternalAccessTokenException extends Exception {
+        private final ChatWingError error;
+
+        public InvalidExternalAccessTokenException(ChatWingError error) {
+            super(error.getMessage());
+            this.error = error;
+        }
+
+        public ChatWingError getError() {
+            return error;
+        }
+    }
+
+    /**
+     * thrown when there was an error from server.
+     * We need to pass necessary to the exception to update the view
+     */
+    public static class CreateMessageException extends Exception {
+        private final CreateMessageParamsError createMessageParamsError;
+        private final Message message;
+
+        public CreateMessageException(CreateMessageParamsError createMessageParamsError,
+                                      Message message) {
+            this.createMessageParamsError = createMessageParamsError;
+            this.message = message;
+        }
+
+        public CreateMessageParamsError getCreateMessageParamsError() {
+            return createMessageParamsError;
+        }
+
+        public Message getCommunicationMessage() {
+            return message;
+        }
+    }
+
+    /**
+     * thrown when user haven't verified his/her email
+     */
+    public static class NotVerifiedEmailException extends Exception {
+        private final ChatWingError error;
+
+        public NotVerifiedEmailException(ChatWingError error) {
+            super(error.getMessage());
+            this.error = error;
+        }
+
+        public ChatWingError getError() {
+            return error;
+        }
+    }
 
     public static class RequiredPermissionException extends Exception {
     }

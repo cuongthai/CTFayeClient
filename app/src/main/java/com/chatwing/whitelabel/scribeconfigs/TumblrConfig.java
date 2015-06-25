@@ -4,7 +4,7 @@ package com.chatwing.whitelabel.scribeconfigs;
 import com.chatwing.whitelabel.BuildConfig;
 import com.chatwing.whitelabel.Constants;
 import com.chatwing.whitelabel.pojos.oauth.OAuthParams;
-import com.chatwingsdk.pojos.params.oauth.AuthenticationParams;
+import com.chatwing.whitelabel.pojos.params.oauth.AuthenticationParams;
 
 import org.scribe.builder.api.Api;
 import org.scribe.builder.api.TumblrApi;

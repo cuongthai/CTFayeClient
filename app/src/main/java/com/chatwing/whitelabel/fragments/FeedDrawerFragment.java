@@ -11,8 +11,6 @@ import com.chatwing.whitelabel.Constants;
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.adapters.FeedSourcesAdapter;
 import com.chatwing.whitelabel.events.UserSelectedFeedSource;
-import com.chatwingsdk.fragments.NavigatableFragmentListener;
-import com.chatwingsdk.managers.UserManager;
 import com.squareup.otto.Bus;
 
 import javax.inject.Inject;

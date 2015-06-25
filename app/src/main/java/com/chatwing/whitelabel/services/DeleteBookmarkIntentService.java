@@ -5,9 +5,8 @@ import android.content.Intent;
 
 import com.chatwing.whitelabel.events.DeleteBookmarkEvent;
 import com.chatwing.whitelabel.managers.ApiManager;
+import com.chatwing.whitelabel.pojos.User;
 import com.chatwing.whitelabel.pojos.responses.DeleteBookmarkResponse;
-import com.chatwingsdk.pojos.User;
-import com.chatwingsdk.services.BaseIntentService;
 
 import java.util.ArrayList;
 

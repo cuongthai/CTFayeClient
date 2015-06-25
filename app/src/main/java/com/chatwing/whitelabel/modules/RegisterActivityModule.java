@@ -6,10 +6,6 @@ import android.content.Context;
 
 import com.chatwing.whitelabel.activities.RegisterActivity;
 import com.chatwing.whitelabel.fragments.RegisterFragment;
-import com.chatwing.whitelabel.managers.ApiManager;
-import com.chatwing.whitelabel.managers.WLApiManagerImpl;
-import com.chatwingsdk.modules.AuthenticateActivityModule;
-import com.chatwingsdk.modules.ForActivity;
 
 import javax.inject.Singleton;
 
@@ -36,19 +32,14 @@ public class RegisterActivityModule {
     @Provides
     @Singleton
     @ForActivity
-    Context provideContext() {
-        return mActivity;
-    }
-
-    @Provides
-    @Singleton
-    @ForActivity
     AccountManager provideAccountManager() {
         return AccountManager.get(mActivity);
     }
 
     @Provides
-    ApiManager provideApiManager(WLApiManagerImpl impl) {
-        return impl;
+    @Singleton
+    @ForActivity
+    Context provideActivityContext() {
+        return mActivity;
     }
 }

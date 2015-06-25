@@ -5,21 +5,19 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
 import com.chatwing.whitelabel.R;
-import com.chatwing.whitelabel.fragments.AuthenticateFragment;
+import com.chatwing.whitelabel.events.TaskFinishedEvent;
+import com.chatwing.whitelabel.events.UserAuthenticationEvent;
 import com.chatwing.whitelabel.fragments.RegisterFragment;
 import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.managers.BuildManager;
 import com.chatwing.whitelabel.modules.RegisterActivityModule;
+import com.chatwing.whitelabel.pojos.errors.ChatWingError;
 import com.chatwing.whitelabel.pojos.oauth.AppOAuthParams;
 import com.chatwing.whitelabel.pojos.oauth.ChatwingOAuthParams;
+import com.chatwing.whitelabel.pojos.params.oauth.AuthenticationParams;
 import com.chatwing.whitelabel.tasks.RegisterTask;
 import com.chatwing.whitelabel.validators.EmailValidator;
 import com.chatwing.whitelabel.validators.PasswordValidator;
-import com.chatwingsdk.activities.AuthenticateActivity;
-import com.chatwingsdk.events.internal.TaskFinishedEvent;
-import com.chatwingsdk.events.internal.UserAuthenticationEvent;
-import com.chatwingsdk.pojos.errors.ChatWingError;
-import com.chatwingsdk.pojos.params.oauth.AuthenticationParams;
 import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;

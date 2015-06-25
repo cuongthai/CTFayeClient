@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (C) 2014 ChatWing
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!--BBCode controls -->
+<LinearLayout
+    android:id="@+id/bbcode_controls_container"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/bg_color"
+    android:orientation="horizontal">
+
+    <HorizontalScrollView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@android:color/transparent"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent">
+
+            <ToggleButton
+                android:id="@+id/btn_bbcode_bold"
+                android:textOn="@string/ic_bold"
+                android:textOff="@string/ic_bold"
+                style="@style/Theme.ChatWing.Button.Toggle" />
+
+            <ToggleButton
+                android:id="@+id/btn_bbcode_italic"
+                android:textOn="@string/ic_italic"
+                android:textOff="@string/ic_italic"
+                style="@style/Theme.ChatWing.Button.Toggle" />
+
+            <ToggleButton
+                android:id="@+id/btn_bbcode_underline"
+                android:textOn="@string/ic_underline"
+                android:textOff="@string/ic_underline"
+                style="@style/Theme.ChatWing.Button.Toggle" />
+
+            <ToggleButton
+                android:id="@+id/btn_bbcode_strike_through"
+                android:textOn="@string/ic_strikethrough"
+                android:textOff="@string/ic_strikethrough"
+                style="@style/Theme.ChatWing.Button.Toggle" />
+
+            <ToggleButton
+                android:id="@+id/btn_bbcode_color"
+                android:textOn="@string/ic_color"
+                android:textOff="@string/ic_color"
+                style="@style/Theme.ChatWing.Button.Toggle" />
+
+            <ToggleButton
+                android:id="@+id/btn_bbcode_background_color"
+                android:textOn="@string/ic_background_color"
+                android:textOff="@string/ic_background_color"
+                style="@style/Theme.ChatWing.Button.Toggle" />
+
+            <Button
+                android:id="@+id/btn_bbcode_image"
+                android:text="@string/ic_img"
+                style="@style/Theme.ChatWing.Button.Toggle" />
+
+            <Button
+                android:id="@+id/btn_bbcode_video"
+                android:text="@string/ic_video"
+                style="@style/Theme.ChatWing.Button.Toggle" />
+
+            <Button
+                android:id="@+id/btn_bbcode_url"
+                android:text="@string/ic_url"
+                style="@style/Theme.ChatWing.Button.Toggle" />
+
+            <Button
+                android:id="@+id/btn_bbcode_email"
+                android:text="@string/ic_email"
+                style="@style/Theme.ChatWing.Button.Toggle" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <ImageButton
+        android:id="@+id/cancel_bbcode_controls"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Theme.ChatWing.Button.Toggle"
+        android:src="@drawable/ic_action_cancel_light"
+        android:contentDescription="@string/description_cancel"/>
+</LinearLayout>

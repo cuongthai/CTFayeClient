@@ -1,7 +1,7 @@
 package com.chatwing.whitelabel.pojos.oauth;
 
 import com.chatwing.whitelabel.Constants;
-import com.chatwingsdk.pojos.params.oauth.AuthenticationParams;
+import com.chatwing.whitelabel.pojos.params.oauth.AuthenticationParams;
 
 /**
  * Created by steve on 03/07/2014.

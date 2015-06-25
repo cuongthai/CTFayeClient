@@ -13,14 +13,15 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.chatwing.whitelabel.R;
+import com.chatwing.whitelabel.contentproviders.ChatWingContentProvider;
 import com.chatwing.whitelabel.events.AccountSwitchEvent;
-import com.chatwingsdk.events.internal.SyncUnreadEvent;
+import com.chatwing.whitelabel.events.SyncUnreadEvent;
+import com.chatwing.whitelabel.events.UpdateUserEvent;
+import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.managers.BuildManager;
-import com.chatwingsdk.contentproviders.ChatWingContentProvider;
-import com.chatwingsdk.fragments.CommunicationDrawerFragment;
-import com.chatwingsdk.managers.UserManager;
-import com.chatwingsdk.tables.ChatBoxTable;
-import com.chatwingsdk.utils.LogUtils;
+import com.chatwing.whitelabel.managers.UserManager;
+import com.chatwing.whitelabel.pojos.User;
+import com.chatwing.whitelabel.tables.ChatBoxTable;
 import com.squareup.otto.Subscribe;
 
 import javax.inject.Inject;
@@ -41,6 +42,9 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
     BuildManager mBuildManager;
     @Inject
     UserManager mUserManager;
+    @Inject
+    ApiManager mApiManager;
+
     private View mNextView;
     private TextView mWebsiteTv;
     private View feedView;
@@ -196,7 +200,8 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
         super.updateUserViews();
 
         //Only allow chatwing to update avatar
-        if (mUserManager.getCurrentUser() != null && mUserManager.getCurrentUser().isChatWing()) {
+        User currentUser = mUserManager.getCurrentUser();
+        if (currentUser != null && currentUser.isChatWing()) {
             mUserAvatarView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -206,10 +211,13 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
         }else{
             mUserAvatarView.setOnClickListener(null);
         }
+        if(currentUser != null) {
+            mAccountTypeView.setText(mApiManager.getDisplayUserLoginType(currentUser.getLoginType()));
+        }
     }
 
     @com.squareup.otto.Subscribe
-    public void onUpdateUserEvent(com.chatwingsdk.events.internal.UpdateUserEvent event) {
+    public void onUpdateUserEvent(UpdateUserEvent event) {
         super.onUpdateUserEvent(event);
     }
 

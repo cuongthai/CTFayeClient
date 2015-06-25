@@ -8,12 +8,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-
 import com.chatwing.whitelabel.R;
-import com.chatwingsdk.tables.SyncedBookmarkTable;
-import com.chatwingsdk.pojos.ChatBox;
-import com.chatwingsdk.tables.ChatBoxTable;
-import com.chatwingsdk.utils.LogUtils;
+import com.chatwing.whitelabel.pojos.ChatBox;
+import com.chatwing.whitelabel.tables.ChatBoxTable;
+import com.chatwing.whitelabel.tables.SyncedBookmarkTable;
+import com.chatwing.whitelabel.utils.LogUtils;
 
 import java.util.HashSet;
 
@@ -42,7 +41,7 @@ public class BookmarkBoxesAdapter extends CursorAdapter {
 
     public void setBookmarkChecked(Cursor cursor, boolean checked) {
         Integer bookmarkId = cursor.getInt(cursor.getColumnIndexOrThrow(SyncedBookmarkTable.BOOKMARK_ID));
-        LogUtils.v("setBookmarkChecked "+bookmarkId);
+        LogUtils.v("setBookmarkChecked " + bookmarkId);
         if (checked) {
             mBookmarkIds.add(bookmarkId);
         } else {

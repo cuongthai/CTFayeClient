@@ -2,19 +2,11 @@ package com.chatwing.whitelabel.services;
 
 import android.content.Intent;
 
+import com.chatwing.whitelabel.events.UpdateUserEvent;
 import com.chatwing.whitelabel.managers.ApiManager;
-import com.chatwing.whitelabel.managers.WLApiManagerImpl;
-import com.chatwing.whitelabel.modules.ExtendChatWingModule;
+import com.chatwing.whitelabel.pojos.User;
+import com.chatwing.whitelabel.pojos.UserProfile;
 import com.chatwing.whitelabel.pojos.responses.UpdateUserProfileResponse;
-import com.chatwingsdk.ChatWing;
-import com.chatwingsdk.events.internal.UpdateUserEvent;
-import com.chatwingsdk.modules.ChatWingModule;
-import com.chatwingsdk.pojos.User;
-import com.chatwingsdk.pojos.UserProfile;
-import com.chatwingsdk.services.BaseIntentService;
-
-import java.util.Arrays;
-import java.util.List;
 
 import javax.inject.Inject;
 

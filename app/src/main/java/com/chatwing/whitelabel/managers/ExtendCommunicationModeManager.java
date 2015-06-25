@@ -1,7 +1,6 @@
 package com.chatwing.whitelabel.managers;
 
 import com.chatwing.whitelabel.events.AccountSwitchEvent;
-import com.chatwingsdk.managers.CommunicationModeManager;
 
 /**
  * Created by steve on 11/03/2015.

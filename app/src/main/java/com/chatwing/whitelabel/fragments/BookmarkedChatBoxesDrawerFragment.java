@@ -20,14 +20,13 @@ import android.widget.ListView;
 
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.adapters.BookmarkBoxesAdapter;
+import com.chatwing.whitelabel.contentproviders.ChatWingContentProvider;
+import com.chatwing.whitelabel.events.UserSelectedChatBoxEvent;
+import com.chatwing.whitelabel.managers.UserManager;
 import com.chatwing.whitelabel.services.DeleteBookmarkIntentService;
-import com.chatwingsdk.utils.StatisticTracker;
-import com.chatwingsdk.contentproviders.ChatWingContentProvider;
-import com.chatwingsdk.tables.SyncedBookmarkTable;
-import com.chatwingsdk.events.internal.UserSelectedChatBoxEvent;
-import com.chatwingsdk.fragments.NavigatableFragmentListener;
-import com.chatwingsdk.managers.UserManager;
-import com.chatwingsdk.tables.ChatBoxTable;
+import com.chatwing.whitelabel.tables.ChatBoxTable;
+import com.chatwing.whitelabel.tables.SyncedBookmarkTable;
+import com.chatwing.whitelabel.utils.StatisticTracker;
 import com.squareup.otto.Bus;
 
 import java.util.ArrayList;

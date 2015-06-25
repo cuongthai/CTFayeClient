@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 
 
 import com.chatwing.whitelabel.activities.SearchChatBoxActivity;
-import com.chatwingsdk.modules.ForActivity;
 
 import javax.inject.Singleton;
 
@@ -18,9 +17,9 @@ import dagger.Provides;
  * using the activity instance because ths entire object graph will only
  * ever exist inside of that activity.<br/>
  * This module is incomplete, since there are dependencies which should be
- * fullfilled by {@link com.chatwingsdk.modules.ChatWingModule}.
+ * fullfilled by {@link com.chatwing.whitelabel.modules.ChatWingModule}.
  * Thus,object graph of this module must be initiated by adding to object
- * graph of {@link com.chatwingsdk.modules.ChatWingModule}. It can be done
+ * graph of {@link com.chatwing.whitelabel.modules.ChatWingModule}. It can be done
  * in {@link com.chatwing.whitelabel.activities.SearchChatBoxActivity#onCreate(android.os.Bundle)}.
  */
 @Module(

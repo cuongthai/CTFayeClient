@@ -1,9 +1,7 @@
 package com.chatwing.whitelabel.pojos.responses;
 
 import com.chatwing.whitelabel.pojos.OnlineUser;
-import com.chatwingsdk.pojos.responses.BaseResponse;
 
-import java.util.List;
 import java.util.Set;
 
 /**

@@ -6,16 +6,16 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 
+import com.chatwing.whitelabel.contentproviders.ChatWingContentProvider;
 import com.chatwing.whitelabel.events.SyncBookmarkEvent;
+import com.chatwing.whitelabel.managers.ApiManager;
+import com.chatwing.whitelabel.pojos.ChatBox;
+import com.chatwing.whitelabel.pojos.LightWeightChatBox;
+import com.chatwing.whitelabel.pojos.SyncedBookmark;
 import com.chatwing.whitelabel.pojos.responses.BookmarkResponse;
-import com.chatwingsdk.contentproviders.ChatWingContentProvider;
-import com.chatwingsdk.managers.ApiManager;
-import com.chatwingsdk.pojos.ChatBox;
-import com.chatwingsdk.pojos.LightWeightChatBox;
-import com.chatwingsdk.pojos.SyncedBookmark;
-import com.chatwingsdk.tables.ChatBoxTable;
-import com.chatwingsdk.tables.SyncedBookmarkTable;
-import com.chatwingsdk.utils.LogUtils;
+import com.chatwing.whitelabel.tables.ChatBoxTable;
+import com.chatwing.whitelabel.tables.SyncedBookmarkTable;
+import com.chatwing.whitelabel.utils.LogUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;

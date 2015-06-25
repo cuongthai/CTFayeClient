@@ -19,12 +19,11 @@ import android.widget.TextView;
 import com.chatwing.whitelabel.BuildConfig;
 import com.chatwing.whitelabel.Constants;
 import com.chatwing.whitelabel.R;
+import com.chatwing.whitelabel.events.UserAuthenticationEvent;
+import com.chatwing.whitelabel.modules.ForMainThread;
 import com.chatwing.whitelabel.pojos.oauth.OAuthParams;
-import com.chatwingsdk.events.internal.UserAuthenticationEvent;
-import com.chatwingsdk.fragments.InjectableFragmentDelegate;
-import com.chatwingsdk.modules.ForMainThread;
-import com.chatwingsdk.pojos.params.oauth.AuthenticationParams;
-import com.chatwingsdk.utils.LogUtils;
+import com.chatwing.whitelabel.pojos.params.oauth.AuthenticationParams;
+import com.chatwing.whitelabel.utils.LogUtils;
 import com.squareup.otto.Bus;
 
 import javax.inject.Inject;

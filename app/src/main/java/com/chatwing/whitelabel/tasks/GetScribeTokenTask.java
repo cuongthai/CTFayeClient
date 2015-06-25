@@ -1,6 +1,5 @@
 package com.chatwing.whitelabel.tasks;
 
-import com.chatwingsdk.tasks.CallbackTask;
 import com.squareup.otto.Bus;
 
 import org.scribe.model.Token;

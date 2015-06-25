@@ -21,9 +21,8 @@ import com.chatwing.whitelabel.events.CancelBlockEvent;
 import com.chatwing.whitelabel.events.RequestBlockIPEvent;
 import com.chatwing.whitelabel.events.RequestBlockTypeEvent;
 import com.chatwing.whitelabel.managers.ApiManager;
-import com.chatwingsdk.fragments.InjectableFragmentDelegate;
-import com.chatwingsdk.pojos.BaseUser;
-import com.chatwingsdk.pojos.Message;
+import com.chatwing.whitelabel.pojos.BaseUser;
+import com.chatwing.whitelabel.pojos.Message;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 

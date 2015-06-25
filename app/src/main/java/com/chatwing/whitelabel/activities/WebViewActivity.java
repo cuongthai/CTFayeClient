@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -15,7 +14,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.chatwing.whitelabel.R;
-import com.chatwingsdk.fragments.WebViewFragment;
+import com.chatwing.whitelabel.fragments.WebViewFragment;
 
 
 /**
@@ -23,7 +22,7 @@ import com.chatwingsdk.fragments.WebViewFragment;
  * Date: 7/9/13
  * Time: 4:28 PM
  * <p/>
- * An activity that holds a web view ({@link com.chatwingsdk.fragments.WebViewFragment}
+ * An activity that holds a web view ({@link com.chatwing.whitelabel.fragments.WebViewFragment}
  * and provides controls such as loading indicator, refresh,
  * go back and forward buttons on the action bar.
  */

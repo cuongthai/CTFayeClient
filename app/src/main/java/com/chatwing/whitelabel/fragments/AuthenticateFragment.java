@@ -11,11 +11,10 @@ import android.widget.Button;
 
 import com.chatwing.whitelabel.Constants;
 import com.chatwing.whitelabel.R;
+import com.chatwing.whitelabel.events.UserAuthenticationEvent;
+import com.chatwing.whitelabel.pojos.params.oauth.AuthenticationParams;
+import com.chatwing.whitelabel.pojos.params.oauth.OAuth2Params;
 import com.chatwing.whitelabel.views.DynamicTextLoginButton;
-import com.chatwingsdk.events.internal.UserAuthenticationEvent;
-import com.chatwingsdk.fragments.InjectableFragmentDelegate;
-import com.chatwingsdk.pojos.params.oauth.AuthenticationParams;
-import com.chatwingsdk.pojos.params.oauth.OAuth2Params;
 import com.facebook.FacebookOperationCanceledException;
 import com.facebook.Session;
 import com.facebook.SessionState;

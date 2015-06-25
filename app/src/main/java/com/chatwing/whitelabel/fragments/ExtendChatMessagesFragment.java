@@ -13,29 +13,29 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.chatwing.whitelabel.R;
+import com.chatwing.whitelabel.events.AppendEmoticonEvent;
+import com.chatwing.whitelabel.events.CreateMessageEvent;
+import com.chatwing.whitelabel.events.CurrentChatBoxEvent;
 import com.chatwing.whitelabel.events.FlagMessageEvent;
 import com.chatwing.whitelabel.events.MessageEditEvent;
+import com.chatwing.whitelabel.events.PasswordEnteredEvent;
+import com.chatwing.whitelabel.events.PasswordRefusedEvent;
 import com.chatwing.whitelabel.events.RequestBlockEvent;
 import com.chatwing.whitelabel.events.RequestBlockIPEvent;
 import com.chatwing.whitelabel.events.RequestBlockTypeEvent;
+import com.chatwing.whitelabel.events.RequestOpenChatBoxEvent;
+import com.chatwing.whitelabel.managers.CurrentChatBoxManager;
+import com.chatwing.whitelabel.managers.UserManager;
+import com.chatwing.whitelabel.pojos.BaseUser;
+import com.chatwing.whitelabel.pojos.Message;
 import com.chatwing.whitelabel.services.BlockUserIntentService;
 import com.chatwing.whitelabel.services.DeleteMessageIntentService;
 import com.chatwing.whitelabel.services.FlagMessageIntentService;
 import com.chatwing.whitelabel.services.IgnoreUserIntentService;
-import com.chatwingsdk.utils.StatisticTracker;
-import com.chatwingsdk.events.internal.CurrentChatBoxEvent;
-import com.chatwingsdk.events.internal.PasswordEnteredEvent;
-import com.chatwingsdk.events.internal.PasswordRefusedEvent;
-import com.chatwingsdk.events.internal.RequestOpenChatBoxEvent;
-import com.chatwingsdk.fragments.ChatMessagesFragment;
-import com.chatwingsdk.fragments.CommunicationMessagesFragment;
-import com.chatwingsdk.managers.CurrentChatBoxManager;
-import com.chatwingsdk.managers.UserManager;
-import com.chatwingsdk.pojos.BaseUser;
-import com.chatwingsdk.pojos.Message;
-import com.chatwingsdk.validators.PermissionsValidator;
-import com.chatwingsdk.views.ErrorMessageView;
-import com.chatwingsdk.views.QuickMessageView;
+import com.chatwing.whitelabel.utils.StatisticTracker;
+import com.chatwing.whitelabel.validators.PermissionsValidator;
+import com.chatwing.whitelabel.views.ErrorMessageView;
+import com.chatwing.whitelabel.views.QuickMessageView;
 import com.squareup.otto.Subscribe;
 
 import javax.inject.Inject;
@@ -233,7 +233,7 @@ public class ExtendChatMessagesFragment extends ChatMessagesFragment {
     }
 
     @com.squareup.otto.Subscribe
-    public void onAppendEmoticonEvent(com.chatwingsdk.events.internal.AppendEmoticonEvent event) {
+    public void onAppendEmoticonEvent(AppendEmoticonEvent event) {
         super.onAppendEmoticonEvent(event);
     }
 
@@ -253,7 +253,7 @@ public class ExtendChatMessagesFragment extends ChatMessagesFragment {
     }
 
     @com.squareup.otto.Subscribe
-    public void onCurrentChatBoxChanged(com.chatwingsdk.events.internal.CurrentChatBoxEvent event) {
+    public void onCurrentChatBoxChanged(CurrentChatBoxEvent event) {
         CurrentChatBoxEvent.Status status = event.getStatus();
         super.onCurrentChatBoxChanged(event);
         if (status == CurrentChatBoxEvent.Status.LOADED) {
@@ -272,7 +272,7 @@ public class ExtendChatMessagesFragment extends ChatMessagesFragment {
     }
 
     @com.squareup.otto.Subscribe
-    public void onCreateMessageEvent(com.chatwingsdk.events.internal.CreateMessageEvent event) {
+    public void onCreateMessageEvent(CreateMessageEvent event) {
         super.onCreateMessageEvent(event);
     }
 

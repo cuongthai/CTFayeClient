@@ -8,8 +8,8 @@ import android.widget.BaseAdapter;
 import com.android.volley.toolbox.NetworkImageView;
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.managers.ApiManager;
-import com.chatwingsdk.managers.VolleyManager;
-import com.chatwingsdk.modules.ForActivity;
+import com.chatwing.whitelabel.managers.VolleyManager;
+import com.chatwing.whitelabel.modules.ForActivity;
 
 import javax.inject.Inject;
 

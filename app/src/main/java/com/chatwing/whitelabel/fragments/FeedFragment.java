@@ -9,12 +9,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.GridView;
+
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.activities.NoMenuWebViewActivity;
 import com.chatwing.whitelabel.adapters.FeedAdapter;
 import com.chatwing.whitelabel.events.UserSelectedFeedSource;
-import com.chatwingsdk.fragments.InjectableFragmentDelegate;
-import com.chatwingsdk.views.ErrorMessageView;
+import com.chatwing.whitelabel.views.ErrorMessageView;
 import com.pkmmte.pkrss.Article;
 import com.pkmmte.pkrss.Callback;
 import com.pkmmte.pkrss.Category;

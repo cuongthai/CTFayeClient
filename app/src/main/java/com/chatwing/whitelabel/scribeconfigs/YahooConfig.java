@@ -4,7 +4,7 @@ import com.chatwing.whitelabel.BuildConfig;
 import com.chatwing.whitelabel.Constants;
 import com.chatwing.whitelabel.pojos.oauth.OAuthParams;
 import com.chatwing.whitelabel.pojos.oauth.YahooJsonParams;
-import com.chatwingsdk.pojos.params.oauth.AuthenticationParams;
+import com.chatwing.whitelabel.pojos.params.oauth.AuthenticationParams;
 
 import org.scribe.builder.api.Api;
 import org.scribe.model.Token;

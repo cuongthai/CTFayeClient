@@ -7,8 +7,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.chatwing.whitelabel.R;
-import com.chatwingsdk.modules.ForActivity;
-import com.chatwingsdk.pojos.Song;
+import com.chatwing.whitelabel.modules.ForActivity;
+import com.chatwing.whitelabel.pojos.Song;
 
 import javax.inject.Inject;
 

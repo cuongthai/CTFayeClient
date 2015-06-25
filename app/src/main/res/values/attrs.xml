@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <declare-styleable name="RatioImageView">
+        <attr name="height_ratio" format="integer" default="3"/>
+        <attr name="width_ratio" format="integer" default="4"/>
+        <attr name="dot_view" format="boolean" default="false"/>
+    </declare-styleable>
+
+    <attr name="clickableItemBackground" format="reference"/>
     <!-- Taken from https://github.com/Pkmmte/CircularImageView/blob/master/CircularImageView/res/values/attrs.xml -->
     <!-- CircularImageView for custom shape -->
     <declare-styleable name="CircularImageView">
@@ -24,4 +31,5 @@
     <declare-styleable name="CustomCircularImageViewTheme">
         <attr name="circularImageViewStyle" format="reference"/>
     </declare-styleable>
+
 </resources>

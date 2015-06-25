@@ -6,12 +6,11 @@ import android.view.Gravity;
 import android.view.Menu;
 
 import com.chatwing.whitelabel.R;
-import com.chatwingsdk.events.internal.UpdateSubscriptionEvent;
-import com.chatwingsdk.managers.CommunicationActivityManager;
-import com.chatwingsdk.managers.ConversationModeManager;
-import com.chatwingsdk.managers.CurrentConversationManager;
-import com.chatwingsdk.managers.UserManager;
-import com.chatwingsdk.validators.ConversationIdValidator;
+import com.chatwing.whitelabel.events.CurrentConversationEvent;
+import com.chatwing.whitelabel.events.PostAuthenticationEvent;
+import com.chatwing.whitelabel.events.UpdateSubscriptionEvent;
+import com.chatwing.whitelabel.events.UserSelectedConversationEvent;
+import com.chatwing.whitelabel.validators.ConversationIdValidator;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -55,7 +54,7 @@ public class ExtendConversationModeManager extends ConversationModeManager {
     }
 
     @com.squareup.otto.Subscribe
-    public void onUserSelectedConversationEvent(com.chatwingsdk.events.internal.UserSelectedConversationEvent event) {
+    public void onUserSelectedConversationEvent(UserSelectedConversationEvent event) {
         super.onUserSelectedConversationEvent(event);
     }
 
@@ -65,12 +64,12 @@ public class ExtendConversationModeManager extends ConversationModeManager {
     }
 
     @com.squareup.otto.Subscribe
-    public void onCurrentConversationChanged(com.chatwingsdk.events.internal.CurrentConversationEvent event) {
+    public void onCurrentConversationChanged(CurrentConversationEvent event) {
         super.onCurrentConversationChanged(event);
     }
 
     @com.squareup.otto.Subscribe
-    public void onPostAuthentication(com.chatwingsdk.events.internal.PostAuthenticationEvent event) {
+    public void onPostAuthentication(PostAuthenticationEvent event) {
         super.onPostAuthentication(event);
     }
 }

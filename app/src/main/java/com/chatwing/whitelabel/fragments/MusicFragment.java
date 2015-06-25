@@ -12,31 +12,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.GridView;
 import android.widget.TextView;
 
 import com.chatwing.whitelabel.R;
-import com.chatwing.whitelabel.activities.NoMenuWebViewActivity;
-import com.chatwing.whitelabel.adapters.FeedAdapter;
-import com.chatwing.whitelabel.events.UserSelectedFeedSource;
 import com.chatwing.whitelabel.events.UserSelectedSongEvent;
 import com.chatwing.whitelabel.interfaces.MediaControlInterface;
+import com.chatwing.whitelabel.pojos.Song;
 import com.chatwing.whitelabel.services.MusicService;
-import com.chatwingsdk.fragments.InjectableFragmentDelegate;
-import com.chatwingsdk.pojos.ChatBox;
-import com.chatwingsdk.pojos.Song;
-import com.chatwingsdk.utils.LogUtils;
-import com.chatwingsdk.views.ErrorMessageView;
-import com.pkmmte.pkrss.Article;
-import com.pkmmte.pkrss.Callback;
+import com.chatwing.whitelabel.views.ErrorMessageView;
 import com.pkmmte.pkrss.Category;
-import com.pkmmte.pkrss.PkRSS;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.inject.Inject;
 

@@ -3,20 +3,15 @@ package com.chatwing.whitelabel.services;
 import android.content.Intent;
 import android.graphics.Bitmap;
 
+import com.chatwing.whitelabel.events.UpdateUserEvent;
 import com.chatwing.whitelabel.managers.ApiManager;
-import com.chatwing.whitelabel.modules.ExtendChatWingModule;
-import com.chatwingsdk.events.internal.UpdateUserEvent;
-import com.chatwingsdk.managers.VolleyManager;
-import com.chatwingsdk.modules.ChatWingModule;
-import com.chatwingsdk.pojos.User;
-import com.chatwingsdk.services.BaseIntentService;
-import com.chatwingsdk.utils.BitmapUtils;
-import com.chatwingsdk.utils.LogUtils;
+import com.chatwing.whitelabel.managers.VolleyManager;
+import com.chatwing.whitelabel.pojos.User;
+import com.chatwing.whitelabel.utils.BitmapUtils;
+import com.chatwing.whitelabel.utils.LogUtils;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 import javax.inject.Inject;
 
