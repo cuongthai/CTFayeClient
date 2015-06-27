@@ -30,14 +30,20 @@
     This should be a FrameLayout so that view of fragments are added on top of
     each other.
     -->
-    <FrameLayout
+    <RelativeLayout
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
+        <include
+            android:id="@+id/toolbar_view"
+            layout="@layout/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"/>
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_below="@id/toolbar_view">
 
             <LinearLayout style="@style/FormContainer">
 
@@ -56,5 +62,5 @@
 
             </LinearLayout>
         </ScrollView>
-    </FrameLayout>
+    </RelativeLayout>
 </merge>

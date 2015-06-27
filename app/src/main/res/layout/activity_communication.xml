@@ -15,6 +15,7 @@
   -->
 
 <android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -23,13 +24,20 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <include
+            android:id="@+id/toolbar_view"
+            layout="@layout/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true" />
+
         <FrameLayout
             android:id="@+id/ads_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true">
+            android:layout_below="@id/toolbar_view">
 
-            </FrameLayout>
+        </FrameLayout>
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -40,10 +48,10 @@
                 android:id="@+id/progress_container"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="@color/bg_color"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:visibility="gone"
-                android:background="@color/bg_color">
+                android:visibility="gone">
 
                 <ProgressBar
                     android:id="@+id/loading_view"
@@ -68,23 +76,22 @@
         </FrameLayout>
     </RelativeLayout>
 
-    <FrameLayout
+    <android.support.design.widget.NavigationView
         android:id="@+id/left_drawer_container"
-        android:layout_width="@dimen/drawer_width"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_gravity="left"
-        android:background="@color/bg_color">
+        android:layout_gravity="start">
 
         <fragment
             android:name="com.chatwing.whitelabel.fragments.ExtendCommunicationDrawerFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:tag="@string/fragment_tag_left_drawer" />
-    </FrameLayout>
+    </android.support.design.widget.NavigationView>
 
     <FrameLayout
+        android:id="@+id/right_drawer_container"
         android:layout_width="@dimen/drawer_width"
         android:layout_height="match_parent"
-        android:layout_gravity="right"
-        android:id="@+id/right_drawer_container" />
+        android:layout_gravity="right" />
 </android.support.v4.widget.DrawerLayout>

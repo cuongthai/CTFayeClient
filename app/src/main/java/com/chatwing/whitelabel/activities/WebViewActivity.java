@@ -4,17 +4,20 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Window;
+import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
 
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.fragments.WebViewFragment;
+import com.chatwing.whitelabel.utils.LogUtils;
 
 
 /**
@@ -26,17 +29,22 @@ import com.chatwing.whitelabel.fragments.WebViewFragment;
  * and provides controls such as loading indicator, refresh,
  * go back and forward buttons on the action bar.
  */
-public class WebViewActivity extends ActionBarActivity {
+public class WebViewActivity extends AppCompatActivity {
 
     public static final String EXTRA_URL = "url";
 
     private String mUrl;
+    private ProgressBar mLoadingView;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_web_view);
+        mLoadingView = (ProgressBar) findViewById(R.id.progress_spinner);
+
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         if (savedInstanceState == null) {
             mUrl = getIntent().getStringExtra(EXTRA_URL);
@@ -48,9 +56,15 @@ public class WebViewActivity extends ActionBarActivity {
             return;
         }
         mUrl = mUrl.trim();
-
+        LogUtils.v("Load Url " + mUrl);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     @Override
@@ -82,7 +96,7 @@ public class WebViewActivity extends ActionBarActivity {
         WebView webView = getWebView();
         MenuItem refreshItem = menu.findItem(R.id.refresh);
         boolean isLoading = webView.getProgress() != 100;
-        setProgressBarIndeterminateVisibility(isLoading);
+        mLoadingView.setVisibility(isLoading ? View.VISIBLE : View.GONE);
         refreshItem.setVisible(!isLoading);
 
         return true;
@@ -103,9 +117,6 @@ public class WebViewActivity extends ActionBarActivity {
                 } catch (Exception e) {
 
                 }
-                return true;
-            case android.R.id.home:
-                finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

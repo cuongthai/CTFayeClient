@@ -16,37 +16,48 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/audio_add"
-        android:title="@string/title_menu_audio_playing"
+    <item
+        android:id="@+id/audio_add"
         android:icon="@drawable/ic_menu_btn_add"
-        app:showAsAction="always"
-        android:visible="false"/>
+        android:title="@string/title_menu_audio_playing"
+        android:visible="false"
+        app:showAsAction="always" />
 
-    <item android:id="@+id/online_users"
-        android:title="@string/title_online_users"
+    <item
+        android:id="@+id/online_users"
         android:icon="@drawable/ic_action_group"
-        app:showAsAction="always"/>
-    <item android:id="@+id/share_chat_box"
+        android:title="@string/title_online_users"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/share_chat_box"
         android:title="@string/title_share_chat_box"
-        app:showAsAction="never"
+        android:visible="false"
         app:actionProviderClass="android.support.v7.widget.ShareActionProvider"
-        android:visible="false"/>
-    <item android:id="@+id/copy_alias"
-        android:title="@string/title_copy_alias_current_chat_box"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/copy_alias"
         android:icon="@drawable/ic_action_copy_holo_dark"
-        app:showAsAction="never"
-        android:visible="false"/>
-    <item android:id="@+id/bookmark_chat_box"
-        android:title="@string/title_bookmark_current_chat_box"
+        android:title="@string/title_copy_alias_current_chat_box"
+        android:visible="false"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/bookmark_chat_box"
         android:icon="@drawable/ic_action_important"
-        app:showAsAction="never"/>
-    <item android:id="@+id/manage_blacklist"
-        android:title="@string/title_manage_blacklist"
+        android:title="@string/title_bookmark_current_chat_box"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/refresh"
+        android:title="@string/title_refresh"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/manage_blacklist"
         android:icon="@drawable/ic_action_manage_blacklist"
-        app:showAsAction="never"/>
+        android:title="@string/title_manage_blacklist"
+        app:showAsAction="never" />
 
-    <item android:id="@+id/manage_notification"
-        android:title="@string/title_activity_notification"
+    <item
+        android:id="@+id/manage_notification"
         android:icon="@drawable/ic_action_notification"
-        app:showAsAction="never"/>
+        android:title="@string/title_activity_notification"
+        app:showAsAction="never" />
 </menu>

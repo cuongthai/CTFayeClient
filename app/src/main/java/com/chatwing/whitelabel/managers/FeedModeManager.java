@@ -2,7 +2,7 @@ package com.chatwing.whitelabel.managers;
 
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 
 import com.chatwing.whitelabel.R;
@@ -40,7 +40,7 @@ public class FeedModeManager extends CommunicationModeManager {
 
     @Override
     public ActionBarDrawerToggle getDrawerToggleListener() {
-        final ActionBarActivity activity = mActivityDelegate.getActivity();
+        final AppCompatActivity activity = mActivityDelegate.getActivity();
         final DrawerLayout drawerLayout = mActivityDelegate.getDrawerLayout();
         return new ActionBarDrawerToggle(activity,
                 drawerLayout,

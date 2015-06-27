@@ -27,6 +27,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -111,8 +112,6 @@ public abstract class CommunicationModeManager {
     }
 
     public boolean onCreateOptionsMenu(Menu menu){
-        ActionBarActivity activity = mActivityDelegate.getActivity();
-        activity.getMenuInflater().inflate(R.menu.main_menu, menu);
         return true;
     }
 
@@ -143,7 +142,7 @@ public abstract class CommunicationModeManager {
             unreadColumn = ChatBoxTable.UNREAD_COUNT;
         }
 
-        ActionBarActivity activity = mActivityDelegate.getActivity();
+        AppCompatActivity activity = mActivityDelegate.getActivity();
         ContentResolver contentResolver = activity.getContentResolver();
 
         // Get unread count of the correct chat box.

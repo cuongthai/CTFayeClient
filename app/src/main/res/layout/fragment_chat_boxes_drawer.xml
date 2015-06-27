@@ -4,22 +4,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_color">
+
     <TextView
+        android:id="@+id/websiteTv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/websiteTv"
-        android:visibility="gone"
-        android:paddingTop="@dimen/drawer_item_padding_top"
+        android:layout_alignParentBottom="true"
         android:paddingBottom="@dimen/drawer_item_padding_bottom"
         android:paddingLeft="@dimen/drawer_item_padding_left"
         android:paddingRight="@dimen/drawer_item_padding_right"
-        android:layout_alignParentBottom="true"/>
+        android:paddingTop="@dimen/drawer_item_padding_top"
+        android:visibility="gone" />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/websiteTv"
-        >
+        android:layout_above="@+id/websiteTv">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -27,122 +27,125 @@
             android:orientation="vertical">
 
             <LinearLayout
+                android:id="@+id/user_info_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="@dimen/drawer_item_padding_top"
-                android:paddingBottom="@dimen/drawer_item_padding_bottom"
-                android:paddingLeft="@dimen/drawer_item_padding_left"
-                android:paddingRight="@dimen/drawer_item_padding_right"
-                android:background="@color/profile_drawer_bg_color"
+                android:layout_height="172dp"
+                android:background="@color/primary"
                 android:orientation="horizontal"
-                android:id="@+id/user_info_layout">
+                android:paddingTop="@dimen/drawer_item_padding_top">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
-
-                    <com.chatwing.whitelabel.views.CircleNetworkImageView
-                        android:id="@+id/avatar"
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/chat_message_avatar_height"
-                        android:layout_marginRight="@dimen/chat_boxes_drawer_avatar_margin_right"
-                        android:layout_alignParentLeft="true"
-                        android:scaleType="fitCenter"
-                        android:layout_centerVertical="true" />
 
                     <ImageView
                         android:id="@+id/next"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
-                        android:src="@drawable/ic_next"
-                        android:layout_centerVertical="true" />
+                        android:layout_alignParentBottom="true"
+                        android:layout_marginRight="@dimen/spacing_large"
+                        android:layout_marginBottom="@dimen/spacing_large"
+                        android:src="@drawable/ic_next" />
 
                     <LinearLayout
+                        android:id="@+id/account"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:id="@+id/account"
-                        android:layout_toRightOf="@id/avatar"
+                        android:layout_alignParentBottom="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="@dimen/spacing_large"
+                        android:layout_marginBottom="@dimen/spacing_large"
                         android:layout_toLeftOf="@id/next"
-                        android:orientation="vertical"
-                        android:layout_centerVertical="true">
+                        android:orientation="vertical">
 
                         <TextView
                             android:id="@+id/username"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textAppearance="?android:attr/textAppearanceSmall"
-                            android:gravity="left|center_vertical"
                             android:ellipsize="end"
-                            android:textColor="@color/text_color"
+                            android:gravity="left|center_vertical"
                             android:lines="1"
+                            android:textAppearance="?android:attr/textAppearanceSmall"
+                            android:textColor="@color/text_on_primary"
                             android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/account_type"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textAppearance="?android:attr/textAppearanceSmall"
-                            android:gravity="left|center_vertical"
                             android:ellipsize="end"
-                            android:textColor="@color/text_color"
-                            android:lines="1" />
+                            android:gravity="left|center_vertical"
+                            android:lines="1"
+                            android:textAppearance="?android:attr/textAppearanceSmall"
+                            android:textColor="@color/text_on_primary"/>
                     </LinearLayout>
+                    <com.chatwing.whitelabel.views.CircleNetworkImageView
+                        android:id="@+id/avatar"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/chat_message_avatar_height"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="@dimen/spacing_large"
+                        android:layout_marginBottom="@dimen/spacing_large"
+                        android:layout_above="@id/account"
+                        android:scaleType="fitCenter" />
                 </RelativeLayout>
             </LinearLayout>
 
             <Button
                 android:id="@+id/login"
+                style="@style/ButtonChatWing"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/title_login"
                 android:textSize="@dimen/authenticate_button_text_size"
                 android:textStyle="bold"
-                style="@style/ButtonChatWing"
                 android:visibility="gone" />
 
             <TextView
                 android:id="@+id/search_chat_box"
+                style="@style/Theme.ChatWing.DrawerItemTitle"
                 android:drawableLeft="@drawable/ic_action_search_light"
-                android:text="@string/title_chat_boxes_drawer_search"
-                style="@style/Theme.ChatWing.DrawerItemTitle" />
+                android:text="@string/title_chat_boxes_drawer_search" />
 
             <TextView
                 android:id="@+id/create_chat_box"
+                style="@style/Theme.ChatWing.DrawerItemTitle"
                 android:drawableLeft="@drawable/ic_action_new_light"
-                android:text="@string/title_chat_boxes_drawer_create"
-                style="@style/Theme.ChatWing.DrawerItemTitle" />
+                android:text="@string/title_chat_boxes_drawer_create" />
 
             <LinearLayout
                 android:id="@+id/feeds"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:background="@drawable/item_selector"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <TextView
+                    style="@style/Theme.ChatWing.DrawerItemTitle"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:drawableLeft="@drawable/ic_menu_today"
-                    android:text="@string/title_feeds"
-                    style="@style/Theme.ChatWing.DrawerItemTitle" />
+                    android:text="@string/title_feeds" />
 
             </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/music_box"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:background="@drawable/item_selector"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <TextView
+                    style="@style/Theme.ChatWing.DrawerItemTitle"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:drawableLeft="@drawable/ic_av_my_library_music"
-                    android:text="@string/title_music_box"
-                    style="@style/Theme.ChatWing.DrawerItemTitle" />
+                    android:text="@string/title_music_box" />
 
             </LinearLayout>
 
@@ -150,16 +153,16 @@
                 android:id="@+id/bookmarks"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:background="@drawable/item_selector"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <TextView
+                    style="@style/Theme.ChatWing.DrawerItemTitle"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:drawableLeft="@drawable/ic_action_important_light"
-                    android:text="@string/title_bookmarks"
-                    style="@style/Theme.ChatWing.DrawerItemTitle" />
+                    android:text="@string/title_bookmarks" />
 
                 <TextView
                     android:id="@+id/bookmarks_unread_count"
@@ -171,16 +174,16 @@
                 android:id="@+id/categories"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:background="@drawable/item_selector"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <TextView
+                    style="@style/Theme.ChatWing.DrawerItemTitle"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:drawableLeft="@drawable/ic_action_group_light"
-                    android:text="@string/title_categories"
-                    style="@style/Theme.ChatWing.DrawerItemTitle" />
+                    android:text="@string/title_categories" />
 
                 <TextView
                     android:id="@+id/categories_unread_count"
@@ -192,43 +195,44 @@
                 android:id="@+id/conversation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:background="@drawable/item_selector"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
                 <TextView
+                    style="@style/Theme.ChatWing.DrawerItemTitle"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:drawableLeft="@drawable/ic_action_conversations_light"
-                    android:text="@string/title_activity_conversation"
-                    style="@style/Theme.ChatWing.DrawerItemTitle" />
+                    android:text="@string/title_activity_conversation" />
 
                 <TextView
-                    android:visibility="gone"
                     android:id="@+id/conversation_unread_count"
-                    style="@style/Theme.ChatWing.DrawerItemCounter" />
+                    style="@style/Theme.ChatWing.DrawerItemCounter"
+                    android:visibility="gone" />
             </LinearLayout>
 
             <TextView
                 android:id="@+id/settings"
-                android:drawableLeft="@drawable/ic_action_settings_light"
-                android:text="@string/title_settings"
+                style="@style/Theme.ChatWing.DrawerItemTitle"
                 android:background="@drawable/item_selector"
-                style="@style/Theme.ChatWing.DrawerItemTitle" />
+                android:drawableLeft="@drawable/ic_action_settings_light"
+                android:text="@string/title_settings" />
 
             <LinearLayout
                 android:id="@+id/logout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:background="@drawable/item_selector"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <TextView
+                    style="@style/Theme.ChatWing.DrawerItemTitle"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:drawableLeft="@drawable/ic_action_exit"
-                    android:text="@string/action_logout"
-                    style="@style/Theme.ChatWing.DrawerItemTitle" />
+                    android:text="@string/action_logout" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

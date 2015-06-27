@@ -106,7 +106,7 @@ public class CircleNetworkImageView extends ImageView {
             int defaultSelectorSize = (int) (2 * context.getResources().getDisplayMetrics().density + 0.5f);
             setSelectorColor(attributes.getColor(R.styleable.CircularImageView_selector_color, Color.TRANSPARENT));
             setSelectorStrokeWidth(attributes.getDimensionPixelOffset(R.styleable.CircularImageView_selector_stroke_width, defaultSelectorSize));
-            setSelectorStrokeColor(attributes.getColor(R.styleable.CircularImageView_selector_stroke_color, Color.BLUE));
+            setSelectorStrokeColor(attributes.getColor(R.styleable.CircularImageView_selector_stroke_color, context.getResources().getColor(R.color.accent)));
         }
 
         // Add shadow if enabled

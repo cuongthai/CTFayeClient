@@ -16,7 +16,7 @@
 package com.chatwing.whitelabel.activities;
 
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 
 import com.chatwing.whitelabel.ChatWing;
 import com.chatwing.whitelabel.managers.UserManager;
@@ -37,7 +37,7 @@ import dagger.ObjectGraph;
 /**
  * Created by nguyenthanhhuy on 11/25/13.
  */
-public abstract class BaseABFragmentActivity extends ActionBarActivity {
+public abstract class BaseABFragmentActivity extends AppCompatActivity {
     public static final int RESULT_EXCEPTION = 800;
 
     @Inject

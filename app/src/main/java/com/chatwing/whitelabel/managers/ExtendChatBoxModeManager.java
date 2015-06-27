@@ -19,7 +19,7 @@ import android.os.RemoteException;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ShareActionProvider;
 import android.text.format.DateUtils;
 import android.util.TypedValue;
@@ -197,7 +197,7 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
-        ActionBarActivity activity = mActivityDelegate.getActivity();
+        AppCompatActivity activity = mActivityDelegate.getActivity();
         final DrawerLayout drawerLayout = mActivityDelegate.getDrawerLayout();
         activity.getMenuInflater().inflate(R.menu.chatbox_menu, menu);
         mOnlineUsersItem = menu.findItem(R.id.online_users);
@@ -286,7 +286,7 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
             }
 
             // Config share intent for share chat box item
-            ActionBarActivity activity = mActivityDelegate.getActivity();
+            AppCompatActivity activity = mActivityDelegate.getActivity();
             ChatBox chatBox = mCurrentChatBoxManager.getCurrentChatBox();
             String shareText = mApiManager.getChatBoxUrl(chatBox.getKey());
             Intent intent = new Intent(Intent.ACTION_SEND);
@@ -507,7 +507,7 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
         if (chatBox == null || chatBox.getAlias() == null) {
             return;
         }
-        ActionBarActivity activity = mActivityDelegate.getActivity();
+        AppCompatActivity activity = mActivityDelegate.getActivity();
 
         if (Build.VERSION.SDK_INT >= 11) {
             ClipboardManager clipboard = (ClipboardManager)
@@ -530,7 +530,7 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
     }
 
     private void manageBlackList() {
-        ActionBarActivity activity = mActivityDelegate.getActivity();
+        AppCompatActivity activity = mActivityDelegate.getActivity();
         Intent i = new Intent(activity, NoMenuWebViewActivity.class);
         i.putExtra(NoMenuWebViewActivity.EXTRA_URL, String.format(ApiManager.MANAGE_BLACKLIST_URL,
                 mCurrentChatBoxManager.getCurrentChatBox().getKey(),

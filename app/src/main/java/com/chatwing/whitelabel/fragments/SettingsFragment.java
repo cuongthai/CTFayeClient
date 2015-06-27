@@ -124,13 +124,19 @@ public class SettingsFragment extends PreferenceFragment
         findPreference(getString(R.string.preference_version)).setSummary(mVersion);
 
         updateUserViews();
+
+
+        updateVerifyButtonState();
+
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         LogUtils.v("onViewCreated");
         if (getActivity().getIntent().getBooleanExtra(LOAD_LATEST_USER_PROFILE, false)) {
             startSyncUserProfile();
         }
-
-        updateVerifyButtonState();
-
     }
 
     private void updateVerifyButtonState() {

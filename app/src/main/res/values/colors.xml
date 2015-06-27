@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary_color">#f3f019</color>
-    <color name="action_primary_color">#e92754</color>
-    <color name="action_secondary_color">#3cb2e2</color>
-    <color name="text_color">#D9000000</color>
-    <color name="text_action_color">#D9FFFFFF</color>
+    <!-- Material design colors -->
+    <color name="primary">#2196F3</color>
+    <color name="primary_dark">#1976D2</color>
+    <color name="accent">#FFC107</color>
+    <color name="primary_text">#212121</color>
+    <color name="secondary_text">#727272</color>
+    <color name="icons_on_primary">#FFFFFF</color>
+    <color name="divider">#B6B6B6</color>
+    <color name="text_on_primary">#FFFFFF</color>
+
     <color name="bg_color">#fefef5</color>
 
-    <color name="profile_drawer_bg_color">@color/primary_color</color>
-    <color name="main_color">@color/primary_color</color>
     <color name="chatwing_icon_color">@android:color/darker_gray</color>
 
     <color name="walkthrough_page_1_background_color">#8000</color>

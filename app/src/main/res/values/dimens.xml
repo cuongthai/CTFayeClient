@@ -6,7 +6,7 @@
     <dimen name="drawer_item_height">48dp</dimen>
     <dimen name="drawer_item_padding_top">2dp</dimen>
     <dimen name="drawer_item_padding_bottom">2dp</dimen>
-    <dimen name="drawer_item_padding_left">2dp</dimen>
+    <dimen name="drawer_item_padding_left">@dimen/spacing_large</dimen>
     <dimen name="drawer_item_padding_right">2dp</dimen>
     <dimen name="drawer_item_drawable_padding">12dp</dimen>
     <dimen name="drawer_item_counter_height">32dp</dimen>
@@ -17,8 +17,10 @@
 
     <dimen name="authenticate_button_text_size">16sp</dimen>
 
-    <dimen name="chat_message_avatar_width">50dp</dimen>
+    <dimen name="chat_message_avatar_width">64dp</dimen>
     <dimen name="chat_message_avatar_height">@dimen/chat_message_avatar_width</dimen>
+    <dimen name="online_avatar_width">32dp</dimen>
+    <dimen name="online_avatar_height">@dimen/online_avatar_width</dimen>
     <dimen name="chat_boxes_drawer_avatar_margin_right">6dp</dimen>
     <dimen name="chatwing_icon_text_size">60sp</dimen>
     <dimen name="padding_small">4dp</dimen>
@@ -44,4 +46,17 @@
     <dimen name="profile_avatar_width">64dp</dimen>
     <dimen name="compose_button_padding">8dp</dimen>
     <dimen name="emoticon_picker_height">128dp</dimen>
+
+
+
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="spacing_xsmall">2dp</dimen>
+    <dimen name="spacing_medium">8dp</dimen>
+    <dimen name="spacing_large">16dp</dimen>
+    <dimen name="spacing_xlarge">32dp</dimen>
+
+    <dimen name="elevation_low">9dp</dimen>
+    <dimen name="elevation_high">12dp</dimen>
+    <dimen name="status_bar_height">25dp</dimen>
+    <dimen name="fab_compat_margin">0dp</dimen>
 </resources>

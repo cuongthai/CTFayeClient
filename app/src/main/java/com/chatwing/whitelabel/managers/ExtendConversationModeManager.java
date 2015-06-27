@@ -1,7 +1,7 @@
 package com.chatwing.whitelabel.managers;
 
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.Menu;
 
@@ -39,7 +39,7 @@ public class ExtendConversationModeManager extends ConversationModeManager {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        ActionBarActivity activity = mActivityDelegate.getActivity();
+        AppCompatActivity activity = mActivityDelegate.getActivity();
         activity.getMenuInflater().inflate(R.menu.conversation_menu, menu);
         return true;
     }

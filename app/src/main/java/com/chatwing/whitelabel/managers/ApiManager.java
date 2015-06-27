@@ -99,7 +99,7 @@ public interface ApiManager {
     String CHAT_BOX_DELETE_MESSAGE_URL = URL_END_POINT + "/chatbox/message/delete";
     String BLACKLIST_CREATE_URL = URL_END_POINT + "/chatbox/blacklist/create";
     String MANAGE_BLACKLIST_URL = Constants.CHATWING_BASE_URL + "/chatbox/%s/control?access_token=%s&client_id="
-            + ChatWing.getAppId();
+            + ChatWing.getClientID();
     String USER_IGNORE= URL_END_POINT + "/chat-user/ignore";
     String FLAG_MESSAGE= URL_END_POINT + "/chatbox/message/flag";
     String USER_UNIGNORE= URL_END_POINT + "/chat-user/unignore";

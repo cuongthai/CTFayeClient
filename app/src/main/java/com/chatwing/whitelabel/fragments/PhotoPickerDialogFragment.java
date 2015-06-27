@@ -77,7 +77,7 @@ public class PhotoPickerDialogFragment extends DialogFragment {
         }
 
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity)
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity, R.style.Theme_ChatWing_AlertDialog)
                 .setCancelable(false)
                 .setTitle(R.string.message_avatar_picker)
                 .setNegativeButton(getString(R.string.title_cancel), new DialogInterface.OnClickListener() {

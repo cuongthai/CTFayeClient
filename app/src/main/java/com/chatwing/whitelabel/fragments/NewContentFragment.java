@@ -81,8 +81,7 @@ public class NewContentFragment extends DialogFragment {
             labels.add(getString(R.string.title_bbcodes));
         }
         String[] labelsArray = labels.toArray(new String[labels.size()]);
-        return new AlertDialog.Builder(getActivity())
-                .setTitle(R.string.title_add)
+        return new AlertDialog.Builder(getActivity(), R.style.Theme_ChatWing_AlertDialog)
                 .setItems(labelsArray, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

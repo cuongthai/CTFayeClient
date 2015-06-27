@@ -28,12 +28,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -185,27 +185,39 @@ public class CommunicationActivity
     // whether a sync operation should be triggered or not and reset right
     // after that.
     private boolean mIsCreated;
-    private MenuItem mRefreshMenuItem;
+    private ProgressBar mLoadingView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
         ChatWing.instance(getApplicationContext()).getChatwingGraph().plus();
+
+
         setContentView(R.layout.activity_communication);
-        setProgressBarIndeterminateVisibility(Boolean.FALSE);
-        mBus.register(this);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
+
+
+        mBus.register(this);
+
 
         mContentView = findViewById(R.id.fragment_container);
         mProgressView = findViewById(R.id.progress_container);
         mProgressBar = (ProgressBar) mProgressView.findViewById(R.id.loading_view);
         mProgressText = (TextView) mProgressView.findViewById(R.id.progress_text);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mLoadingView = (ProgressBar)findViewById(R.id.progress_spinner);
 
         mChatboxModeManager.onCreate(savedInstanceState);
         mConversationModeManager.onCreate(savedInstanceState);
+
+        stopRefreshAnimation();
 
         //This mode is priority due to user action requesting open
         int actionMode = getActionMode();
@@ -234,6 +246,7 @@ public class CommunicationActivity
         } else {
             setupConversationMode();
         }
+
         mIsCreated = true;
 
 
@@ -384,27 +397,13 @@ public class CommunicationActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        boolean leftDrawerOpened = mCurrentCommunicationMode.isCommunicationBoxDrawerOpening();
+        if (mCurrentCommunicationMode == null) return false;
 
-        //we use share menu
-        if (leftDrawerOpened) {
-            getMenuInflater().inflate(R.menu.drawer_menu, menu);
-            mRefreshMenuItem = menu.findItem(R.id.refresh);
-            return true;
-        }
         return mCurrentCommunicationMode.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        boolean leftDrawerOpened = mCurrentCommunicationMode.isCommunicationBoxDrawerOpening();
-
-        if (leftDrawerOpened) {
-            mRefreshMenuItem.setVisible(true);
-            syncRefreshAnimationState();
-            return true;
-        }
-
         return mCurrentCommunicationMode.onPrepareOptionsMenu(menu);
     }
 
@@ -520,7 +519,7 @@ public class CommunicationActivity
 
     @Override
     public final void setContentShown(boolean shown) {
-        LogUtils.v("Test Chatbox not display, shown: "+shown);
+        LogUtils.v("Test Chatbox not display, shown: " + shown);
         if (shown) {
             mContentView.setVisibility(View.VISIBLE);
             mProgressView.setVisibility(View.GONE);
@@ -905,7 +904,6 @@ public class CommunicationActivity
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow_left, Gravity.LEFT);
         mDrawerToggle = mCurrentCommunicationMode.getDrawerToggleListener();
         mDrawerToggle.setDrawerIndicatorEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         // Don't allow the drawer layout to catch back button and close itself
@@ -1022,35 +1020,23 @@ public class CommunicationActivity
     }
 
     protected void syncRefreshAnimationState() {
-        if (mRefreshMenuItem == null) {
-            return;
-        }
-
+        LogUtils.v("syncRefreshAnimationState "+syncingInProcess());
         // Start refresh animation if the chat boxes drawer is opened and a
         // sync operation is running.
         // Stop the animation if that drawer is closed.
-        if (mCurrentCommunicationMode.isCommunicationBoxDrawerOpening()
-                && syncingInProcess()
-                && mRefreshMenuItem.getActionView() == null) {
-            mRefreshMenuItem.setVisible(false);
-            setProgressBarIndeterminateVisibility(Boolean.TRUE);
+        if (syncingInProcess()) {
+            startRefreshAnimation();
         } else {
             stopRefreshAnimation();
         }
     }
 
     protected void stopRefreshAnimation() {
-        if (mRefreshMenuItem != null) {
-            mRefreshMenuItem.setVisible(true);
-            setProgressBarIndeterminateVisibility(Boolean.FALSE);
-        }
+        mLoadingView.setVisibility(View.GONE);
     }
 
-    protected void startRefreshAnimation(){
-        if (mRefreshMenuItem != null) {
-            mRefreshMenuItem.setVisible(false);
-            setProgressBarIndeterminateVisibility(Boolean.TRUE);
-        }
+    protected void startRefreshAnimation() {
+        mLoadingView.setVisibility(View.VISIBLE);
     }
 
     protected boolean syncingInProcess() {

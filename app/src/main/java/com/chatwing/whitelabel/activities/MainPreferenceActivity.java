@@ -1,8 +1,10 @@
 package com.chatwing.whitelabel.activities;
 
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.view.Window;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.fragments.SettingsFragment;
@@ -18,10 +20,15 @@ import java.util.List;
  */
 public class MainPreferenceActivity extends BaseABFragmentActivity implements SettingsFragment.SettingDelegate {
 
+    private ProgressBar mLoadingView;
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_preferences);
+        mLoadingView = (ProgressBar) findViewById(R.id.progress_spinner);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
     }
@@ -44,6 +51,6 @@ public class MainPreferenceActivity extends BaseABFragmentActivity implements Se
 
     @Override
     public void showLoading(boolean show) {
-        setSupportProgressBarIndeterminateVisibility(show);
+        mLoadingView.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 }

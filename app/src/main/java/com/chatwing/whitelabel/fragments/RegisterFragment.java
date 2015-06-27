@@ -70,7 +70,6 @@ public class RegisterFragment extends Fragment {
         final CheckBox autoCreateChatBoxCheckBox = (CheckBox) view.findViewById(R.id.auto_create_chatbox);
         TextView agreeConditionsTextView = (TextView) view.findViewById(R.id.agree_conditions);
         Button registerButton = (Button) view.findViewById(R.id.register);
-        registerButton.setText(getString(R.string.title_register_chatwing, getString(R.string.app_name)));
         showPasswordCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

@@ -60,7 +60,7 @@
     <string name="message_agree_conditions">"By creating an account, you are agreeing to our <a href="http://chatwing.com/site/tos">Terms of Service</a> and <a href="http://chatwing.com/site/privacy">Privacy Policy</a></string>
     <string name="message_current_chat_box_alias_copied">"Alias Copied"</string>
     <string name="message_avatar_picker">Avatar Picker</string>
-    <string name="title_register_chatwing">"Sign Up for %s"</string>
+    <string name="title_register_chatwing">"Sign Up"</string>
     <string name="error_invalid_username_password">"Email or Password is invalid."</string>
     <string name="error_app_invalid_username_password">"Email or Password is invalid or you are not allowed to join. Please contact app admin"</string>
     <string name="progress_registering">"Signing up…"</string>

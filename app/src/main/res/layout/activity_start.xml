@@ -2,43 +2,102 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/primary_color">
+    android:background="@color/primary">
 
     <LinearLayout
+        android:id="@+id/bottom_panel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:layout_alignParentBottom="true"
-        android:id="@+id/bottom_panel">
+        android:orientation="horizontal"
+        android:layout_margin="@dimen/spacing_large">
+
 
         <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/title_login"
-            style="@style/ButtonChatWing"
-            android:textAllCaps="true"
-            android:id="@+id/btn_login"
-            android:textStyle="bold"/>
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/title_register"
-            style="@style/ButtonChatWing"
-            android:textAllCaps="true"
-            android:background="@color/action_secondary_color"
             android:id="@+id/btn_register"
-            android:textStyle="bold"/>
+            style="@style/ButtonChatWing"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/title_register"
+            android:textAllCaps="true"
+            android:textStyle="bold"
+            android:layout_marginRight="@dimen/spacing_medium"/>
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="@dimen/spacing_medium"
+            android:layout_marginTop="@dimen/spacing_medium"
+            android:background="@color/text_on_primary"
+            android:layout_marginLeft="@dimen/spacing_medium"
+            android:layout_marginRight="@dimen/spacing_medium"/>
+
+        <Button
+            android:id="@+id/btn_login"
+            style="@style/ButtonChatWing"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/title_login"
+            android:textAllCaps="true"
+            android:layout_marginLeft="@dimen/spacing_medium"
+            android:textStyle="bold" />
     </LinearLayout>
 
-    <RelativeLayout
+
+    <LinearLayout
+        android:id="@+id/logo"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/bottom_panel">
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_launcher"
-            android:layout_centerInParent="true"/>
-    </RelativeLayout>
+        android:layout_above="@id/bottom_panel"
+        android:orientation="vertical">
+
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_gravity="top"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/app_name"
+            android:textColor="@color/text_on_primary"
+            android:textSize="22sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:orientation="horizontal">
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:layout_weight="3"
+                android:orientation="vertical">
+
+
+                <com.chatwing.whitelabel.views.ImageViewRounded
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_gravity="center_horizontal|center_vertical"
+                    android:layout_weight="2"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_launcher" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+        </LinearLayout>
+    </LinearLayout>
+
 </RelativeLayout>

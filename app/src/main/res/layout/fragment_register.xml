@@ -41,6 +41,7 @@
             android:layout_height="wrap_content"
             android:text="@string/message_agree_conditions"
             android:gravity="center_horizontal"
+            android:textColorLink="@color/accent"
             android:paddingTop="@dimen/item_padding"
             android:paddingBottom="@dimen/item_padding"/>
 
@@ -51,6 +52,7 @@
             android:text="@string/title_register_chatwing"
             android:textSize="@dimen/authenticate_button_text_size"
             android:textStyle="bold"
-            style="@style/ButtonChatWing"/>
+            style="@style/ButtonChatWing"
+            android:textColor="@color/primary"/>
 
 </LinearLayout>
