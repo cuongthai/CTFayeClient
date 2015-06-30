@@ -145,7 +145,8 @@ public class SyncCommunicationBoxesIntentService extends BaseIntentService {
 //        handleChatWingOfficial(intent);
 //        handleKentucky(intent);
 //        handleSeattle(intent);
-        handleDestiny(intent);
+//        handleDestiny(intent);
+        handleDemo(intent);
 //        handleDebug(intent);
 //        handleStaging(intent);
     }
@@ -381,6 +382,47 @@ public class SyncCommunicationBoxesIntentService extends BaseIntentService {
                 Category category1 = new Category("General", generalGroup);
 
                 chatBoxListResponse.getCategories().add(category1);
+
+                fetchUnreadCount(chatBoxListResponse);
+                addDeleteOldDataOperations(batch);
+                addInsertOperations(chatBoxListResponse.getCategories(), batch);
+            }
+
+            if (mUserManager.userCanLoadConversations() && intent.getBooleanExtra(UPDATE_CONVERSATION_FLAG, true)) {
+                LoadConversationsResponse loadConversationsResponse =
+                        mApiManager.loadConversations(user, Constants.MAX_NUMBER_OF_CONVERSATIONS, 0);
+                String conversationId = intent.getStringExtra(EXTRA_CONVERSATION_ID);
+                addUpdateConversationsOperations(loadConversationsResponse.getData(), batch);
+                addMarkAsReadCurrentConversationOperations(conversationId, batch);
+            }
+
+            getContentResolver().applyBatch(ChatWingContentProvider.AUTHORITY, batch);
+            getContentResolver().notifyChange(ChatWingContentProvider.getCategorizedChatBoxesUri(), null);
+
+            result = SyncCommunicationBoxEvent.succeedEvent();
+        } catch (final Exception exc) {
+            LogUtils.e(exc);
+            result = SyncCommunicationBoxEvent.failedEvent(exc);
+        }
+
+        setIsInProgress(false);
+        post(result);
+    }
+
+    private void handleDemo(Intent intent) {
+        if (!mNetworkUtils.hasInternetConnection()) {
+            return;
+        }
+        setIsInProgress(true);
+        post(SyncCommunicationBoxEvent.startedEvent());
+
+        SyncCommunicationBoxEvent result;
+        User user = mUserManager.getCurrentUser();
+        try {
+
+            ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
+            if (intent.getBooleanExtra(UPDATE_CATEGORIES_FLAG, true)) {
+                ChatBoxListResponse chatBoxListResponse = mApiManager.loadChatBoxes();
 
                 fetchUnreadCount(chatBoxListResponse);
                 addDeleteOldDataOperations(batch);

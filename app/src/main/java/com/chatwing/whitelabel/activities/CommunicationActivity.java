@@ -18,11 +18,11 @@ package com.chatwing.whitelabel.activities;
 
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.OperationApplicationException;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -212,7 +212,7 @@ public class CommunicationActivity
         mProgressBar = (ProgressBar) mProgressView.findViewById(R.id.loading_view);
         mProgressText = (TextView) mProgressView.findViewById(R.id.progress_text);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mLoadingView = (ProgressBar)findViewById(R.id.progress_spinner);
+        mLoadingView = (ProgressBar) findViewById(R.id.progress_spinner);
 
         mChatboxModeManager.onCreate(savedInstanceState);
         mConversationModeManager.onCreate(savedInstanceState);
@@ -248,8 +248,6 @@ public class CommunicationActivity
         }
 
         mIsCreated = true;
-
-
     }
 
     @Override
@@ -920,23 +918,52 @@ public class CommunicationActivity
             return;
         }
 
-        mCurrentCommunicationMode.logout();
-        mUserManager.removeUsers();
-        mGcmManager.clearRegistrationId();
+        new AsyncTask<Void, Void, Void>() {
+            public ProgressDialog dialog;
 
-        try {
-            getContentResolver().applyBatch(ChatWingContentProvider.AUTHORITY,
-                    ChatWingContentProvider.getClearAllDataBatch());
-        } catch (RemoteException e) {
-            LogUtils.e(e);
-        } catch (OperationApplicationException e) {
-            LogUtils.e(e);
-        }
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                dialog = ProgressDialog.show(CommunicationActivity.this, "",
+                        getString(R.string.logging_out), true, false);
+            }
 
-        Intent i = new Intent(this, getEntranceActivityClass());
-        startActivity(i);
-        finish();
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    String regId = mGcmManager.getRegistrationId();
+                    mApiManager.updateGcm(mUserManager.getCurrentUser(), regId, ApiManager.GCM_ACTION_REMOVE);
+                }catch(Exception e){
+                    LogUtils.e(e);
+                }
+                mGcmManager.clearRegistrationId();
+
+
+                try {
+                    getContentResolver().applyBatch(ChatWingContentProvider.AUTHORITY,
+                            ChatWingContentProvider.getClearAllDataBatch());
+                } catch (Exception e) {
+                    LogUtils.e(e);
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                if(dialog.isShowing()) {
+                    dialog.dismiss();
+                }
+                mCurrentCommunicationMode.logout();
+                mUserManager.removeUsers();
+
+                Intent i = new Intent(CommunicationActivity.this, getEntranceActivityClass());
+                startActivity(i);
+                finish();
+            }
+        }.execute();
     }
+
 
     protected Class<? extends BaseABFragmentActivity> getEntranceActivityClass() {
         return CommunicationActivity.class;
@@ -1012,7 +1039,7 @@ public class CommunicationActivity
             return;
         }
         Intent i = new Intent(this, UpdateGcmIntentService.class);
-        i.putExtra(UpdateGcmIntentService.EXTRA_ACTION, action);
+        i.setAction(action);
         if (shouldSupplyUser) {
             i.putExtra(UpdateGcmIntentService.EXTRA_USER, user);
         }
@@ -1020,7 +1047,7 @@ public class CommunicationActivity
     }
 
     protected void syncRefreshAnimationState() {
-        LogUtils.v("syncRefreshAnimationState "+syncingInProcess());
+        LogUtils.v("syncRefreshAnimationState " + syncingInProcess());
         // Start refresh animation if the chat boxes drawer is opened and a
         // sync operation is running.
         // Stop the animation if that drawer is closed.

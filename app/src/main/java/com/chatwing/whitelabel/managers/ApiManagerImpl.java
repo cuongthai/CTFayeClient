@@ -577,7 +577,7 @@ public class ApiManagerImpl implements ApiManager {
 
         try {
             responseString = validate(request);
-            LogUtils.v("Added GCM to server " + gcmRegId);
+            LogUtils.v(action+" GCM to server " + gcmRegId);
             return gson.fromJson(responseString, UpdateGcmResponse.class);
         } catch (JsonSyntaxException e) {
             throw ApiException.createJsonSyntaxException(e, responseString);

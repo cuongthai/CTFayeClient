@@ -37,7 +37,6 @@ import javax.inject.Inject;
  */
 public class UpdateGcmIntentService extends BaseIntentService {
 
-    public static final String EXTRA_ACTION = "action";
     /**
      * Key for a optional user extra. If the extra is not supplied,
      * it will be obtained via {@link com.chatwing.whitelabel.managers.UserManager#getCurrentUser()}.
@@ -63,7 +62,7 @@ public class UpdateGcmIntentService extends BaseIntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        String action = intent.getStringExtra(EXTRA_ACTION);
+        String action = intent.getAction();
         if (action == null) return;
         User user = (User) intent.getSerializableExtra(EXTRA_USER);
         if (user == null) {

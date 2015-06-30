@@ -145,6 +145,7 @@ public class NotificationIntentService extends IntentService {
 
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.ic_launcher)
                         .setContentTitle(getString(R.string.broadcast_tag) + " " + name + " ")
                         .setTicker(message)
                         .setContentText(message);
@@ -182,11 +183,11 @@ public class NotificationIntentService extends IntentService {
     }
 
     private void doNotify(Intent i, String contentTitle, List<Message> messages, int notificationCode) {
-
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.ic_launcher)
                         .setContentTitle(contentTitle)
                         .setTicker(messages.get(0).getContent())
                         .setContentText(messages.get(0).getContent());
