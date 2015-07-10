@@ -17,24 +17,31 @@
 package com.chatwing.whitelabel.fragments;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Bundle;
+import android.support.v4.content.Loader;
 
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.contentproviders.ChatWingContentProvider;
 import com.chatwing.whitelabel.events.AppendEmoticonEvent;
 import com.chatwing.whitelabel.events.CreateConversationEvent;
 import com.chatwing.whitelabel.events.CreateMessageEvent;
+import com.chatwing.whitelabel.events.CurrentChatBoxEvent;
 import com.chatwing.whitelabel.events.CurrentCommunicationEvent;
 import com.chatwing.whitelabel.events.CurrentConversationEvent;
+import com.chatwing.whitelabel.events.GotMoreMessagesEvent;
 import com.chatwing.whitelabel.events.MessageEvent;
 import com.chatwing.whitelabel.events.UserUnauthenticatedEvent;
+import com.chatwing.whitelabel.loaders.CommunicationBoxMessagesLoader;
 import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.managers.CurrentConversationManager;
 import com.chatwing.whitelabel.pojos.Conversation;
 import com.chatwing.whitelabel.pojos.Message;
 import com.chatwing.whitelabel.pojos.User;
 import com.chatwing.whitelabel.services.AckConversationIntentService;
+import com.chatwing.whitelabel.services.GetMessagesIntentService;
 import com.chatwing.whitelabel.tables.ConversationTable;
 import com.chatwing.whitelabel.utils.LogUtils;
 import com.squareup.otto.Subscribe;
@@ -80,6 +87,11 @@ public class ConversationMessagesFragment extends CommunicationMessagesFragment 
     }
 
     @Override
+    protected CommunicationBoxMessagesLoaderCallbacks constructLoaderCallbacks() {
+        return new ConversationBoxMessagesLoaderCallbacks();
+    }
+
+    @Override
     public boolean addNewMessage(Message newMessage) {
         if (newMessage.getStatus() == Message.Status.PUBLISHED) {
             //Ack if necessary
@@ -88,7 +100,7 @@ public class ConversationMessagesFragment extends CommunicationMessagesFragment 
             }
             mLastReceiveMessageTime = System.currentTimeMillis();
         }
-        return true;
+        return super.addNewMessage(newMessage);
     }
 
     @Override
@@ -102,23 +114,27 @@ public class ConversationMessagesFragment extends CommunicationMessagesFragment 
         super.onAppendEmoticonEvent(event);
     }
 
+    @Override
+    @Subscribe
+    public void onGotMoreMessagesEvent(GotMoreMessagesEvent event) {
+        super.onGotMoreMessagesEvent(event);
+    }
+
     @Subscribe
     public void onCurrentConversationChanged(CurrentConversationEvent event) {
         CurrentCommunicationEvent.Status status = event.getStatus();
         if (CurrentConversationEvent.Status.REMOVED.equals(status)) {
-            mWebview.loadUrl("");
+            mIsNoMoreMessages = false;
+            mAdapter.clear();
+            getLoaderManager().destroyLoader(0);
         } else if (CurrentConversationEvent.Status.LOADING.equals(status)) {
         } else if (CurrentConversationEvent.Status.LOADED.equals(status)) {
-            try {
-                String conversationUrl = mApiManager.getConversationUrl(mUserManager.getCurrentUser(),
-                        event.getUrl());
-                LogUtils.v("Request conversationUrl url " + conversationUrl);
+            loadMessagesFromDb();
+            updateCommunicationBoxDetail();
 
-                mWebview.loadUrl(conversationUrl);
-                loadEmoticons(event.getConversation().getEmoticons());
-            } catch (ApiManager.UserUnauthenticatedException e) {
-                e.printStackTrace();
-            }
+            loadEmoticons(event.getConversation().getEmoticons());
+        }else if (CurrentChatBoxEvent.Status.UPDATED.equals(status)) {
+            updateCommunicationBoxDetail();
         }
     }
 
@@ -168,11 +184,39 @@ public class ConversationMessagesFragment extends CommunicationMessagesFragment 
             }
 
             mCurrentConversationManager.loadConversation(conversation.getId());
-        }finally {
+        } finally {
             if (cursor != null && !cursor.isClosed()) {
                 cursor.close();
             }
         }
+    }
+
+
+    @Override
+    protected void updateCommunicationBoxDetail() {
+        Conversation conversation = mCurrentConversationManager.getCurrentConversation();
+        if (conversation == null) {
+            return;
+        }
+        doUpdateCommunicationBoxDetail(Conversation.getDefaultJson(), conversation.getEmoticonsAsMap(), false);
+    }
+
+    @Override
+    protected void loadMessagesFromServer() {
+        Conversation conversation = mCurrentConversationManager.getCurrentConversation();
+        if (conversation == null || mUserManager.getCurrentUser() == null
+                || mAdapter == null || mIsNoMoreMessages) {
+            // Chat box and user are required.
+            // So if they are unavailable by now, don't load.
+            // Also, don't load if there adapter is not ready or there is no more messages.
+            return;
+        }
+
+
+        Intent intent = new Intent(getActivity(), GetMessagesIntentService.class);
+        intent.putExtra(GetMessagesIntentService.EXTRA_CONVERSATION_ID, conversation.getId());
+        intent.putExtra(GetMessagesIntentService.EXTRA_OLDEST_MESSAGE, mAdapter.getOldestMessageItem());
+        getActivity().startService(intent);
     }
 
     @Override
@@ -184,5 +228,14 @@ public class ConversationMessagesFragment extends CommunicationMessagesFragment 
     protected boolean isInCurrentCommunicationBox(MessageEvent event) {
         Conversation currentConversation = mCurrentConversationManager.getCurrentConversation();
         return currentConversation != null && currentConversation.getId().equals(event.getConversationId());
+    }
+
+    public class ConversationBoxMessagesLoaderCallbacks extends CommunicationBoxMessagesLoaderCallbacks {
+        @Override
+        public Loader<CommunicationBoxMessagesLoader.Result> onCreateLoader(int id, Bundle args) {
+            return new CommunicationBoxMessagesLoader(
+                    getActivity(),
+                    mCurrentConversationManager.getCurrentConversation().getId());
+        }
     }
 }

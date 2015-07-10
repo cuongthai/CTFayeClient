@@ -83,7 +83,7 @@
                     <com.chatwing.whitelabel.views.CircleNetworkImageView
                         android:id="@+id/avatar"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/chat_message_avatar_height"
+                        android:layout_height="@dimen/drawer_avatar_height"
                         android:layout_alignParentLeft="true"
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="@dimen/spacing_large"

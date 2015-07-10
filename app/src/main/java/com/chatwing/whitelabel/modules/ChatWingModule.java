@@ -34,6 +34,7 @@ import com.chatwing.whitelabel.services.AckChatboxIntentService;
 import com.chatwing.whitelabel.services.AckConversationIntentService;
 import com.chatwing.whitelabel.services.CreateConversationIntentService;
 import com.chatwing.whitelabel.services.CreateMessageIntentService;
+import com.chatwing.whitelabel.services.GetMessagesIntentService;
 import com.chatwing.whitelabel.services.LoadChatBoxDetailsService;
 import com.chatwing.whitelabel.services.NotificationIntentService;
 import com.chatwing.whitelabel.services.NotificationStatusIntentService;
@@ -69,6 +70,7 @@ import dagger.Provides;
                 OfflineIntentService.class,
                 NotificationStatusIntentService.class,
                 AckConversationIntentService.class,
+                GetMessagesIntentService.class,
                 AckChatboxIntentService.class
         },
         library = true

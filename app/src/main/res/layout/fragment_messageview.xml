@@ -21,11 +21,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <WebView
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/message_list"
+        android:scrollbars="vertical"
+        android:layout_weight="1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:id="@+id/webView" />
+        android:background="@color/white"/>
+
     <!-- Compose view -->
     <LinearLayout
         android:id="@+id/chat_box_container"

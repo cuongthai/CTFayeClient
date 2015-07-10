@@ -201,7 +201,7 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
 
         //Only allow chatwing to update avatar
         User currentUser = mUserManager.getCurrentUser();
-        if (currentUser != null && currentUser.isChatWing()) {
+        if (currentUser != null && (currentUser.isChatWing())||currentUser.isAppUser()) {
             mUserAvatarView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

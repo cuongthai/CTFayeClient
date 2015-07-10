@@ -32,6 +32,7 @@ import com.chatwing.whitelabel.helpers.ChatWingSQLiteOpenHelper;
 import com.chatwing.whitelabel.tables.CategoryTable;
 import com.chatwing.whitelabel.tables.ChatBoxTable;
 import com.chatwing.whitelabel.tables.ConversationTable;
+import com.chatwing.whitelabel.tables.MessageTable;
 import com.chatwing.whitelabel.tables.NotificationMessagesTable;
 import com.chatwing.whitelabel.tables.SyncedBookmarkTable;
 
@@ -49,6 +50,7 @@ public class ChatWingContentProvider extends ContentProvider {
     public static final String PATH_CONVERSATIONS = "conversations";
     public static final String PATH_CHAT_BOXES = "chat_boxes";
     public static final String PATH_CATEGORIES = "categories";
+    public static final String PATH_MESSAGES = "messages";
     public static final String PATH_CATEGORIZED_CHAT_BOXES = "categorized_chat_boxes";
     public static final String PATH_AGGREGATED_CATEGORIES = "aggregated_categories";
     public static final String PATH_NOTIFICATION_MESSAGES = "notification_messages";
@@ -59,6 +61,7 @@ public class ChatWingContentProvider extends ContentProvider {
 
     private static final int CODE_CONVERSATIONS = 130;
     private static final int CODE_CONVERSATION = 140;
+    private static final int CODE_CONVERSATIONS_ID_MESSAGES = 150;
 
     private static final int CODE_CATEGORIES = 10;
     private static final int CODE_CATEGORY = 11;
@@ -68,6 +71,11 @@ public class ChatWingContentProvider extends ContentProvider {
     private static final int CODE_CHAT_BOX = 21;
     private static final int CODE_CATEGORIES_TITLE_CHAT_BOXES = 22;
     private static final int CODE_CATEGORIZED_CHAT_BOXES = 23;
+
+    private static final int CODE_MESSAGES = 30;
+    private static final int CODE_MESSAGE = 31;
+    private static final int CODE_CHAT_BOXES_ID_MESSAGES = 32;
+
 
     private static final int CODE_AGGREEGATED_CATEGORIES = 90;
 
@@ -84,6 +92,11 @@ public class ChatWingContentProvider extends ContentProvider {
 
         sUriMatcher.addURI(AUTHORITY, PATH_CONVERSATIONS, CODE_CONVERSATIONS);
         sUriMatcher.addURI(AUTHORITY, PATH_CONVERSATIONS + "/*", CODE_CONVERSATION);
+        sUriMatcher.addURI(
+                AUTHORITY,
+                PATH_CONVERSATIONS + "/*/" + PATH_MESSAGES,
+                CODE_CONVERSATIONS_ID_MESSAGES);
+
 
         sUriMatcher.addURI(AUTHORITY, PATH_CHAT_BOXES, CODE_CHAT_BOXES);
         sUriMatcher.addURI(AUTHORITY, PATH_CHAT_BOXES + "/#", CODE_CHAT_BOX);
@@ -97,6 +110,13 @@ public class ChatWingContentProvider extends ContentProvider {
                 PATH_CATEGORIZED_CHAT_BOXES,
                 CODE_CATEGORIZED_CHAT_BOXES
         );
+
+        sUriMatcher.addURI(AUTHORITY, PATH_MESSAGES, CODE_MESSAGES);
+        sUriMatcher.addURI(AUTHORITY, PATH_MESSAGES + "/*", CODE_MESSAGE);
+        sUriMatcher.addURI(
+                AUTHORITY,
+                PATH_CHAT_BOXES + "/#/" + PATH_MESSAGES,
+                CODE_CHAT_BOXES_ID_MESSAGES);
 
         sUriMatcher.addURI(
                 AUTHORITY,
@@ -115,6 +135,7 @@ public class ChatWingContentProvider extends ContentProvider {
 
     private static Uri sConversationsUri;
     private static Uri sChatBoxesUri;
+    private static Uri sMessagesUri;
     private static Uri sCategoriesUri;
     private static Uri sAggregatedCategoriesUri;
     private static Uri sCategorizedChatBoxesUri;
@@ -157,6 +178,22 @@ public class ChatWingContentProvider extends ContentProvider {
         return sCategorizedChatBoxesUri;
     }
 
+    public static Uri getMessagesUri() {
+        if (sMessagesUri == null) {
+            sMessagesUri = CONTENT_URI.buildUpon()
+                    .appendEncodedPath(PATH_MESSAGES)
+                    .build();
+        }
+        return sMessagesUri;
+    }
+
+    public static Uri getMessagesInChatBoxUri(int chatBoxId) {
+        return getChatBoxesUri().buildUpon()
+                .appendPath(Integer.toString(chatBoxId))
+                .appendPath(PATH_MESSAGES)
+                .build();
+    }
+
     public static Uri getSyncedBookmarkWithChatBoxIdUri(int chatBoxId) {
         return getSyncedBookmarksUri().buildUpon()
                 .appendPath(Integer.toString(chatBoxId))
@@ -184,6 +221,14 @@ public class ChatWingContentProvider extends ContentProvider {
                 .build();
     }
 
+    public static Uri getMessagesInConversationUri(String mConversationId) {
+        return getConversationsUri().buildUpon()
+                .appendPath(mConversationId)
+                .appendPath(PATH_MESSAGES)
+                .build();
+    }
+
+
     public static Uri getNotificationMessagesUri() {
         if (sNotificationMessagesUri == null) {
             sNotificationMessagesUri = CONTENT_URI.buildUpon()
@@ -206,6 +251,10 @@ public class ChatWingContentProvider extends ContentProvider {
         ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
         batch.add(ContentProviderOperation.newDelete(getConversationsUri()).build());
         batch.add(ContentProviderOperation.newDelete(getChatBoxesUri()).build());
+        batch.add(ContentProviderOperation.newDelete(getMessagesUri()).build());
+        batch.add(ContentProviderOperation.newDelete(getSyncedBookmarksUri()).build());
+        batch.add(ContentProviderOperation.newDelete(getCategoriesUri()).build());
+
         return batch;
     }
 
@@ -312,6 +361,11 @@ public class ChatWingContentProvider extends ContentProvider {
                         ConversationTable.CONVERSATION_ID + "=\"" + uri.getLastPathSegment() + "\"");
                 builder.setTables(ConversationTable.TABLE);
                 break;
+            case CODE_CONVERSATIONS_ID_MESSAGES:
+                builder.appendWhere(
+                        MessageTable.CONVERSATION_ID + "=\"" + uri.getPathSegments().get(1) + "\"");
+                builder.setTables(MessageTable.TABLE);
+                break;
             case CODE_CHAT_BOXES:
                 builder.setTables(ChatBoxTable.TABLE_CHAT_BOX);
                 break;
@@ -326,6 +380,19 @@ public class ChatWingContentProvider extends ContentProvider {
                                 "TRIM(" + ChatBoxTable.CATEGORY_TITLE + ") != ''"
                 );
                 builder.setTables(ChatBoxTable.TABLE_CHAT_BOX);
+                break;
+            case CODE_MESSAGES:
+                builder.setTables(MessageTable.TABLE);
+                break;
+            case CODE_MESSAGE:
+                builder.appendWhere(
+                        MessageTable._ID + "=" + uri.getLastPathSegment());
+                builder.setTables(MessageTable.TABLE);
+                break;
+            case CODE_CHAT_BOXES_ID_MESSAGES:
+                builder.appendWhere(
+                        MessageTable.CHAT_BOX_ID + "=" + uri.getPathSegments().get(1));
+                builder.setTables(MessageTable.TABLE);
                 break;
             case CODE_CATEGORIES_TITLE_CHAT_BOXES:
                 builder.appendWhere(
@@ -387,6 +454,10 @@ public class ChatWingContentProvider extends ContentProvider {
                 id = db.insert(ConversationTable.TABLE, null, values);
                 path = PATH_CONVERSATIONS;
                 break;
+            case CODE_MESSAGES:
+                id = db.insertWithOnConflict(MessageTable.TABLE, null, values, SQLiteDatabase.CONFLICT_IGNORE);
+                path = PATH_MESSAGES;
+                break;
             case CODE_CHAT_BOXES:
                 id = db.insertWithOnConflict(ChatBoxTable.TABLE_CHAT_BOX, null, values, SQLiteDatabase.CONFLICT_REPLACE);
                 path = PATH_CHAT_BOXES;
@@ -422,6 +493,10 @@ public class ChatWingContentProvider extends ContentProvider {
                 rowsDeleted = db.delete(CategoryTable.TABLE_CATEGORY,
                         selection, selectionArgs);
                 break;
+            case CODE_MESSAGES:
+                rowsDeleted = db.delete(MessageTable.TABLE,
+                        selection, selectionArgs);
+                break;
             case CODE_CATEGORIZED_CHAT_BOXES:
                 rowsDeleted = db.delete(ChatBoxTable.TABLE_CHAT_BOX,
                         ChatBoxTable.CATEGORY_TITLE + " IS NOT NULL AND " +
@@ -443,6 +518,29 @@ public class ChatWingContentProvider extends ContentProvider {
                 }
                 rowsDeleted = db.delete(ConversationTable.TABLE,
                         deleteSelection, selectionArgs);
+                break;
+            case CODE_CHAT_BOXES_ID_MESSAGES:
+                String deleteMessageSelection;
+                String chatboxId = uri.getPathSegments().get(1);
+                String chatboxIdSelection = MessageTable.CHAT_BOX_ID + "=" + chatboxId;
+                if (TextUtils.isEmpty(selection)) {
+                    deleteMessageSelection = chatboxIdSelection;
+                } else {
+                    deleteMessageSelection = chatboxIdSelection + " AND " + selection;
+                }
+                rowsDeleted = db.delete(MessageTable.TABLE,
+                        deleteMessageSelection, selectionArgs);
+                break;
+            case CODE_CONVERSATIONS_ID_MESSAGES:
+                String conversationId = uri.getPathSegments().get(1);
+                String conversationIdSelection = MessageTable.CONVERSATION_ID + "=\"" + conversationId + "\"";
+                if (TextUtils.isEmpty(selection)) {
+                    deleteMessageSelection = conversationIdSelection;
+                } else {
+                    deleteMessageSelection = conversationIdSelection + " AND " + selection;
+                }
+                rowsDeleted = db.delete(MessageTable.TABLE,
+                        deleteMessageSelection, selectionArgs);
                 break;
             case CODE_CHAT_BOXES:
                 rowsDeleted = db.delete(ChatBoxTable.TABLE_CHAT_BOX,
@@ -497,6 +595,11 @@ public class ChatWingContentProvider extends ContentProvider {
                 }
                 table = CategoryTable.TABLE_CATEGORY;
                 break;
+            case CODE_CONVERSATIONS_ID_MESSAGES:
+                updatedSelection =
+                        MessageTable.CONVERSATION_ID + "=\"" + uri.getPathSegments().get(1) + "\"";
+                table = MessageTable.TABLE;
+                break;
             case CODE_CONVERSATION:
                 String id = uri.getLastPathSegment();
                 String idSelection = ConversationTable.CONVERSATION_ID + "=\"" + id + "\"";
@@ -529,6 +632,29 @@ public class ChatWingContentProvider extends ContentProvider {
                     updatedSelection = categorySelection + " AND " + selection;
                 }
                 table = ChatBoxTable.TABLE_CHAT_BOX;
+                break;
+            case CODE_MESSAGES:
+                table = MessageTable.TABLE;
+                break;
+            case CODE_MESSAGE:
+                id = uri.getLastPathSegment();
+                idSelection = MessageTable._ID + "=" + id;
+                if (TextUtils.isEmpty(selection)) {
+                    updatedSelection = idSelection;
+                } else {
+                    updatedSelection = idSelection + " AND " + selection;
+                }
+                table = MessageTable.TABLE;
+                break;
+            case CODE_CHAT_BOXES_ID_MESSAGES:
+                String chatBoxId = uri.getPathSegments().get(1);
+                String chatBoxIdSelection = MessageTable._ID + "=" + chatBoxId;
+                if (TextUtils.isEmpty(selection)) {
+                    updatedSelection = chatBoxIdSelection;
+                } else {
+                    updatedSelection = chatBoxIdSelection + " AND " + selection;
+                }
+                table = MessageTable.TABLE;
                 break;
             case CODE_SYNCED_BOOKMARKS:
                 updatedSelection = selection;

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/pm" android:title="@string/title_chat" android:icon="@drawable/ic_chat_black_24dp"/>
+    <item android:id="@+id/copy" android:title="@string/title_copy" android:icon="@drawable/ic_content_copy_black_24dp"/>
+
+    <item android:id="@+id/delete" android:title="@string/title_delete_chat_message" android:icon="@drawable/ic_delete_black_24dp"/>
+    <item android:id="@+id/ignore" android:title="@string/title_ignore" android:icon="@drawable/ic_volume_mute_black_24dp"/>
+    <item android:id="@+id/block" android:title="@string/title_block" android:icon="@drawable/ic_block_black_24dp"/>
+    <item android:id="@+id/flag" android:title="@string/title_flag" android:icon="@drawable/ic_flag_black_24dp"/>
+</menu>

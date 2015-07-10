@@ -552,12 +552,16 @@ public class SyncCommunicationBoxesIntentService extends BaseIntentService {
     private void addDeleteOldDataOperations(List<ContentProviderOperation> batch) {
         Uri categoriesUri = ChatWingContentProvider.getCategoriesUri();
         Uri chatBoxesUri = ChatWingContentProvider.getCategorizedChatBoxesUri();
+        Uri messagesUri = ChatWingContentProvider.getMessagesUri();
 
         batch.add(ContentProviderOperation.newDelete(categoriesUri).build());
 
         ContentProviderOperation.Builder operationBuilder
                 = ContentProviderOperation.newDelete(chatBoxesUri);
         batch.add(operationBuilder.build());
+
+        //Delete messages (private message included)
+        batch.add(ContentProviderOperation.newDelete(messagesUri).build());
     }
 
 

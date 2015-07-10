@@ -17,7 +17,9 @@
 
     <dimen name="authenticate_button_text_size">16sp</dimen>
 
-    <dimen name="chat_message_avatar_width">64dp</dimen>
+    <dimen name="drawer_avatar_width">64dp</dimen>
+    <dimen name="drawer_avatar_height">@dimen/drawer_avatar_width</dimen>
+    <dimen name="chat_message_avatar_width">40dp</dimen>
     <dimen name="chat_message_avatar_height">@dimen/chat_message_avatar_width</dimen>
     <dimen name="online_avatar_width">32dp</dimen>
     <dimen name="online_avatar_height">@dimen/online_avatar_width</dimen>

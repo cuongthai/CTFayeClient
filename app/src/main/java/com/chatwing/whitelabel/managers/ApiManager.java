@@ -25,6 +25,7 @@ import com.chatwing.whitelabel.pojos.responses.FlagMessageResponse;
 import com.chatwing.whitelabel.pojos.responses.IgnoreUserResponse;
 import com.chatwing.whitelabel.pojos.responses.LoadConversationsResponse;
 import com.chatwing.whitelabel.pojos.responses.LoadOnlineUsersResponse;
+import com.chatwing.whitelabel.pojos.responses.MessagesResponse;
 import com.chatwing.whitelabel.pojos.responses.RegisterResponse;
 import com.chatwing.whitelabel.pojos.responses.ResetPasswordResponse;
 import com.chatwing.whitelabel.pojos.responses.SearchChatBoxResponse;
@@ -110,6 +111,8 @@ public interface ApiManager {
     String BOOKMARK_DELETE = URL_END_POINT + "/user/bookmark/delete";
     String BOOKMARK_CREATE = URL_END_POINT + "/user/bookmark/create";
     String BOOKMARK_LIST = URL_END_POINT + "/user/bookmark/list";
+    String CHAT_BOX_MESSAGES_URL = URL_END_POINT + "/chatbox/message/list";
+    String CONVERSATION_MESSAGES_URL = URL_END_POINT + "/chat-user/conversation/message/list";
 
     DeleteMessageResponse deleteMessage(User user,
                                         int chatBoxId,
@@ -143,6 +146,27 @@ public interface ApiManager {
             HttpRequest.HttpRequestException,
             EmailValidator.InvalidEmailException,
             ValidationException,
+            NotVerifiedEmailException;
+
+    MessagesResponse loadMessages(User user,
+                                  int chatBoxId,
+                                  Message oldestMessage)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            ChatBoxIdValidator.InvalidIdException,
+            InvalidAccessTokenException,
+            InvalidIdentityException,
+            NotVerifiedEmailException;
+
+    MessagesResponse loadMessages(User user,
+                                  String conversationId,
+                                  Message oldestMessage)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            ConversationIdValidator.InvalidIdException,
+            UserUnauthenticatedException,
+            InvalidAccessTokenException,
+            InvalidIdentityException,
             NotVerifiedEmailException;
 
     IgnoreUserResponse ignoreUser(User user,
@@ -183,6 +207,9 @@ public interface ApiManager {
     int getLoginTypeImageResId(String type);
 
     String getAvatarUrl(OnlineUser user);
+
+    String getAvatarUrl(Message message);
+
 
     public UpdateUserProfileResponse updateUserProfile(User user)
             throws ApiException,

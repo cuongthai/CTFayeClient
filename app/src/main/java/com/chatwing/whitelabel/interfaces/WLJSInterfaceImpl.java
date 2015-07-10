@@ -2,11 +2,7 @@ package com.chatwing.whitelabel.interfaces;
 
 import android.os.Handler;
 
-import com.chatwing.whitelabel.events.MessageEditEvent;
 import com.chatwing.whitelabel.modules.ForMainThread;
-import com.chatwing.whitelabel.pojos.jspojos.MessageResponse;
-import com.chatwing.whitelabel.utils.LogUtils;
-import com.google.gson.Gson;
 import com.squareup.otto.Bus;
 
 import javax.inject.Inject;
@@ -29,17 +25,5 @@ public class WLJSInterfaceImpl extends JSInterfaceImpl {
     @Override
     public void publish(String event, final String data) {
         super.publish(event, data);
-        if (LONG_CLICK_MESSAGE_EVENT.equals(event)) {
-            LogUtils.v("Publish " + event);
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    MessageResponse messageResponse = new Gson().fromJson(data, MessageResponse.class);
-                    if (messageResponse != null && messageResponse.getMessages().length != 0) {
-                        mBus.post(new MessageEditEvent(messageResponse.getMessages()));
-                    }
-                }
-            });
-        }
     }
 }

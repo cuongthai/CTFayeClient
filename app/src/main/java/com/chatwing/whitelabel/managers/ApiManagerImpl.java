@@ -32,11 +32,13 @@ import com.chatwing.whitelabel.pojos.errors.ChatWingError;
 import com.chatwing.whitelabel.pojos.errors.CreateMessageParamsError;
 import com.chatwing.whitelabel.pojos.jspojos.JSUserResponse;
 import com.chatwing.whitelabel.pojos.params.BlockUserParams;
+import com.chatwing.whitelabel.pojos.params.ChatBoxMessagesParams;
 import com.chatwing.whitelabel.pojos.params.ChatboxAckParams;
 import com.chatwing.whitelabel.pojos.params.ChatboxMessageViewParams;
 import com.chatwing.whitelabel.pojos.params.ChatboxNotificationStatus;
 import com.chatwing.whitelabel.pojos.params.ConcreteParams;
 import com.chatwing.whitelabel.pojos.params.ConversationAckParams;
+import com.chatwing.whitelabel.pojos.params.ConversationMessageParams;
 import com.chatwing.whitelabel.pojos.params.ConversationMessageViewParams;
 import com.chatwing.whitelabel.pojos.params.ConversationNotificationStatus;
 import com.chatwing.whitelabel.pojos.params.CreateBookmarkParams;
@@ -77,6 +79,7 @@ import com.chatwing.whitelabel.pojos.responses.FlagMessageResponse;
 import com.chatwing.whitelabel.pojos.responses.IgnoreUserResponse;
 import com.chatwing.whitelabel.pojos.responses.LoadConversationsResponse;
 import com.chatwing.whitelabel.pojos.responses.LoadOnlineUsersResponse;
+import com.chatwing.whitelabel.pojos.responses.MessagesResponse;
 import com.chatwing.whitelabel.pojos.responses.RegisterResponse;
 import com.chatwing.whitelabel.pojos.responses.ResetPasswordResponse;
 import com.chatwing.whitelabel.pojos.responses.SearchChatBoxResponse;
@@ -104,6 +107,7 @@ import com.google.gson.JsonSyntaxException;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -146,6 +150,7 @@ public class ApiManagerImpl implements ApiManager {
     protected static void setUpRequest(HttpRequest request,
                                        User user) {
         if (user != null && user.isSessionValid()) {
+            LogUtils.v("Access Token "+user.getAccessToken());
             request.authorization("Bearer " + user.getAccessToken());
         }
         request.acceptJson();
@@ -516,7 +521,6 @@ public class ApiManagerImpl implements ApiManager {
                     Message userMessage = createMessageParamsError.getUserMessage();
                     if (userMessage != null) {
                         userMessage.setStatus(status);
-                        userMessage.setSendingDate(message.getSendingDate());
                         userMessage.setCreatedDate(message.getCreatedDate());
                     }
                     throw new CreateMessageException(createMessageParamsError, message);
@@ -1006,7 +1010,35 @@ public class ApiManagerImpl implements ApiManager {
         return url;
     }
 
+    private MessagesResponse doLoadMessages(User user,
+                                            String url,
+                                            Object params)
+            throws ApiException,
+            InvalidAccessTokenException,
+            InvalidIdentityException,
+            NotVerifiedEmailException{
+        Gson gson = new Gson();
 
+        HttpRequest request = HttpRequest.get(url + appendParams(params));
+        setUpRequest(request, user);
+        String responseString = null;
+
+        try {
+            responseString = validate(request);
+            MessagesResponse response = gson.fromJson(
+                    responseString,
+                    MessagesResponse.class);
+            List<Message> messages = response.getMessages();
+            for (Message m : messages) {
+                m.setStatus(Message.Status.PUBLISHED);
+            }
+            return response;
+        } catch (JsonSyntaxException e) {
+            throw ApiException.createJsonSyntaxException(e, responseString);
+        } catch (ValidationException e) {
+            throw ApiException.createException(e);
+        }
+    }
 
     @Override
     public ResetPasswordResponse resetPassword(String email)
@@ -1036,6 +1068,49 @@ public class ApiManagerImpl implements ApiManager {
         } catch (InvalidAccessTokenException e) {
             throw ApiException.createException(e);
         }
+    }
+
+
+    @Override
+    public MessagesResponse loadMessages(User user,
+                                         int chatBoxId,
+                                         Message oldestMessage)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            ChatBoxIdValidator.InvalidIdException,
+            InvalidAccessTokenException,
+            InvalidIdentityException,
+            NotVerifiedEmailException{
+        mChatBoxIdValidator.validate(chatBoxId);
+
+        ChatBoxMessagesParams params = new ChatBoxMessagesParams(chatBoxId);
+        if (oldestMessage != null) {
+            params.setDateCreated(oldestMessage.getCreatedDate());
+        }
+
+        return doLoadMessages(user, CHAT_BOX_MESSAGES_URL, params);
+    }
+
+    @Override
+    public MessagesResponse loadMessages(User user,
+                                         String conversationId,
+                                         Message oldestMessage)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            ConversationIdValidator.InvalidIdException,
+            UserUnauthenticatedException,
+            InvalidAccessTokenException,
+            InvalidIdentityException,
+            NotVerifiedEmailException{
+        validate(user);
+        mConversationIdValidator.validate(conversationId);
+
+        ConversationMessageParams params = new ConversationMessageParams(conversationId);
+        if (oldestMessage != null) {
+            params.setCreatedDate(oldestMessage.getCreatedDate());
+        }
+
+        return doLoadMessages(user, CONVERSATION_MESSAGES_URL, params);
     }
 
     @Override
@@ -1237,6 +1312,14 @@ public class ApiManagerImpl implements ApiManager {
             return DEFAULT_AVATAR_URL;
         }
         return getAvatarUrl(user.getLoginType(), user.getLoginId());
+    }
+
+    @Override
+    public String getAvatarUrl(Message message) {
+        if (message == null) {
+            return DEFAULT_AVATAR_URL;
+        }
+        return ensureAbsoluteUrl(message.getAvatar(), DEFAULT_AVATAR_URL)+"?size="+Constants.AVATAR_SIZE;
     }
 
     @Override

@@ -54,6 +54,10 @@ public abstract class BaseUser implements Serializable {
         return Constants.TYPE_CHATWING.equals(type);
     }
 
+    public boolean isAppUser(){
+        return Constants.TYPE_APP.equals(type);
+    }
+
     public static boolean isGuest(String userType) {
         return Constants.TYPE_GUEST.equals(userType);
     }

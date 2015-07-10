@@ -2,6 +2,7 @@
 <resources>
 
     <style name="Theme.ChatWing" parent="Theme.ChatWing.Base">
+        <item name="android:colorEdgeEffect">@color/primary</item>
         <item name="android:alertDialogTheme">@style/Theme.ChatWing.AlertDialog</item>
         <item name="android:windowContentTransitions">true</item>
         <item name="android:windowAllowEnterTransitionOverlap">true</item>

@@ -1,6 +1,5 @@
 <resources>
     <style name="Theme.ChatWing" parent="Theme.ChatWing.Base">
-
     </style>
     <!-- Base application theme. -->
     <style name="Theme.ChatWing.Base" parent="Theme.AppCompat.Light.NoActionBar">

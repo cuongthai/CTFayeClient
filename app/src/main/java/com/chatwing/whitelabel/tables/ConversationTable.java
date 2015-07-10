@@ -66,7 +66,10 @@ public class ConversationTable implements BaseColumns {
             // in this switch are intended.
             switch (version){
                 case ChatWingSQLiteOpenHelper.VERSION_0_4:
-                    version = ChatWingSQLiteOpenHelper.VERSION_0_5;
+                case ChatWingSQLiteOpenHelper.VERSION_0_5:
+                case ChatWingSQLiteOpenHelper.VERSION_1_2:
+                case ChatWingSQLiteOpenHelper.VERSION_1_2_1:
+                    version = ChatWingSQLiteOpenHelper.VERSION_1_5;
             }
 
             if (version != ChatWingSQLiteOpenHelper.DATABASE_VERSION) {

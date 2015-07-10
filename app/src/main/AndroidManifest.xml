@@ -134,6 +134,7 @@
         <service android:name=".services.NotificationIntentService" />
         <service android:name=".services.NotificationStatusIntentService" />
         <service android:name=".services.UpdateNotificationSettingsService" />
+        <service android:name=".services.GetMessagesIntentService" />
 
 
         <service android:name=".services.UpdateAvatarIntentService" />

@@ -3,6 +3,7 @@ package com.chatwing.whitelabel.utils;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.format.DateFormat;
 import android.text.format.DateUtils;
 
 import com.pkmmte.pkrss.PkRSS;
@@ -10,6 +11,7 @@ import com.pkmmte.pkrss.PkRSS;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +26,14 @@ public class Utils {
 
     public static CharSequence getRelativeDate(long date) {
         return DateUtils.getRelativeTimeSpanString(date, System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS, 0);
+    }
+
+    public static CharSequence formatDateMonth(long date){
+        return new DateFormat().format("MMMM dd, yyyy", new Date(date));
+    }
+
+    public static CharSequence formatTimeOnly(long date){
+        return new DateFormat().format("hh:mm a", new Date(date));
     }
 
     public static Map<String, List<String>> getQueryParams(String url) {
@@ -54,4 +64,6 @@ public class Utils {
             throw new AssertionError(ex);
         }
     }
+
+
 }

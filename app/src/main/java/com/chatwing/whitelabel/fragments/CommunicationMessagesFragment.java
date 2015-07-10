@@ -19,47 +19,48 @@ package com.chatwing.whitelabel.fragments;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Typeface;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.webkit.WebChromeClient;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ToggleButton;
 
 import com.chatwing.whitelabel.R;
+import com.chatwing.whitelabel.adapters.CommunicationMessagesAdapter;
 import com.chatwing.whitelabel.adapters.EmoticonPackagesAdapter;
 import com.chatwing.whitelabel.events.AccessTokenExpiredEvent;
 import com.chatwing.whitelabel.events.AppendEmoticonEvent;
 import com.chatwing.whitelabel.events.CreateMessageEvent;
-import com.chatwing.whitelabel.events.CurrentChatBoxEvent;
-import com.chatwing.whitelabel.events.CurrentCommunicationEvent;
-import com.chatwing.whitelabel.events.CurrentConversationEvent;
+import com.chatwing.whitelabel.events.GotMoreMessagesEvent;
 import com.chatwing.whitelabel.events.InvalidIdentityEvent;
 import com.chatwing.whitelabel.events.MessageEvent;
 import com.chatwing.whitelabel.events.UserUnauthenticatedEvent;
+import com.chatwing.whitelabel.generators.MessageRandomKeyGenerator;
 import com.chatwing.whitelabel.interfaces.ChatWingJSInterface;
+import com.chatwing.whitelabel.loaders.CommunicationBoxMessagesLoader;
 import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.managers.UserManager;
 import com.chatwing.whitelabel.parsers.BBCodePair;
 import com.chatwing.whitelabel.parsers.BBCodeParser;
 import com.chatwing.whitelabel.pojos.ChatBox;
+import com.chatwing.whitelabel.pojos.CommunicationBoxJson;
 import com.chatwing.whitelabel.pojos.Emoticon;
 import com.chatwing.whitelabel.pojos.Message;
 import com.chatwing.whitelabel.pojos.User;
 import com.chatwing.whitelabel.pojos.errors.CreateMessageParamsError;
 import com.chatwing.whitelabel.services.CreateMessageIntentService;
+import com.chatwing.whitelabel.services.GetMessagesIntentService;
 import com.chatwing.whitelabel.utils.LogUtils;
 import com.chatwing.whitelabel.validators.PermissionsValidator;
 import com.chatwing.whitelabel.views.BBCodeEditText;
@@ -71,6 +72,7 @@ import com.viewpagerindicator.TabPageIndicator;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -83,6 +85,7 @@ import javax.inject.Provider;
  * Created by cuongthai on 18/07/2014.
  */
 public abstract class CommunicationMessagesFragment extends Fragment {
+    private static final int MESSAGE_LOADER_ID = 87654;
     @Inject
     Bus mBus;
     @Inject
@@ -95,24 +98,31 @@ public abstract class CommunicationMessagesFragment extends Fragment {
     UserManager mUserManager;
     @Inject
     ChatWingJSInterface mFayeJsInterface;
+    @Inject
+    CommunicationMessagesAdapter mAdapter;
+    @Inject
+    MessageRandomKeyGenerator mRandomKeyGenerator;
 
-    protected WebView mWebview;
     private View mBBCodeControlsContainer;
     private View mStickerContainer;
     private Map<BBCodeParser.BBCode, Button> mBBCodeControls;
     protected View newContentBtn;
     protected View newEmoBtn;
     protected Delegate mDelegate;
+    protected CommunicationBoxMessagesLoaderCallbacks mLoaderCallbacks;
     private boolean mSyncingBBCodeControls;
     private BBCodeEditText mCommunicationBoxEditText;
     private View sendBtn;
     private View mComposeContainer;
     private boolean showingBottomContainer;
+    protected boolean mIsNoMoreMessages;
 
 
     private EmoticonPackagesAdapter adapter;
     private ViewPager emoticonsPager;
     private TabPageIndicator indicator;
+    private RecyclerView mRecyclerView;
+    private LinearLayoutManager mLayoutManager;
 
 
     public boolean isShowingBBControls() {
@@ -151,10 +161,15 @@ public abstract class CommunicationMessagesFragment extends Fragment {
                                                 long createdDate, String randomKey,
                                                 Message.Status status);
 
+    protected abstract CommunicationBoxMessagesLoaderCallbacks constructLoaderCallbacks();
+
     protected abstract boolean canHandle(MessageEvent event);
 
     protected abstract boolean isInCurrentCommunicationBox(MessageEvent event);
 
+    protected abstract void loadMessagesFromServer();
+
+    protected abstract void updateCommunicationBoxDetail();
 
     protected abstract boolean hasCurrentCommunication();
 
@@ -166,74 +181,98 @@ public abstract class CommunicationMessagesFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_messageview, container, false);
     }
 
-    private void setupWebView() {
-        LogUtils.v("Test Chatbox not display, setupWebView " + mWebview);
-
-        mWebview.setWebViewClient(new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                try {
-                    view.getContext().startActivity(
-                            new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
-                    return true;
-                } catch (Exception e) {
-                    return false;
-                }
-            }
-
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view, url);
-                //TODO should be when page start rendering chatbox
-                LogUtils.v("Test Chatbox not display, Loading page DONE "+url);
-                if(!"about:blank".equals(url)) {
-                    mBus.post(new CurrentChatBoxEvent(CurrentCommunicationEvent.Status.UI_LOADED, null));
-                    mBus.post(new CurrentConversationEvent(CurrentCommunicationEvent.Status.UI_LOADED, null));
-                }
-            }
-
-            @Override
-            public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-                super.onReceivedError(view, errorCode, description, failingUrl);
-                LogUtils.v("Loading page Oh no! " + description);
-            }
-        });
-
-        mWebview.setWebChromeClient(new WebChromeClient() {
-
-            @Override
-            public void onConsoleMessage(String message, int lineNumber, String sourceID) {
-                LogUtils.v(message + " -- From line " + lineNumber + " of " + sourceID);
-                super.onConsoleMessage(message, lineNumber, sourceID);
-            }
-
-            @Override
-            public void onProgressChanged(WebView view, int newProgress) {
-                super.onProgressChanged(view, newProgress);
-                LogUtils.v("Loading page " + newProgress + ":" + mWebview);
-            }
-        });
-        WebSettings webSettings = mWebview.getSettings();
-        webSettings.setAppCacheEnabled(false);
-        webSettings.setJavaScriptEnabled(true);
-        webSettings.setDomStorageEnabled(true);
-        webSettings.setDatabaseEnabled(true);
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-            webSettings.setDatabasePath("/data/data/" + getActivity().getPackageName() + "/databases/");
-        }
-
-        mWebview.addJavascriptInterface(mFayeJsInterface,
-                ChatWingJSInterface.CHATWING_JS_NAME);
-
-
-    }
-
     protected boolean handleException(Exception exception) {
         if (exception instanceof HttpRequest.HttpRequestException) {
             mErrorMessageView.show(R.string.error_network_connection);
             return true;
         }
         return false;
+    }
+
+    /**
+     * Adds new message to the message list. While adding, the new message is
+     * checked against existing ones by using random key ({@link Message#randomKey}.
+     * If another message with the same random key already exists in the list,
+     * instead of adding (and thus, creating a duplicated item), the existing
+     * message is replaced by the new one.
+     *
+     * @param newMessage the new message being added.
+     * @return true if the message is new and is added to the list.
+     * false if the message already exists and necessary information
+     * of the message is updated.
+     */
+    public boolean addNewMessage(Message newMessage) {
+
+        String randomKey = newMessage.getRandomKey();
+        LogUtils.v("Check send message addNewMessage randomkey " + randomKey);
+        boolean isAdded = false;
+        if (TextUtils.isEmpty(randomKey)) {
+            mAdapter.addToHead(newMessage);
+            scrollToLast(false);
+            isAdded = true;
+        } else {
+            LogUtils.v("Check send message ");
+            Message existingMessage = mAdapter.getItemByRandomKey(randomKey);
+            LogUtils.v("Check send message " + existingMessage);
+            if (existingMessage != null) {
+                mAdapter.replace(existingMessage, newMessage);
+            } else {
+                mAdapter.addToHead(newMessage);
+                scrollToLast(false);
+                isAdded = true;
+            }
+        }
+//        updateItemViews();
+        return isAdded;
+    }
+
+    private void scrollToLast(boolean force) {
+        LogUtils.v("Scroll to last " + mLayoutManager.findFirstCompletelyVisibleItemPosition());
+        //Only scroll if looking at to latest
+        if (mLayoutManager.findFirstCompletelyVisibleItemPosition() == 0 || force) {
+            mRecyclerView.scrollToPosition(0);
+        }
+    }
+
+    protected void loadMessagesFromDb() {
+        LogUtils.v("loadMessagesFromDb");
+        if (!hasCurrentCommunication()) {
+            // Communication box is required to init the loader.
+            // So if it is unavailable by now, don't load.
+            return;
+        }
+
+        if (mLoaderCallbacks == null) {
+            mLoaderCallbacks = constructLoaderCallbacks();
+        }
+        getLoaderManager().restartLoader(MESSAGE_LOADER_ID, null, mLoaderCallbacks);
+    }
+
+    protected void onGotMoreMessagesEvent(GotMoreMessagesEvent event) {
+        LogUtils.v("onGotMoreMessagesEvent "+event.getMessagesFromServer().size());
+        if (onMessageEvent(event, getString(R.string.error_while_loading_messages))) {
+            return;
+        }
+
+        List<Message> messagesFromServer = event.getMessagesFromServer();
+        if (messagesFromServer == null) {
+            LogUtils.e("Both exception and new messages are null. " +
+                    "Something is wrong.");
+            return;
+        }
+        if (mIsNoMoreMessages = messagesFromServer.size() == 0) {
+            return;
+        }
+
+        List<Message> insertedMessages = event.getInsertedMessages();
+        if (insertedMessages.size() == 0) {
+            // No new message inserted to DB. It means we already have all
+            // messages in DB for the last request. So we don't need to touch
+            // the view.
+            return;
+        }
+
+        mAdapter.addAllDataToTail(insertedMessages);
     }
 
     protected void onCreateMessageEvent(CreateMessageEvent event) {
@@ -253,8 +292,6 @@ public abstract class CommunicationMessagesFragment extends Fragment {
         //Yahooo! no error, get message from REST response and add to view.
         addNewMessage(event.getResponse().getMessage());
     }
-
-    public abstract boolean addNewMessage(Message newMessage);
 
     /**
      * Checks and pre-processes a {@link com.chatwing.whitelabel.events.MessageEvent} for common cases.
@@ -340,14 +377,13 @@ public abstract class CommunicationMessagesFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         mDelegate.inject(this);
 
+//        new BottomSheet.Builder(this).title("title")
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.message_list);
         emoticonsPager = (ViewPager) view.findViewById(R.id.pager);
         emoticonsPager.setAdapter(new EmoticonPackagesAdapter(getActivity().getSupportFragmentManager(),
                 new HashMap<String, Emoticon[]>()));
         indicator = (TabPageIndicator) view.findViewById(R.id.indicator);
         indicator.setViewPager(emoticonsPager);
-
-        mWebview = (WebView) view.findViewById(R.id.webView);
-        setupWebView();
 
         newContentBtn = view.findViewById(R.id.btn_new_content);
         newContentBtn.setOnClickListener(new View.OnClickListener() {
@@ -448,6 +484,50 @@ public abstract class CommunicationMessagesFragment extends Fragment {
         });
     }
 
+    protected void doUpdateCommunicationBoxDetail(CommunicationBoxJson communicationBoxJson,
+                                                  Map<String, String> emoticons,
+                                                  boolean hasAdminPermission) {
+        // Reset the same adapter to the list view, to invalidate all items
+        // so that they are not reused.
+        mAdapter.updateCommunicationBoxDetail(
+                communicationBoxJson,
+                emoticons,
+                hasAdminPermission);
+    }
+
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        configRecyclerView();
+    }
+
+    private void configRecyclerView() {
+        mRecyclerView.setHasFixedSize(true);
+        mLayoutManager = new LinearLayoutManager(getActivity());
+        mLayoutManager.setReverseLayout(true);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            int pastVisiblesItems, visibleItemCount, totalItemCount;
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+
+                visibleItemCount = mLayoutManager.getChildCount();
+                totalItemCount = mLayoutManager.getItemCount();
+                pastVisiblesItems = mLayoutManager.findFirstVisibleItemPosition();
+
+                if (!GetMessagesIntentService.isRunning()) {
+                    if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
+                        LogUtils.v("Last Item Wow !");
+                        loadMessagesFromServer();
+                    }
+                }
+            }
+        });
+    }
+
     @Override
     public void onStart() {
         super.onStart();
@@ -481,14 +561,14 @@ public abstract class CommunicationMessagesFragment extends Fragment {
     }
 
     @Override
+    public void onStop() {
+        super.onStop();
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
-        LogUtils.v("Test Chatbox not display, destroy webview");
-
-        if (mWebview != null) {
-            mWebview.destroy();
-            mWebview = null;
-        }
+        getLoaderManager().destroyLoader(MESSAGE_LOADER_ID);
     }
 
     @Override
@@ -653,15 +733,18 @@ public abstract class CommunicationMessagesFragment extends Fragment {
         }
 
         long createdDate = System.currentTimeMillis();
+        String randomKey = mRandomKeyGenerator.generate(content, createdDate);
         Message newMessage = constructMessage(
                 user,
                 content,
                 createdDate,
-                null,
+                randomKey,
                 Message.Status.SENDING);
-        newMessage.setSendingDate(System.currentTimeMillis());
+        newMessage.setCreatedDate(System.currentTimeMillis());
 
-        addNewMessage(newMessage);
+        if (addNewMessage(newMessage)) {
+            scrollToLast(true);
+        }
         mCommunicationBoxEditText.setText("");
         if (!user.getProfile().shouldRememberPreviousStyle()) {
             mCommunicationBoxEditText.clearAllBBCodes();
@@ -671,7 +754,6 @@ public abstract class CommunicationMessagesFragment extends Fragment {
         // Send task to CreateMessageIntentService to make a async request.
         Intent i = new Intent(getActivity(), CreateMessageIntentService.class);
         i.putExtra(CreateMessageIntentService.EXTRA_MESSAGE, newMessage);
-        i.putExtra(CreateMessageIntentService.EXTRA_SENDING_DATE, newMessage.getSendingDate());
         getActivity().startService(i);
     }
 
@@ -705,4 +787,30 @@ public abstract class CommunicationMessagesFragment extends Fragment {
         indicator.notifyDataSetChanged();
     }
 
+    public abstract class CommunicationBoxMessagesLoaderCallbacks implements
+            LoaderManager.LoaderCallbacks<CommunicationBoxMessagesLoader.Result> {
+
+        @Override
+        public void onLoadFinished(Loader<CommunicationBoxMessagesLoader.Result> loader,
+                                   CommunicationBoxMessagesLoader.Result data) {
+            List<Message> messagesFromDB = data.getMessages();
+
+            LogUtils.v("CommunicationBoxMessagesLoaderCallbacks finished ");
+            if (data.getException() != null) {
+                mErrorMessageView.show(data.getException());
+            } else if (messagesFromDB != null && messagesFromDB.size() > 0) {
+                mAdapter.setData(messagesFromDB);
+            }
+
+            /**
+             * After adding data to adapter, we start loading more to fill the view
+             * If adapter is empty, load from server
+             */
+            loadMessagesFromServer();
+        }
+
+        @Override
+        public void onLoaderReset(Loader<CommunicationBoxMessagesLoader.Result> loader) {
+        }
+    }
 }

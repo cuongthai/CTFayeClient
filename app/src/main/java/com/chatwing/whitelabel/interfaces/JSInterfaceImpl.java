@@ -19,13 +19,11 @@ package com.chatwing.whitelabel.interfaces;
 import android.content.Context;
 import android.os.Handler;
 
-import com.chatwing.whitelabel.events.TouchUserInfoEvent;
 import com.chatwing.whitelabel.events.faye.ChannelSubscriptionChangedEvent;
 import com.chatwing.whitelabel.events.faye.MessageReceivedEvent;
 import com.chatwing.whitelabel.events.faye.ServerConnectionChangedEvent;
 import com.chatwing.whitelabel.modules.ForApplication;
 import com.chatwing.whitelabel.modules.ForMainThread;
-import com.chatwing.whitelabel.pojos.jspojos.JSUserResponse;
 import com.chatwing.whitelabel.utils.LogUtils;
 import com.google.gson.Gson;
 import com.squareup.otto.Bus;
@@ -66,9 +64,7 @@ public class JSInterfaceImpl implements ChatWingJavaDelegate {
     public void publish(String event, final String data) {
         if (data == null || event == null) return;
 //        LogUtils.v("event " + event + " data " + data);
-        if (TOUCH_AVATAR_EVENT.equals(event) || TOUCH_NAME_EVENT.equals(event)) {
-            handleOpenUser(data);
-        } else if (FAYE_CONNECTED_TO_SERVER.equals(event)) {
+        if (FAYE_CONNECTED_TO_SERVER.equals(event)) {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -122,18 +118,6 @@ public class JSInterfaceImpl implements ChatWingJavaDelegate {
                 }
             });
         }
-    }
-
-    private void handleOpenUser(final String data) {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                JSUserResponse user = mGson.fromJson(data, JSUserResponse.class);
-                mBus.post(new TouchUserInfoEvent(user));
-            }
-        });
-
-
     }
 
 }

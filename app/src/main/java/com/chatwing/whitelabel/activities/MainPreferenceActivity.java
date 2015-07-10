@@ -25,7 +25,7 @@ public class MainPreferenceActivity extends BaseABFragmentActivity implements Se
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preferences);
-        mLoadingView = (ProgressBar) findViewById(R.id.progress_spinner);
+        mLoadingView = (ProgressBar) findViewById(R.id.progress_bar);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 

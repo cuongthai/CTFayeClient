@@ -60,7 +60,10 @@ public class NotificationMessagesTable implements BaseColumns {
             int version = oldVersion;
             switch (version){
                 case ChatWingSQLiteOpenHelper.VERSION_0_4:
-                    version = ChatWingSQLiteOpenHelper.VERSION_0_5;
+                case ChatWingSQLiteOpenHelper.VERSION_0_5:
+                case ChatWingSQLiteOpenHelper.VERSION_1_2:
+                case ChatWingSQLiteOpenHelper.VERSION_1_2_1:
+                    version = ChatWingSQLiteOpenHelper.VERSION_1_5;
 
             }
 

@@ -21,6 +21,8 @@ import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by cuongthai on 4/1/14.
@@ -100,6 +102,10 @@ public class Conversation implements Serializable {
         return unreadCount;
     }
 
+    public static CommunicationBoxJson getDefaultJson() {
+        return new Gson().fromJson(JsonConstantsProvider.DEFAULT_COMMUNICATION_JSON, CommunicationBoxJson.class);
+    }
+
     public static Emoticon[] getEmoticons() {
         return JsonConstantsProvider.emoticonObject;
     }
@@ -167,5 +173,13 @@ public class Conversation implements Serializable {
             }
         }
         return null;
+    }
+
+    public Map<String, String> getEmoticonsAsMap() {
+        Map<String, String> emos =new HashMap<String, String>();
+        for(Emoticon emoticon:JsonConstantsProvider.emoticonObject){
+            emos.put(emoticon.getSymbol(), emoticon.getImage());
+        }
+        return emos;
     }
 }

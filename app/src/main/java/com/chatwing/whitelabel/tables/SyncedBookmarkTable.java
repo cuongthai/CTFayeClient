@@ -45,13 +45,11 @@ public class SyncedBookmarkTable implements BaseColumns {
             int version = oldVersion;
             // Upgrade this table step by step. That's why all "fall through"s
             // in this switch are intended.
-            switch (version) {
-                case ChatWingSQLiteOpenHelper.VERSION_1_2:
-                    version = ChatWingSQLiteOpenHelper.VERSION_1_2_1;
-                    break;
-                default:
-                    onCreate(database);
-                    version = ChatWingSQLiteOpenHelper.VERSION_1_2_1;
+            if(version < ChatWingSQLiteOpenHelper.VERSION_1_2){
+                onCreate(database);
+                version = ChatWingSQLiteOpenHelper.VERSION_1_2;
+            }else{
+                version = ChatWingSQLiteOpenHelper.VERSION_1_5;
             }
             if (version != ChatWingSQLiteOpenHelper.DATABASE_VERSION) {
                 database.execSQL("DROP TABLE IF EXISTS " + TABLE + ";");

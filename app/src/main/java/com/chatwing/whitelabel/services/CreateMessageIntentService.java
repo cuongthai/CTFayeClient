@@ -18,10 +18,12 @@ package com.chatwing.whitelabel.services;
 
 import android.content.Intent;
 
+import com.chatwing.whitelabel.contentproviders.ChatWingContentProvider;
 import com.chatwing.whitelabel.events.CreateMessageEvent;
 import com.chatwing.whitelabel.pojos.Message;
 import com.chatwing.whitelabel.pojos.User;
 import com.chatwing.whitelabel.pojos.responses.CreateMessageResponse;
+import com.chatwing.whitelabel.tables.MessageTable;
 
 
 /**
@@ -31,7 +33,6 @@ import com.chatwing.whitelabel.pojos.responses.CreateMessageResponse;
  */
 public class CreateMessageIntentService extends BaseIntentService {
     public static final String EXTRA_MESSAGE = "message";
-    public static final String EXTRA_SENDING_DATE = "sending_date";
 
     public CreateMessageIntentService() {
         super("CreateMessageIntentService");
@@ -42,14 +43,16 @@ public class CreateMessageIntentService extends BaseIntentService {
         User user = mUserManager.getCurrentUser();
         Message message = (Message) intent.getSerializableExtra(EXTRA_MESSAGE);
         if (user == null || message == null) return;
-        long sendingDate = intent.getLongExtra(EXTRA_SENDING_DATE, 0);
         CreateMessageEvent event;
         try {
             CreateMessageResponse response = mApiManager.createMessage(user, message);
             message = response.getMessage();
 
             if (message != null) {
-                message.setSendingDate(sendingDate);
+                // Save the new message to DB
+                getContentResolver().insert(
+                        ChatWingContentProvider.getMessagesUri(),
+                        MessageTable.getContentValues(message));
             }
 
             if (!message.isPrivate()) {

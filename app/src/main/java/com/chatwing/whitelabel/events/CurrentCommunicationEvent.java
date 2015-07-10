@@ -24,7 +24,6 @@ public abstract class CurrentCommunicationEvent {
         REMOVED,
         LOADING,
         LOADED,
-        UI_LOADED,
         UPDATED
     }
 

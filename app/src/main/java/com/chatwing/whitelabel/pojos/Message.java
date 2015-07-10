@@ -19,7 +19,10 @@ package com.chatwing.whitelabel.pojos;
 import android.text.TextUtils;
 
 import com.chatwing.whitelabel.pojos.params.Params;
+import com.chatwing.whitelabel.utils.LogUtils;
 import com.google.gson.annotations.SerializedName;
+
+import java.util.Calendar;
 
 /**
  * Author: Huy Nguyen
@@ -30,7 +33,7 @@ public class Message extends Params implements Comparable<Message> {
 
     /**
      * Indicates status of a message. Int value of this enum can be stored in
-     * Database ({@link com.chatwing.tables.MessageTable}),
+     * Database ({@link com.chatwing.whitelabel.tables.MessageTable}),
      * it should not be changed without a good reason.
      */
     public enum Status {
@@ -73,19 +76,12 @@ public class Message extends Params implements Comparable<Message> {
     /**
      * Status of the message. It is transient so are not part
      * of the JSON representation. Thus, it is neither sent to our server
-     * nor stored in value of {@link com.chatwing.tables.MessageTable#DATA}
+     * nor stored in value of {@link com.chatwing.whitelabel.tables.MessageTable#DATA}
      * in DB.
      */
     private transient Status status;
-    /**
-     * The time that this message was started to be sent to server. It can be
-     * used to sort messages if 1 of them is being sent (having SENDING
-     * status). It should not be part of the JSON representation since the
-     * server doesn't need it. Thus, it is transient and is stored in DB in a
-     * separated column ({@link com.chatwing.tables.MessageTable#SENDING_DATE}.
-     * Also, it should be separately passed together with Message object.
-     */
-    private transient long sendingDate;
+
+    private transient boolean isStartedDateMessage;
 
     public Message(User user, int chatBoxId, String content, long createdDate,
                    String randomKey, Status status) {
@@ -166,20 +162,27 @@ public class Message extends Params implements Comparable<Message> {
         this.createdDate = createdDate;
     }
 
-    public long getSendingDate() {
-        return sendingDate;
+    public long getStartDate() {
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(createdDate);
+        c.set(Calendar.HOUR_OF_DAY, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
+        LogUtils.v("Sending Date " + createdDate + " Midnight " + c.getTimeInMillis() + " Passed " + (createdDate - c.getTimeInMillis()));
+        return c.getTimeInMillis();
     }
 
-    public void setSendingDate(long sendingDate) {
-        this.sendingDate = sendingDate;
+    public void setIsStartedDateMessage(boolean isStartedDateMessage) {
+        this.isStartedDateMessage = isStartedDateMessage;
+    }
+
+    public boolean isStartedDateMessage() {
+        return isStartedDateMessage;
     }
 
     private boolean isBeingSent() {
         return status == Status.SENDING;
-    }
-
-    private boolean hasValidSendingDate() {
-        return sendingDate != 0;
     }
 
     public String getAvatar() {
@@ -197,16 +200,7 @@ public class Message extends Params implements Comparable<Message> {
 
     @Override
     public int compareTo(Message another) {
-        // If either this or the other message is being sent, we should prefer
-        // sendingDate to relativeDate for comparison (#101).
-        boolean shouldCompareSendingDate = isBeingSent() || another.isBeingSent();
-        long thisDate = shouldCompareSendingDate && hasValidSendingDate()
-                ? sendingDate
-                : createdDate;
-        long anotherDate = shouldCompareSendingDate && another.hasValidSendingDate()
-                ? another.sendingDate
-                : another.createdDate;
-        return thisDate < anotherDate ? -1 : (thisDate > anotherDate ? 1 : 0);
+        return createdDate < another.createdDate ? -1 : (createdDate > another.createdDate ? 1 : 0);
     }
 
     @Override

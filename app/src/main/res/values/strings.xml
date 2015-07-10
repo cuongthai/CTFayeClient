@@ -82,11 +82,14 @@
     <string name="error_required_agree_conditions">"You must read and agree the Terms of Service and License"</string>
     <string name="error_block_user_no_permission">"You do not have permission to block user."</string>
     <string name="error_delete_message_no_permission">"You do not have permission to delete messages."</string>
+    <string name="error_ignore_message_no_permission">"You can't ignore this message"</string>
+    <string name="error_flag_message_no_permission">"You can't flag this message"</string>
     <string name="error_duration_cant_blank">"Duration must be numeric and greater than 0."</string>
     <string name="error_invalid_chat_box_id">"Chat box id is invalid."</string>
     <string name="error_require_permission_to_view_ip">"You dont have permission to block user"</string>
     <string name="error_while_blocking_user">"There was an error while blocking user."</string>
     <string name="error_while_deleting_bookmark">"There was an error while deleting bookmark."</string>
+    <string name="error_while_loading_messages">"There was an error while loading message."</string>
     <string name="error_account_not_found">"Account not found. Please select another one"</string>
     <string name="error_while_creating_chatbox">"There was an error while creating chatbox."</string>
     <string name="error_failed_to_save_chat_box">"Failed to save the chat box"</string>
@@ -291,5 +294,7 @@
     <string name="current_conversation_key">current_conversation_key</string>
     <string name="broadcast_tag">[Broadcast]</string>
     <string name="logging_out">Signing Out...</string>
+    <string name="title_copy">Copy</string>
+    <string name="title_chat">Send Private Messages</string>
 
 </resources>

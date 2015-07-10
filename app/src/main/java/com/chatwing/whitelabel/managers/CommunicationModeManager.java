@@ -93,7 +93,7 @@ public abstract class CommunicationModeManager {
             case LOADING:
                 mActivityDelegate.setContentShown(false);
                 break;
-            case UI_LOADED:
+            case LOADED:
                 mActivityDelegate.setContentShown(true);
                 break;
         }

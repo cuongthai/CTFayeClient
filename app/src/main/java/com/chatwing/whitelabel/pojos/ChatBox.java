@@ -23,6 +23,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -201,5 +202,13 @@ public class ChatBox implements Serializable{
 
     public String getAudioUrl() {
         return audioUrl;
+    }
+
+    public Map<String, String> getEmoticonsAsMap() {
+        Map<String, String> emos =new HashMap<String, String>();
+        for(Emoticon emoticon:emoticons){
+            emos.put(emoticon.getSymbol(), emoticon.getImage());
+        }
+        return emos;
     }
 }

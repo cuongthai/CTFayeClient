@@ -40,7 +40,7 @@ public class WebViewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_web_view);
-        mLoadingView = (ProgressBar) findViewById(R.id.progress_spinner);
+        mLoadingView = (ProgressBar) findViewById(R.id.progress_bar);
 
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

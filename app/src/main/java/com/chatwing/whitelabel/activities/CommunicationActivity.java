@@ -19,7 +19,9 @@ package com.chatwing.whitelabel.activities;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -48,9 +50,7 @@ import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.contentproviders.ChatWingContentProvider;
 import com.chatwing.whitelabel.events.AllSyncsCompletedEvent;
 import com.chatwing.whitelabel.events.SyncCommunicationBoxEvent;
-import com.chatwing.whitelabel.events.TouchUserInfoEvent;
 import com.chatwing.whitelabel.events.UserUnauthenticatedEvent;
-import com.chatwing.whitelabel.events.ViewProfileEvent;
 import com.chatwing.whitelabel.events.faye.ChannelSubscriptionChangedEvent;
 import com.chatwing.whitelabel.events.faye.FayePublishEvent;
 import com.chatwing.whitelabel.events.faye.MessageReceivedEvent;
@@ -88,7 +88,6 @@ import com.chatwing.whitelabel.pojos.Conversation;
 import com.chatwing.whitelabel.pojos.Event;
 import com.chatwing.whitelabel.pojos.Message;
 import com.chatwing.whitelabel.pojos.User;
-import com.chatwing.whitelabel.pojos.jspojos.JSUserResponse;
 import com.chatwing.whitelabel.pojos.params.CreateConversationParams;
 import com.chatwing.whitelabel.services.AckChatboxIntentService;
 import com.chatwing.whitelabel.services.AckConversationIntentService;
@@ -96,6 +95,7 @@ import com.chatwing.whitelabel.services.CreateConversationIntentService;
 import com.chatwing.whitelabel.services.OfflineIntentService;
 import com.chatwing.whitelabel.services.SyncCommunicationBoxesIntentService;
 import com.chatwing.whitelabel.services.UpdateGcmIntentService;
+import com.chatwing.whitelabel.tables.MessageTable;
 import com.chatwing.whitelabel.utils.LogUtils;
 import com.chatwing.whitelabel.views.BBCodeEditText;
 import com.google.android.gms.common.ConnectionResult;
@@ -212,7 +212,7 @@ public class CommunicationActivity
         mProgressBar = (ProgressBar) mProgressView.findViewById(R.id.loading_view);
         mProgressText = (TextView) mProgressView.findViewById(R.id.progress_text);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mLoadingView = (ProgressBar) findViewById(R.id.progress_spinner);
+        mLoadingView = (ProgressBar) findViewById(R.id.progress_bar);
 
         mChatboxModeManager.onCreate(savedInstanceState);
         mConversationModeManager.onCreate(savedInstanceState);
@@ -689,25 +689,6 @@ public class CommunicationActivity
     }
 
     @Subscribe
-    public void onTouchUserInfoEvent(TouchUserInfoEvent event) {
-        JSUserResponse user = event.getUser();
-        String loginType = user.getLoginType();
-        String loginId = user.getLoginId();
-        String userAvatar = user.getUserAvatar();
-
-        String userProfileUrl = mApiManager.getUserProfileUrl(loginType, loginId);
-        ProfileFragment newFragment = ProfileFragment.newInstance(new ViewProfileEvent(
-                userProfileUrl,
-                mApiManager.getAvatarUrl(loginType, loginId, userAvatar),
-                user.getUserName(),
-                loginType,
-                loginId,
-                mUserManager.getCurrentUser() == null ? true : user.equals(mUserManager.getCurrentUser())
-        ));
-        newFragment.show(getSupportFragmentManager(), "dialog");
-    }
-
-    @Subscribe
     public void onChannelSubscriptionChanged(ChannelSubscriptionChangedEvent event) {
         //Faye
         if (event.getStatus() == ChannelSubscriptionChangedEvent.Status.SUCCEED) {
@@ -808,6 +789,19 @@ public class CommunicationActivity
         if (name.equals(EventParser.EVENT_NEW_MESSAGE) || name.equals(EventParser.EVENT_NETWORK_NEW_MESSAGE)) {
             Message message = (Message) event.getParams();
             message.setStatus(Message.Status.PUBLISHED);
+
+            if (!isFromMe(message)) {
+                // New message, insert it into DB.
+                Uri uri = ChatWingContentProvider.getMessagesUri();
+                ContentValues contentValues = MessageTable.getContentValues(message);
+                Uri result = getContentResolver().insert(uri, contentValues);
+                if ("-1".equals(result.getLastPathSegment())) {
+                    // Failed to insert the message. Stop here.
+                    LogUtils.e("Insert message failed ");
+                    return;
+                }
+            }
+
             boolean added;
             boolean isInCurrentCommunicationBox = mCurrentCommunicationMode.isInCurrentCommunicationBox(message);
 
@@ -816,7 +810,6 @@ public class CommunicationActivity
             } else {
                 CommunicationMessagesFragment fragment = getCommunicationMessagesFragment();
                 added = (fragment != null && fragment.addNewMessage(message));
-
                 mCurrentCommunicationMode.processMessageInCurrentCommunicationBox(message);
             }
         }
@@ -825,6 +818,14 @@ public class CommunicationActivity
     //////////////////////////
     // Instance methods
     //////////////////////////
+    private boolean isFromMe(Message message) {
+        User currentUser = mUserManager.getCurrentUser();
+        if (currentUser == null) {
+            return false;
+        }
+        return mUserManager.isCurrentUser(message.getUserIdentifier());
+    }
+
     private void initConversationMenu() {
         setTitle(getActivity().getString(R.string.title_activity_conversation));
 
@@ -933,7 +934,7 @@ public class CommunicationActivity
                 try {
                     String regId = mGcmManager.getRegistrationId();
                     mApiManager.updateGcm(mUserManager.getCurrentUser(), regId, ApiManager.GCM_ACTION_REMOVE);
-                }catch(Exception e){
+                } catch (Exception e) {
                     LogUtils.e(e);
                 }
                 mGcmManager.clearRegistrationId();
@@ -951,7 +952,7 @@ public class CommunicationActivity
             @Override
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
-                if(dialog.isShowing()) {
+                if (dialog.isShowing()) {
                     dialog.dismiss();
                 }
                 mCurrentCommunicationMode.logout();

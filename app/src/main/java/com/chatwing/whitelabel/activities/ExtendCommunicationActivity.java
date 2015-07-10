@@ -24,9 +24,7 @@ import com.chatwing.whitelabel.events.BlockedEvent;
 import com.chatwing.whitelabel.events.DeleteBookmarkEvent;
 import com.chatwing.whitelabel.events.SyncCommunicationBoxEvent;
 import com.chatwing.whitelabel.events.SyncUnreadEvent;
-import com.chatwing.whitelabel.events.TouchUserInfoEvent;
 import com.chatwing.whitelabel.events.UpdateUserEvent;
-import com.chatwing.whitelabel.events.ViewProfileEvent;
 import com.chatwing.whitelabel.events.faye.ChannelSubscriptionChangedEvent;
 import com.chatwing.whitelabel.events.faye.FayePublishEvent;
 import com.chatwing.whitelabel.events.faye.MessageReceivedEvent;
@@ -58,7 +56,6 @@ import com.chatwing.whitelabel.modules.ExtendCommunicationActivityModule;
 import com.chatwing.whitelabel.pojos.Message;
 import com.chatwing.whitelabel.pojos.Song;
 import com.chatwing.whitelabel.pojos.errors.ChatWingError;
-import com.chatwing.whitelabel.pojos.jspojos.JSUserResponse;
 import com.chatwing.whitelabel.pojos.params.CreateConversationParams;
 import com.chatwing.whitelabel.pojos.responses.ChatBoxDetailsResponse;
 import com.chatwing.whitelabel.pojos.responses.DeleteBookmarkResponse;
@@ -211,26 +208,6 @@ public class ExtendCommunicationActivity
     @Subscribe
     public void onSyncUnreadEvent(SyncUnreadEvent event) {
         syncRefreshAnimationState();
-    }
-
-    @Subscribe
-    public void onTouchUserInfoEvent(TouchUserInfoEvent event) {
-        JSUserResponse user = event.getUser();
-        String loginType = user.getLoginType();
-        String loginId = user.getLoginId();
-        String userAvatar = user.getUserAvatar();
-        String userProfileUrl = mApiManager.getUserProfileUrl(loginType, loginId);
-
-        ViewProfileEvent viewProfileEvent = new ViewProfileEvent(
-                userProfileUrl,
-                mApiManager.getAvatarUrl(loginType, loginId, userAvatar),
-                user.getUserName(),
-                loginType,
-                loginId,
-                mUserManager.getCurrentUser() == null || user.equals(mUserManager.getCurrentUser()) || user.isGuest()); // Prevent chat to yourself, guest
-        if (!viewProfileEvent.isDenyReply()) {
-            showConversation(new CreateConversationParams.SimpleUser(viewProfileEvent.getLoginId(), viewProfileEvent.getUserType()));
-        }
     }
 
     @Subscribe
