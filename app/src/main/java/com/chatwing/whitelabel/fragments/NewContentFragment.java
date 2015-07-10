@@ -17,11 +17,12 @@
 package com.chatwing.whitelabel.fragments;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
+import android.view.View;
 
 import com.chatwing.whitelabel.R;
 
@@ -70,6 +71,11 @@ public class NewContentFragment extends DialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mHasBBCodeOption = getArguments().getBoolean(EXTRA_HAS_BBCODE_OPTION);
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
     }
 
     @Override

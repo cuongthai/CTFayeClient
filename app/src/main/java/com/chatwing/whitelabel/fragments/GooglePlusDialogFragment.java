@@ -1,9 +1,9 @@
 package com.chatwing.whitelabel.fragments;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 
 import com.chatwing.whitelabel.R;
 import com.google.android.gms.common.ConnectionResult;
@@ -47,7 +47,7 @@ public class GooglePlusDialogFragment extends DialogFragment {
                     getActivity(),
                     requestCode);
         }
-        return new AlertDialog.Builder(getActivity())
+        return new AlertDialog.Builder(getActivity(), R.style.Theme_ChatWing_AlertDialog)
                 .setMessage(R.string.error_unavailable_google_plus_login)
                 .setCancelable(true)
                 .create();

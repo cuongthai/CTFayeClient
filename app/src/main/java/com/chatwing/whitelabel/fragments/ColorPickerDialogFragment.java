@@ -17,12 +17,12 @@
 package com.chatwing.whitelabel.fragments;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 
 import com.chatwing.whitelabel.R;
@@ -74,7 +74,7 @@ public class ColorPickerDialogFragment extends DialogFragment
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.Theme_ChatWing_AlertDialog)
                 .setTitle(R.string.title_pick_color)
                 .setView(inflateContentView())
                 .setPositiveButton(android.R.string.ok, this)

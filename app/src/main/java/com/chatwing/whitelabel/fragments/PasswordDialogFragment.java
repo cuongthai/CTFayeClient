@@ -1,11 +1,11 @@
 package com.chatwing.whitelabel.fragments;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
@@ -49,7 +49,7 @@ public class PasswordDialogFragment extends DialogFragment
         mPasswordEditText = (EditText) promptView.findViewById(R.id.password);
         mRememberPasswordCheckBox = (CheckBox) promptView.findViewById(R.id.remember);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity)
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity,R.style.Theme_ChatWing_AlertDialog)
                 .setCancelable(false)
                 .setTitle(R.string.message_input_password_chatbox)
                 .setView(promptView)
