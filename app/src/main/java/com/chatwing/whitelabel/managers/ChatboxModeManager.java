@@ -39,8 +39,10 @@ import com.chatwing.whitelabel.events.UpdateSubscriptionEvent;
 import com.chatwing.whitelabel.events.UserSelectedChatBoxEvent;
 import com.chatwing.whitelabel.fragments.NotificationFragment;
 import com.chatwing.whitelabel.pojos.ChatBox;
+import com.chatwing.whitelabel.pojos.Event;
 import com.chatwing.whitelabel.pojos.Message;
 import com.chatwing.whitelabel.services.AckChatboxIntentService;
+import com.chatwing.whitelabel.tables.MessageTable;
 import com.chatwing.whitelabel.tables.NotificationMessagesTable;
 import com.chatwing.whitelabel.utils.LogUtils;
 import com.chatwing.whitelabel.validators.ChatBoxIdValidator;
@@ -242,6 +244,41 @@ public class ChatboxModeManager extends CommunicationModeManager {
     @Override
     public int getResourceStringNoCommunicationBox() {
         return R.string.message_select_chat_box;
+    }
+
+    @Override
+    public void processDeleteMessageEvent(Event event) {
+        Message message = (Message) event.getParams();
+        mActivityDelegate.getActivity().getContentResolver().delete(
+                ChatWingContentProvider.getMessagesUri(),
+                MessageTable._ID + "='" + message.getId() + "'",
+                null
+        );
+        mActivityDelegate.getCommunicationMessagesFragment().deleteMessage(message);
+    }
+
+    @Override
+    public void processDeleteMessagesBySocialAccountEvent(Event event) {
+        Message message = (Message) event.getParams();
+        mActivityDelegate.getActivity().getContentResolver().delete(
+                ChatWingContentProvider.getMessagesUri(),
+                MessageTable.CHAT_BOX_ID + "=" + message.getChatBoxId()
+                        + " AND " + MessageTable.LOGIN_TYPE + "='" + message.getUserType() + "'",
+                null
+        );
+        mActivityDelegate.getCommunicationMessagesFragment().deleteMessageBySocialAccount(message);
+    }
+
+    @Override
+    public void processDeleteMessagesByIPEvent(Event event) {
+        Message message = (Message) event.getParams();
+        int delete = mActivityDelegate.getActivity().getContentResolver().delete(
+                ChatWingContentProvider.getMessagesUri(),
+                MessageTable.CHAT_BOX_ID + "=" + message.getChatBoxId()
+                        + " AND " + MessageTable.IP + "='" + message.getIp() + "'",
+                null
+        );
+        mActivityDelegate.getCommunicationMessagesFragment().deleteMessageByIp(message);
     }
 
     @Override

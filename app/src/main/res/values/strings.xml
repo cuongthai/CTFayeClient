@@ -150,7 +150,7 @@
     <string name="preference_clear_previous_style">"clear_previous_style"</string>
     <string name="preference_verify_email">"verify_email"</string>
     <string name="title_dialog_select_message">Select message</string>
-    <string name="title_ignore">Ignore</string>
+    <string name="title_ignore">Ignore/Unignore</string>
     <string name="title_flag">Flag</string>
     <string name="title_unignore">Show Content</string>
     <string name="title_menu_audio_playing">Playing</string>
@@ -296,5 +296,6 @@
     <string name="logging_out">Signing Out...</string>
     <string name="title_copy">Copy</string>
     <string name="title_chat">Send Private Messages</string>
+    <string name="message_ignored_content">Ignored content</string>
 
 </resources>

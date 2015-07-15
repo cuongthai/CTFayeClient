@@ -7,8 +7,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.NetworkImageView;
 import com.chatwing.whitelabel.Constants;
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.managers.ApiManager;
@@ -16,6 +14,9 @@ import com.chatwing.whitelabel.managers.VolleyManager;
 import com.chatwing.whitelabel.modules.ForActivity;
 import com.chatwing.whitelabel.pojos.OnlineUser;
 import com.chatwing.whitelabel.utils.StringUtils;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.display.SimpleBitmapDisplayer;
 
 import java.util.List;
 
@@ -33,6 +34,8 @@ public class OnlineUsersAdapter extends CompatArrayAdapter<OnlineUser> {
     private VolleyManager mVolleyManager;
     private List<String> mNameFilters;
     private int mUsernameTextColor;
+    private final DisplayImageOptions displayImageOptions;
+
 
     @Inject
     OnlineUsersAdapter(@ForActivity Context context,
@@ -43,6 +46,15 @@ public class OnlineUsersAdapter extends CompatArrayAdapter<OnlineUser> {
         mInflater = layoutInflater;
         mApiManager = apiManager;
         mVolleyManager = volleyManager;
+        displayImageOptions = new DisplayImageOptions.Builder()
+                .showImageOnLoading(R.drawable.default_avatar)
+                .showImageForEmptyUri(R.drawable.default_avatar)
+                .showImageOnFail(R.drawable.default_avatar)
+                .cacheInMemory(true)
+                .cacheOnDisk(true)
+                .considerExifParams(true)
+                .displayer(new SimpleBitmapDisplayer())
+                .build();
     }
 
     @Override
@@ -54,7 +66,7 @@ public class OnlineUsersAdapter extends CompatArrayAdapter<OnlineUser> {
             viewHolder.loginType
                     = (ImageView) convertView.findViewById(R.id.login_type);
             viewHolder.avatar
-                    = (NetworkImageView) convertView.findViewById(R.id.image_view_avatar);
+                    = (ImageView) convertView.findViewById(R.id.image_view_avatar);
             viewHolder.username
                     = (TextView) convertView.findViewById(R.id.username);
 
@@ -80,9 +92,7 @@ public class OnlineUsersAdapter extends CompatArrayAdapter<OnlineUser> {
         viewHolder.loginType.setImageResource(resId);
 
         String avatarUrl = mApiManager.getAvatarUrl(user);
-        ImageLoader imageLoader = mVolleyManager.getImageLoader();
-        viewHolder.avatar.setImageUrl(avatarUrl, imageLoader);
-
+        ImageLoader.getInstance().displayImage(avatarUrl, viewHolder.avatar, displayImageOptions);
         return convertView;
     }
 
@@ -104,7 +114,7 @@ public class OnlineUsersAdapter extends CompatArrayAdapter<OnlineUser> {
 
     private static class ViewHolder {
         private ImageView loginType;
-        private NetworkImageView avatar;
+        private ImageView avatar;
         private TextView username;
     }
 }

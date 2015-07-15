@@ -18,6 +18,7 @@ import com.chatwing.whitelabel.events.CurrentChatBoxEvent;
 import com.chatwing.whitelabel.events.EditChatMessageEvent;
 import com.chatwing.whitelabel.events.FlagMessageEvent;
 import com.chatwing.whitelabel.events.GotMoreMessagesEvent;
+import com.chatwing.whitelabel.events.IgnoreUserEvent;
 import com.chatwing.whitelabel.events.PasswordEnteredEvent;
 import com.chatwing.whitelabel.events.PasswordRefusedEvent;
 import com.chatwing.whitelabel.events.RequestBlockEvent;
@@ -110,7 +111,7 @@ public class ExtendChatMessagesFragment extends ChatMessagesFragment {
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
                             case R.id.delete:
-                                deleteMessage(message);
+                                doDeleteMessage(message);
                                 break;
                             case R.id.block:
                                 blockUser(message);
@@ -185,7 +186,7 @@ public class ExtendChatMessagesFragment extends ChatMessagesFragment {
         getActivity().startService(intent);
     }
 
-    private void deleteMessage(Message message) {
+    private void doDeleteMessage(Message message) {
         boolean canDeleteMessage = hasPermission(PermissionsValidator.Permission.DELETE_MESSAGE);
         if (!canDeleteMessage) {
             mErrorMessageView.show(R.string.error_delete_message_no_permission);
@@ -215,6 +216,11 @@ public class ExtendChatMessagesFragment extends ChatMessagesFragment {
     @com.squareup.otto.Subscribe
     public void onAppendEmoticonEvent(AppendEmoticonEvent event) {
         super.onAppendEmoticonEvent(event);
+    }
+
+    @Subscribe
+    public void onIgnoreUserUpdate(IgnoreUserEvent event){
+        mAdapter.notifyDataSetChanged();
     }
 
     @Subscribe

@@ -41,6 +41,7 @@ import com.chatwing.whitelabel.events.UpdateSubscriptionEvent;
 import com.chatwing.whitelabel.events.UserSelectedConversationEvent;
 import com.chatwing.whitelabel.fragments.NotificationFragment;
 import com.chatwing.whitelabel.pojos.Conversation;
+import com.chatwing.whitelabel.pojos.Event;
 import com.chatwing.whitelabel.pojos.Message;
 import com.chatwing.whitelabel.pojos.User;
 import com.chatwing.whitelabel.services.AckConversationIntentService;
@@ -231,6 +232,21 @@ public class ConversationModeManager extends CommunicationModeManager {
     @Override
     public int getResourceStringNoCommunicationBox() {
         return R.string.message_select_conversation;
+    }
+
+    @Override
+    public void processDeleteMessageEvent(Event event) {
+
+    }
+
+    @Override
+    public void processDeleteMessagesBySocialAccountEvent(Event event) {
+
+    }
+
+    @Override
+    public void processDeleteMessagesByIPEvent(Event event) {
+
     }
 
     @Override

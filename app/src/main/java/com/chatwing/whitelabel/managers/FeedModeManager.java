@@ -8,6 +8,7 @@ import android.view.Gravity;
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.events.UserSelectedFeedSource;
 import com.chatwing.whitelabel.fragments.NotificationFragment;
+import com.chatwing.whitelabel.pojos.Event;
 import com.chatwing.whitelabel.pojos.Message;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -66,6 +67,21 @@ public class FeedModeManager extends CommunicationModeManager {
     @Override
     public int getResourceStringNoCommunicationBox() {
         return R.string.message_select_feed_source;
+    }
+
+    @Override
+    public void processDeleteMessageEvent(Event event) {
+
+    }
+
+    @Override
+    public void processDeleteMessagesBySocialAccountEvent(Event event) {
+
+    }
+
+    @Override
+    public void processDeleteMessagesByIPEvent(Event event) {
+
     }
 
     @Override

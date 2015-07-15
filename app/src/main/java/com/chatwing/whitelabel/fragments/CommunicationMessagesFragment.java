@@ -173,6 +173,12 @@ public abstract class CommunicationMessagesFragment extends Fragment {
 
     protected abstract boolean hasCurrentCommunication();
 
+    public abstract void deleteMessage(Message message);
+
+    public abstract void deleteMessageByIp(Message message);
+
+    public abstract void deleteMessageBySocialAccount(Message message);
+
     public void onContextMenuClosed(Menu menu) {
     }
 

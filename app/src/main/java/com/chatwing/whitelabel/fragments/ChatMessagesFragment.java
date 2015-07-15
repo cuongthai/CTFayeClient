@@ -170,6 +170,33 @@ public class ChatMessagesFragment extends CommunicationMessagesFragment {
     }
 
     @Override
+    public void deleteMessage(Message message) {
+        ChatBox currentChatBox = mCurrentChatBoxManager.getCurrentChatBox();
+        if (currentChatBox == null) {
+            return;
+        }
+        mAdapter.removeByMessageId(message.getId());
+    }
+
+    @Override
+    public void deleteMessageByIp(Message message) {
+        ChatBox currentChatBox = mCurrentChatBoxManager.getCurrentChatBox();
+        if (currentChatBox == null) {
+            return;
+        }
+        mAdapter.removeByIp(message.getIp());
+    }
+
+    @Override
+    public void deleteMessageBySocialAccount(Message message) {
+        ChatBox currentChatBox = mCurrentChatBoxManager.getCurrentChatBox();
+        if (currentChatBox == null) {
+            return;
+        }
+        mAdapter.removeBySocialAccount(message.getUserType());
+    }
+
+    @Override
     protected boolean canHandle(MessageEvent event) {
         // We ignore conversation message type, only process chat
         return !event.isPrivate();

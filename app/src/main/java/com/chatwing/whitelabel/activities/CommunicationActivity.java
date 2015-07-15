@@ -786,7 +786,13 @@ public class CommunicationActivity
 
     private void processEvent(Event event) {
         String name = event.getName();
-        if (name.equals(EventParser.EVENT_NEW_MESSAGE) || name.equals(EventParser.EVENT_NETWORK_NEW_MESSAGE)) {
+        if (name.equals(EventParser.EVENT_DELETE_MESSAGE)) {
+            mCurrentCommunicationMode.processDeleteMessageEvent(event);
+        } else if (name.equals(EventParser.EVENT_DELETE_MESSAGE_BY_SOCIAL)) {
+            mCurrentCommunicationMode.processDeleteMessagesBySocialAccountEvent(event);
+        } else if (name.equals(EventParser.EVENT_DELETE_MESSAGE_BY_IP)) {
+            mCurrentCommunicationMode.processDeleteMessagesByIPEvent(event);
+        } else if (name.equals(EventParser.EVENT_NEW_MESSAGE) || name.equals(EventParser.EVENT_NETWORK_NEW_MESSAGE)) {
             Message message = (Message) event.getParams();
             message.setStatus(Message.Status.PUBLISHED);
 

@@ -55,7 +55,7 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
         super.onViewCreated(view, savedInstanceState);
         mUserInfoContainer = view.findViewById(R.id.user_info_layout);
         mNextView = view.findViewById(R.id.next);
-        mWebsiteTv = (TextView)view.findViewById(R.id.websiteTv);
+        mWebsiteTv = (TextView) view.findViewById(R.id.websiteTv);
 
         view.findViewById(R.id.settings).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -134,11 +134,11 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
             mWebsiteTv.setMovementMethod(LinkMovementMethod.getInstance());
         }
 
-        if(!mBuildManager.isSupportedRss()){
+        if (!mBuildManager.isSupportedRss()) {
             feedView.setVisibility(View.GONE);
         }
 
-        if(!mBuildManager.isSupportedMusicBox()){
+        if (!mBuildManager.isSupportedMusicBox()) {
             musicView.setVisibility(View.GONE);
         }
     }
@@ -201,17 +201,17 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
 
         //Only allow chatwing to update avatar
         User currentUser = mUserManager.getCurrentUser();
-        if (currentUser != null && (currentUser.isChatWing())||currentUser.isAppUser()) {
+        if (currentUser != null && (currentUser.isChatWing() || currentUser.isAppUser())) {
             mUserAvatarView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     mListener.updateAvatar();
                 }
             });
-        }else{
+        } else {
             mUserAvatarView.setOnClickListener(null);
         }
-        if(currentUser != null) {
+        if (currentUser != null) {
             mAccountTypeView.setText(mApiManager.getDisplayUserLoginType(currentUser.getLoginType()));
         }
     }
@@ -222,7 +222,7 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
     }
 
     @Subscribe
-    public void onSyncChatboxUnreadComplete(SyncUnreadEvent event){
+    public void onSyncChatboxUnreadComplete(SyncUnreadEvent event) {
         super.onSyncChatboxUnreadComplete(event);
         getLoaderManager().restartLoader(LOADER_ID_SYNCED_BOOKMARKS, null, this);
         getLoaderManager().restartLoader(LOADER_ID_CHATBOXES, null, this);
@@ -233,7 +233,7 @@ public class ExtendCommunicationDrawerFragment extends CommunicationDrawerFragme
         updateUserViews();
     }
 
-    public  interface Listener extends CommunicationDrawerFragment.Listener {
+    public interface Listener extends CommunicationDrawerFragment.Listener {
         void showSettings();
 
         void updateAvatar();

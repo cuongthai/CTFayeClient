@@ -57,9 +57,16 @@ import javax.inject.Inject;
  * Time: 7:29 AM
  */
 public class NotificationIntentService extends IntentService {
-    public static final int NOTIFICATION_ID = 1;
     private static final int MAX_MESSAGES_PER_GROUP = 5;
-    private static final int BROADCAST_NOTIFICATION_CODE = 991;
+
+    /**
+     * To prevent crashing when updating push format, we introduce push version
+     * only process push notification if app push version not older than push
+     * Only increase push version on server side if we add/remove fields.
+     * If adding fields, we won't increase push version
+     */
+    private static final int PUSH_VERION_1 = 1; //Init version
+    private static final int CURRENT_PUSH_VERSION = PUSH_VERION_1;
 
     @Inject
     NotificationManager mNotificationManager;
@@ -78,6 +85,10 @@ public class NotificationIntentService extends IntentService {
         Set<String> keys = extras.keySet();
         for (String k : keys) {
             LogUtils.v("Key in GCM " + k + ":" + extras.get(k));
+        }
+
+        if (!supportVersion(extras)) {
+            return;
         }
 
         if (handleBroadCastEvent(extras)) {
@@ -110,6 +121,17 @@ public class NotificationIntentService extends IntentService {
             List<Message> freshChatboxes = getMessagesByGroup(chatbox.getId());
             notifyForBox(freshChatboxes, chatbox);
         }
+    }
+
+    private boolean supportVersion(Bundle extras) {
+        if (extras == null) {
+            return false;
+        }
+        int pushVersion = extras.getInt("version");
+        if(pushVersion<=CURRENT_PUSH_VERSION){
+            return true;
+        }
+        return false;
     }
 
     private void fillGroupIDToMessage(Message[] messages, String type, MessageResponse messageResponse) {

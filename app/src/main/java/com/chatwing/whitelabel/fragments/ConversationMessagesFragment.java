@@ -32,6 +32,7 @@ import com.chatwing.whitelabel.events.CurrentChatBoxEvent;
 import com.chatwing.whitelabel.events.CurrentCommunicationEvent;
 import com.chatwing.whitelabel.events.CurrentConversationEvent;
 import com.chatwing.whitelabel.events.GotMoreMessagesEvent;
+import com.chatwing.whitelabel.events.IgnoreUserEvent;
 import com.chatwing.whitelabel.events.MessageEvent;
 import com.chatwing.whitelabel.events.UserUnauthenticatedEvent;
 import com.chatwing.whitelabel.loaders.CommunicationBoxMessagesLoader;
@@ -109,6 +110,21 @@ public class ConversationMessagesFragment extends CommunicationMessagesFragment 
     }
 
     @Override
+    public void deleteMessage(Message message) {
+
+    }
+
+    @Override
+    public void deleteMessageByIp(Message message) {
+
+    }
+
+    @Override
+    public void deleteMessageBySocialAccount(Message message) {
+
+    }
+
+    @Override
     @Subscribe
     public void onAppendEmoticonEvent(AppendEmoticonEvent event) {
         super.onAppendEmoticonEvent(event);
@@ -152,6 +168,11 @@ public class ConversationMessagesFragment extends CommunicationMessagesFragment 
         }
 
         onCreateConversationResult(event.getResponse().getData());
+    }
+
+    @Subscribe
+    public void onIgnoreUserUpdate(IgnoreUserEvent event){
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override

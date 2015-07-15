@@ -20,7 +20,6 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -31,6 +30,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.chatwing.whitelabel.ChatWing;
@@ -46,11 +46,8 @@ import com.chatwing.whitelabel.pojos.User;
 import com.chatwing.whitelabel.tables.ChatBoxTable;
 import com.chatwing.whitelabel.tables.ConversationTable;
 import com.chatwing.whitelabel.utils.LogUtils;
-import com.chatwing.whitelabel.views.CircleNetworkImageView;
 import com.chatwing.whitelabel.views.ErrorMessageView;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.assist.FailReason;
-import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -93,7 +90,7 @@ public class CommunicationDrawerFragment extends Fragment implements LoaderManag
     ProgressDialog mProgressDialog;
 
     private Listener mListener;
-    protected CircleNetworkImageView mUserAvatarView;
+    protected ImageView mUserAvatarView;
     private TextView mUsernameView;
     protected TextView mAccountTypeView;
     private View mUserInfoContainer;
@@ -121,7 +118,7 @@ public class CommunicationDrawerFragment extends Fragment implements LoaderManag
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mUserAvatarView = (CircleNetworkImageView) view.findViewById(R.id.avatar);
+        mUserAvatarView = (ImageView) view.findViewById(R.id.avatar);
         mUsernameView = (TextView) view.findViewById(R.id.username);
         mAccountTypeView = (TextView) view.findViewById(R.id.account_type);
         mUserInfoContainer = view.findViewById(R.id.user_info_layout);
@@ -243,28 +240,9 @@ public class CommunicationDrawerFragment extends Fragment implements LoaderManag
         showLoginButton(false);
 
         String avatarUrl = mApiManager.getAvatarUrl(user);
-        ImageLoader.getInstance().loadImage(avatarUrl, new ImageLoadingListener() {
-            @Override
-            public void onLoadingStarted(String s, View view) {
-
-            }
-
-            @Override
-            public void onLoadingFailed(String s, View view, FailReason failReason) {
-
-            }
-
-            @Override
-            public void onLoadingComplete(String s, View view, Bitmap bitmap) {
-                mUserAvatarView.setImageBitmap(bitmap);
-            }
-
-            @Override
-            public void onLoadingCancelled(String s, View view) {
-
-            }
-        });
-
+        LogUtils.v("Avatar drawer "+avatarUrl);
+//        ImageLoader.getInstance().clearDiskCache();
+        ImageLoader.getInstance().displayImage(avatarUrl, mUserAvatarView);
         mUsernameView.setText(user.getName());
         mAccountTypeView.setText(mApiManager.getDisplayUserLoginType(user.getLoginType()));
     }

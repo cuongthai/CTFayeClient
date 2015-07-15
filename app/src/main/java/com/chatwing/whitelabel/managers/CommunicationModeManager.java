@@ -26,7 +26,6 @@ import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -41,6 +40,7 @@ import com.chatwing.whitelabel.events.ChatBoxUnreadCountChangedEvent;
 import com.chatwing.whitelabel.events.CurrentCommunicationEvent;
 import com.chatwing.whitelabel.fragments.CommunicationMessagesFragment;
 import com.chatwing.whitelabel.fragments.NotificationFragment;
+import com.chatwing.whitelabel.pojos.Event;
 import com.chatwing.whitelabel.pojos.Message;
 import com.chatwing.whitelabel.services.SyncCommunicationBoxesIntentService;
 import com.chatwing.whitelabel.tables.ChatBoxTable;
@@ -106,6 +106,12 @@ public abstract class CommunicationModeManager {
     public abstract ActionBarDrawerToggle getDrawerToggleListener();
 
     public abstract int getResourceStringNoCommunicationBox();
+
+    public abstract void processDeleteMessageEvent(Event event);
+
+    public abstract void processDeleteMessagesBySocialAccountEvent(Event event);
+
+    public abstract void processDeleteMessagesByIPEvent(Event event);
 
     public boolean isCommunicationBoxDrawerOpening() {
         return mActivityDelegate.getDrawerLayout().isDrawerOpen(getCommunicationBoxDrawerGravity());

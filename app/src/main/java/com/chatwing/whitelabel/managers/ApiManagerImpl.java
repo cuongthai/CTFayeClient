@@ -1467,7 +1467,8 @@ public class ApiManagerImpl implements ApiManager {
         //We have to specify this temp_avatar.jpg in order to upload the file...
         //https://github.com/kevinsawicki/http-request/issues/22
         request.part("avatar", "temp_avatar.jpg", new File(path));
-        request.part("client_id", ChatWing.getAppId());
+        request.part("client_id", ChatWing.getClientID());
+        request.part("app_id", ChatWing.getAppId());
         String responseString;
 
         try {

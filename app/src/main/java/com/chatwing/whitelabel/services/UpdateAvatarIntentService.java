@@ -9,6 +9,9 @@ import com.chatwing.whitelabel.managers.VolleyManager;
 import com.chatwing.whitelabel.pojos.User;
 import com.chatwing.whitelabel.utils.BitmapUtils;
 import com.chatwing.whitelabel.utils.LogUtils;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.utils.DiskCacheUtils;
+import com.nostra13.universalimageloader.utils.MemoryCacheUtils;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -45,6 +48,8 @@ public class UpdateAvatarIntentService extends ExtendBaseIntentService {
             mApiManager.updateAvatar(currentUser, path);
             String permanentAvatarUrl = mApiManager.getAvatarUrl(currentUser);
             mVolleyManager.mQueue.getCache().remove(permanentAvatarUrl);
+            DiskCacheUtils.removeFromCache(permanentAvatarUrl, ImageLoader.getInstance().getDiskCache());
+            MemoryCacheUtils.removeFromCache(permanentAvatarUrl, ImageLoader.getInstance().getMemoryCache());
             post(UpdateUserEvent.success());
         } catch (Exception e) {
             LogUtils.e(e);

@@ -41,7 +41,7 @@ import com.chatwing.whitelabel.R;
  * Created by steve on 04/07/2014.
  * Reference: https://github.com/Pkmmte/CircularImageView/blob/master/CircularImageView/src/com/pkmmte/circularimageview/CircularImageView.java
  */
-public class CircleNetworkImageView extends ImageView {
+public class CircleImageView extends ImageView {
     // Border & Selector configuration variables
     private boolean hasBorder;
     private boolean hasSelector;
@@ -58,15 +58,15 @@ public class CircleNetworkImageView extends ImageView {
     private Paint paintSelectorBorder;
     private ColorFilter selectorFilter;
 
-    public CircleNetworkImageView(Context context) {
+    public CircleImageView(Context context) {
         this(context, null);
     }
 
-    public CircleNetworkImageView(Context context, AttributeSet attrs) {
+    public CircleImageView(Context context, AttributeSet attrs) {
         this(context, attrs, R.attr.circularImageViewStyle);
     }
 
-    public CircleNetworkImageView(Context context, AttributeSet attrs, int defStyle) {
+    public CircleImageView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init(context, attrs, defStyle);
     }

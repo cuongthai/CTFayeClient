@@ -80,7 +80,7 @@
                             android:textAppearance="?android:attr/textAppearanceSmall"
                             android:textColor="@color/text_on_primary"/>
                     </LinearLayout>
-                    <com.chatwing.whitelabel.views.CircleNetworkImageView
+                    <com.chatwing.whitelabel.views.CircleImageView
                         android:id="@+id/avatar"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/drawer_avatar_height"

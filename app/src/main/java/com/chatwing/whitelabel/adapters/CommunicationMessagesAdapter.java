@@ -22,6 +22,7 @@ import com.chatwing.whitelabel.modules.ForActivity;
 import com.chatwing.whitelabel.parsers.BBCodeParser;
 import com.chatwing.whitelabel.pojos.CommunicationBoxJson;
 import com.chatwing.whitelabel.pojos.Message;
+import com.chatwing.whitelabel.pojos.User;
 import com.chatwing.whitelabel.utils.LogUtils;
 import com.chatwing.whitelabel.utils.ScreenUtils;
 import com.chatwing.whitelabel.utils.Utils;
@@ -102,6 +103,13 @@ public class CommunicationMessagesAdapter extends RecyclerView.Adapter<Communica
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int i) {
         Message message = mDataSet.get(i);
+        User currentUser = mUserManager.getCurrentUser();
+
+        boolean isIgnored =
+                currentUser == null
+                        ? false
+                        : currentUser.isIgnoring(message.getUserIdentifier());
+
         viewHolder.username.setText(message.getUserName());
 
         viewHolder.createTime.setText(Utils.formatTimeOnly(message.getCreatedDate()));
@@ -122,6 +130,7 @@ public class CommunicationMessagesAdapter extends RecyclerView.Adapter<Communica
 
         //Load avatar
         String avatarUrl = mApiManager.getAvatarUrl(message);
+        LogUtils.v("Avatar "+avatarUrl);
         mImageLoader.displayImage(avatarUrl, viewHolder.avatarImageView, displayImageOptions);
 
         viewHolder.content.setMovementMethod(LinkMovementMethod.getInstance());
@@ -130,7 +139,13 @@ public class CommunicationMessagesAdapter extends RecyclerView.Adapter<Communica
         viewHolder.content.setImageMaxHeight(mImageMaxHeight);
         viewHolder.content.setVolleyManager(mVolleyManager);
         viewHolder.content.setBBCodeParser(mBBCodeParser);
-        viewHolder.content.setBBCodeText(message.getContent());
+
+
+        if(!isIgnored) {
+            viewHolder.content.setBBCodeText(message.getContent());
+        }else{
+            viewHolder.content.setBBCodeText("[i]"+mContext.getString(R.string.message_ignored_content)+"[/i]");
+        }
 
     }
 
@@ -223,6 +238,61 @@ public class CommunicationMessagesAdapter extends RecyclerView.Adapter<Communica
 
     public Message getItem(int position) {
         return mDataSet.get(position);
+    }
+
+    private Message getItemById(String messageId) {
+        int count = mDataSet.size();
+        for (int i = 0; i < count; ++i) {
+            Message m = getItem(i);
+            String k = m.getId();
+            if (!TextUtils.isEmpty(k) && messageId.equals(k)) {
+                return m;
+            }
+        }
+        return null;
+    }
+
+    public void removeByMessageId(String id) {
+        Message message = getItemById(id);
+        if (message != null) {
+            mDataSet.remove(message);
+        }
+        notifyDataSetChanged();
+    }
+
+    public void removeByIp(String ip) {
+        if (ip == null) return;
+        int count = mDataSet.size();
+        List<Message> toBeDeleted = new ArrayList<Message>();
+        for (int i = 0; i < count; i++) {
+            Message message = getItem(i);
+            if (ip.equals(message.getIp())) {
+                toBeDeleted.add(message);
+            }
+        }
+
+        deleteMessage(toBeDeleted);
+    }
+
+    private void deleteMessage(List<Message> toBeDeleted) {
+        if (toBeDeleted == null || toBeDeleted.size() == 0) return;
+        for (Message message : toBeDeleted) {
+            mDataSet.remove(message);
+        }
+        notifyDataSetChanged();
+    }
+
+    public void removeBySocialAccount(String userType) {
+        if (userType == null) return;
+        List<Message> toBeDeleted = new ArrayList<Message>();
+        int count = mDataSet.size();
+        for (int i = 0; i < count; i++) {
+            Message message = getItem(i);
+            if (message.isTheSameUserType(userType)) {
+                toBeDeleted.add(message);
+            }
+        }
+        deleteMessage(toBeDeleted);
     }
 
     // Provide a reference to the views for each data item

@@ -236,6 +236,7 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
         mOnlineUsersBadgeView.setBadgeMargin(res.getDimensionPixelSize(
                 R.dimen.default_margin));
         mOnlineUsersItem.setActionView(container);
+        mOnlineUsersBadgeView.setBadgeBackgroundColor(mActivityDelegate.getActivity().getResources().getColor(R.color.accent));
 
         return true;
     }

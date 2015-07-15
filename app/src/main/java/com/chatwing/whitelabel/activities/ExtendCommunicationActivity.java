@@ -610,7 +610,6 @@ public class ExtendCommunicationActivity
          */
         @Override
         public void onDestroy() {
-
             if (mAdView != null) {
                 mAdView.destroy();
             }

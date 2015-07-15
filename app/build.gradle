@@ -11,8 +11,6 @@ buildscript {
     }
 }
 
-def app_name = 'Cuong'
-
 apply plugin: 'com.android.application'
 apply plugin: 'crashlytics'
 
