@@ -181,6 +181,8 @@ COLOR_ACTION_SECONDARY=#3CB2E2
 
 
 ##################### Destiny ####################
+
+APP_ID = 3181f6e0-2933-11e5-8bc8-6fdd6f0ea556
 APP_NAME = Destiny Team Finder
 PACKAGE_NAME = com.chatwing.demo.destinyteamfinder
 RELEASE_STORE_FILE=../certs/whitelabel.keystore
@@ -205,7 +207,7 @@ SUPPORT_RSS = No
 SUPPORT_MUSIC_BOX = No
 FLURRY_API_KEY = 667ZH2V6RFHPJN42TDY5
 ALLOW_REGISTER=Yes
-VERSION_CODE=5
+VERSION_CODE=6
 VERSION_NAME=1.1
 
 #Used ONLY in Non Official
@@ -230,6 +232,7 @@ TUMBLR_API_SECRET =
 
 
 ==================== Demo =========================
+APP_ID = 3181f6e0-2933-11e5-8bc8-6fdd6f0ea556
 APP_NAME = Demo Whitelabel
 PACKAGE_NAME = com.chatwing.whitelabel.demo
 RELEASE_STORE_FILE=../certs/whitelabel.keystore

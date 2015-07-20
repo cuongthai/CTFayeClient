@@ -97,6 +97,7 @@ public class CommunicationMessagesAdapter extends RecyclerView.Adapter<Communica
                 .cacheOnDisk(true)
                 .considerExifParams(true)
                 .displayer(new SimpleBitmapDisplayer())
+                .resetViewBeforeLoading(true)
                 .build();
     }
 

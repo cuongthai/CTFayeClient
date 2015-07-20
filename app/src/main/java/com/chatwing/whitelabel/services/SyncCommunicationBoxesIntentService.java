@@ -145,8 +145,8 @@ public class SyncCommunicationBoxesIntentService extends BaseIntentService {
 //        handleChatWingOfficial(intent);
 //        handleKentucky(intent);
 //        handleSeattle(intent);
-//        handleDestiny(intent);
-        handleDemo(intent);
+        handleDestiny(intent);
+//        handleDemo(intent);
 //        handleDebug(intent);
 //        handleStaging(intent);
     }

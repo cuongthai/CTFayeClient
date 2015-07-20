@@ -35,6 +35,7 @@ public class ChatWingError {
     public static final int ERROR_CODE_INVALID_IDENTITY = 40302;
     public static final int ERROR_CODE_PERMISSION_ERR = 40303;
     public static final int ERROR_CODE_VERIFY_EMAIL_ERR = 40304;
+    public static final int ERROR_CODE_OTHER_ERR = 40009;
 
 
     protected int code;

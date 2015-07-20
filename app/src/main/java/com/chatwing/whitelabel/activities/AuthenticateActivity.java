@@ -29,6 +29,7 @@ import android.widget.TextView;
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.events.TaskFinishedEvent;
 import com.chatwing.whitelabel.events.UserAuthenticationEvent;
+import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.managers.ProgressViewsManager;
 import com.chatwing.whitelabel.modules.AuthenticateActivityModule;
 import com.chatwing.whitelabel.pojos.params.oauth.AuthenticationParams;
@@ -185,7 +186,10 @@ public abstract class AuthenticateActivity extends BaseABFragmentActivity {
                                   StartSessionTask task) {
 
         if (event.getStatus() == TaskFinishedEvent.Status.FAILED) {
-
+            if(event.getException() instanceof ApiManager.OtherApplicationException){
+                mErrorMessageView.show(event.getException().getMessage());
+                return;
+            }
             //Others error
             mErrorMessageView.show(event.getException(), getString(R.string.error_invalid_external_access_token));
             return;

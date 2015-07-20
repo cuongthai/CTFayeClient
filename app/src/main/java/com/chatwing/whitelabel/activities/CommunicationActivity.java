@@ -491,6 +491,9 @@ public class CommunicationActivity
             onAccessTokenExpired();
         } else if (exception instanceof ApiManager.NotVerifiedEmailException) {
             mErrorMessageView.show(errorMessageResId);
+        } else if (exception instanceof ApiManager.OtherApplicationException) {
+            mErrorMessageView.show(((ApiManager.OtherApplicationException) exception).getError().getMessage());
+            logout();
         } else {
             mErrorMessageView.show(exception, getString(R.string.error_unknown));
         }
@@ -786,6 +789,7 @@ public class CommunicationActivity
 
     private void processEvent(Event event) {
         String name = event.getName();
+        LogUtils.v("event " + event.getParams());
         if (name.equals(EventParser.EVENT_DELETE_MESSAGE)) {
             mCurrentCommunicationMode.processDeleteMessageEvent(event);
         } else if (name.equals(EventParser.EVENT_DELETE_MESSAGE_BY_SOCIAL)) {

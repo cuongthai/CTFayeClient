@@ -101,9 +101,9 @@ public interface ApiManager {
     String BLACKLIST_CREATE_URL = URL_END_POINT + "/chatbox/blacklist/create";
     String MANAGE_BLACKLIST_URL = Constants.CHATWING_BASE_URL + "/chatbox/%s/control?access_token=%s&client_id="
             + ChatWing.getClientID();
-    String USER_IGNORE= URL_END_POINT + "/chat-user/ignore";
-    String FLAG_MESSAGE= URL_END_POINT + "/chatbox/message/flag";
-    String USER_UNIGNORE= URL_END_POINT + "/chat-user/unignore";
+    String USER_IGNORE = URL_END_POINT + "/chat-user/ignore";
+    String FLAG_MESSAGE = URL_END_POINT + "/chatbox/message/flag";
+    String USER_UNIGNORE = URL_END_POINT + "/chat-user/unignore";
     String USER_DETAIL = URL_END_POINT + "/chat-user/read";
     String USER_VERIFY = URL_END_POINT + "/chat-user/verify";
     String CHAT_BOX_SEARCH_URL = URL_END_POINT + "/chatbox/search";
@@ -125,7 +125,7 @@ public interface ApiManager {
             InvalidIdentityException,
             InvalidAccessTokenException,
             RequiredPermissionException,
-            NotVerifiedEmailException;
+            NotVerifiedEmailException, OtherApplicationException;
 
     BlackListResponse blockUser(User user,
                                 ExtendChatMessagesFragment.BLOCK block,
@@ -139,14 +139,14 @@ public interface ApiManager {
             ValidationException,
             InvalidAccessTokenException,
             RequiredPermissionException,
-            NotVerifiedEmailException;
+            NotVerifiedEmailException, OtherApplicationException;
 
     ResetPasswordResponse resetPassword(String email)
             throws ApiException,
             HttpRequest.HttpRequestException,
             EmailValidator.InvalidEmailException,
             ValidationException,
-            NotVerifiedEmailException;
+            NotVerifiedEmailException, OtherApplicationException;
 
     MessagesResponse loadMessages(User user,
                                   int chatBoxId,
@@ -156,7 +156,7 @@ public interface ApiManager {
             ChatBoxIdValidator.InvalidIdException,
             InvalidAccessTokenException,
             InvalidIdentityException,
-            NotVerifiedEmailException;
+            NotVerifiedEmailException, OtherApplicationException;
 
     MessagesResponse loadMessages(User user,
                                   String conversationId,
@@ -167,7 +167,7 @@ public interface ApiManager {
             UserUnauthenticatedException,
             InvalidAccessTokenException,
             InvalidIdentityException,
-            NotVerifiedEmailException;
+            NotVerifiedEmailException, OtherApplicationException;
 
     IgnoreUserResponse ignoreUser(User user,
                                   String userId,
@@ -177,7 +177,7 @@ public interface ApiManager {
             HttpRequest.HttpRequestException,
             ApiException,
             InvalidAccessTokenException,
-            NotVerifiedEmailException;
+            NotVerifiedEmailException, OtherApplicationException;
 
     RegisterResponse register(String email,
                               String password,
@@ -187,7 +187,7 @@ public interface ApiManager {
             HttpRequest.HttpRequestException,
             EmailValidator.InvalidEmailException,
             PasswordValidator.InvalidPasswordException,
-            ValidationException;
+            ValidationException, OtherApplicationException;
 
     public String getChatBoxUrl(String chatBoxKey);
 
@@ -196,13 +196,13 @@ public interface ApiManager {
             ApiException,
             HttpRequest.HttpRequestException,
             InvalidAccessTokenException,
-            NotVerifiedEmailException;
+            NotVerifiedEmailException, OtherApplicationException;
 
     LoadOnlineUsersResponse loadOnlineUsers(int chatBoxId)
             throws ApiException,
             HttpRequest.HttpRequestException,
             ChatBoxIdValidator.InvalidIdException,
-            NotVerifiedEmailException;
+            NotVerifiedEmailException, OtherApplicationException;
 
     int getLoginTypeImageResId(String type);
 
@@ -217,26 +217,26 @@ public interface ApiManager {
             UserUnauthenticatedException,
             ValidationException,
             InvalidAccessTokenException,
-            NotVerifiedEmailException;
+            NotVerifiedEmailException, OtherApplicationException;
 
     JSUserResponse updateAvatar(User currentUser,
-                              String path)
+                                String path)
             throws UserUnauthenticatedException,
             HttpRequest.HttpRequestException,
             ApiException,
-            NotVerifiedEmailException;
+            NotVerifiedEmailException, OtherApplicationException;
 
     void verifyEmail(User user)
             throws UserUnauthenticatedException,
             HttpRequest.HttpRequestException,
             ApiException,
-            NotVerifiedEmailException;
+            NotVerifiedEmailException, OtherApplicationException;
 
     SearchChatBoxResponse searchChatBox(String query,
                                         int offset,
                                         int limit)
             throws ApiException,
-            ValidationException, NotVerifiedEmailException;
+            ValidationException, NotVerifiedEmailException, OtherApplicationException;
 
     CreateChatBoxResponse createChatBox(User user,
                                         String name)
@@ -244,7 +244,7 @@ public interface ApiManager {
             ApiException,
             InvalidIdentityException,
             InvalidAccessTokenException,
-            NotVerifiedEmailException;
+            NotVerifiedEmailException, OtherApplicationException;
 
     String getFullChatBoxAliasUrl(String alias);
 
@@ -255,7 +255,7 @@ public interface ApiManager {
             UserUnauthenticatedException,
             InvalidAccessTokenException,
             InvalidIdentityException,
-            NotVerifiedEmailException;
+            NotVerifiedEmailException, OtherApplicationException;
 
     CreateBookmarkResponse createBookmark(User user,
                                           int chatboxId)
@@ -265,7 +265,7 @@ public interface ApiManager {
             ChatBoxIdValidator.InvalidIdException,
             InvalidAccessTokenException,
             InvalidIdentityException,
-            NotVerifiedEmailException;
+            NotVerifiedEmailException, OtherApplicationException;
 
     BookmarkResponse loadBookmarks(User user)
             throws ApiException,
@@ -273,14 +273,14 @@ public interface ApiManager {
             UserUnauthenticatedException,
             InvalidAccessTokenException,
             InvalidIdentityException,
-            NotVerifiedEmailException;
+            NotVerifiedEmailException, OtherApplicationException;
 
     FlagMessageResponse flagMessage(User currentUser, String messageID)
             throws UserUnauthenticatedException,
             HttpRequest.HttpRequestException,
             ApiException,
             InvalidAccessTokenException,
-            NotVerifiedEmailException;
+            NotVerifiedEmailException, OtherApplicationException;
 
     UpdateGcmResponse updateGcm(User user,
                                 String gcmRegId,
@@ -289,13 +289,13 @@ public interface ApiManager {
             HttpRequest.HttpRequestException,
             UserUnauthenticatedException,
             InvalidAccessTokenException,
-            NotVerifiedEmailException;
+            NotVerifiedEmailException, OtherApplicationException;
 
 
     ChatBoxListResponse loadChatBoxes()
             throws ApiException,
             HttpRequest.HttpRequestException,
-            NotVerifiedEmailException;
+            NotVerifiedEmailException, OtherApplicationException;
 
     public String getFullEmoticonUrl(String emoticonPath);
 
@@ -303,7 +303,7 @@ public interface ApiManager {
             throws ApiException,
             HttpRequest.HttpRequestException,
             ValidationException,
-            InvalidExternalAccessTokenException;
+            InvalidExternalAccessTokenException, OtherApplicationException;
 
     public CreateConversationResponse createConversation(User user,
                                                          String loginId,
@@ -313,7 +313,7 @@ public interface ApiManager {
             HttpRequest.HttpRequestException,
             InvalidAccessTokenException,
             InvalidIdentityException,
-            NotVerifiedEmailException;
+            NotVerifiedEmailException, OtherApplicationException;
 
     public ChatBoxDetailsResponse loadChatBoxDetails(User user,
                                                      int chatBoxId)
@@ -322,8 +322,7 @@ public interface ApiManager {
             ChatBoxIdValidator.InvalidIdException,
             ValidationException,
             InvalidIdentityException,
-            NotVerifiedEmailException;
-
+            NotVerifiedEmailException, OtherApplicationException;
 
 
     /**
@@ -364,7 +363,7 @@ public interface ApiManager {
             InvalidIdentityException,
             InvalidAccessTokenException,
             CreateMessageException,
-            NotVerifiedEmailException;
+            NotVerifiedEmailException, OtherApplicationException;
 
     public LoadConversationsResponse loadConversations(User user,
                                                        int limit,
@@ -374,7 +373,7 @@ public interface ApiManager {
             UserUnauthenticatedException,
             InvalidAccessTokenException,
             InvalidIdentityException,
-            NotVerifiedEmailException;
+            NotVerifiedEmailException, OtherApplicationException;
 
     public String getAvatarUrl(User user);
 
@@ -396,7 +395,7 @@ public interface ApiManager {
             ConversationIdValidator.InvalidIdException,
             InvalidAccessTokenException,
             InvalidIdentityException,
-            NotVerifiedEmailException;
+            NotVerifiedEmailException, OtherApplicationException;
 
     void ackChatbox(User user,
                     Integer chatboxID)
@@ -406,7 +405,7 @@ public interface ApiManager {
             ChatBoxIdValidator.InvalidIdException,
             InvalidAccessTokenException,
             InvalidIdentityException,
-            NotVerifiedEmailException;
+            NotVerifiedEmailException, OtherApplicationException;
 
 
     public SubscriptionStatusResponse loadCommunicationSetting(User user,
@@ -417,7 +416,7 @@ public interface ApiManager {
             ChatBoxIdValidator.InvalidIdException,
             InvalidAccessTokenException,
             InvalidIdentityException,
-            NotVerifiedEmailException;
+            NotVerifiedEmailException, OtherApplicationException;
 
     public SubscriptionStatusResponse loadCommunicationSetting(User user,
                                                                String conversationID)
@@ -427,7 +426,7 @@ public interface ApiManager {
             ConversationIdValidator.InvalidIdException,
             InvalidAccessTokenException,
             InvalidIdentityException,
-            NotVerifiedEmailException;
+            NotVerifiedEmailException, OtherApplicationException;
 
     SubscriptionResponse updateNotificationSubscription(User user,
                                                         String action,
@@ -438,7 +437,7 @@ public interface ApiManager {
             UserUnauthenticatedException,
             ChatBoxIdValidator.InvalidIdException,
             InvalidAccessTokenException,
-            NotVerifiedEmailException;
+            NotVerifiedEmailException, OtherApplicationException;
 
     SubscriptionResponse updateNotificationSubscription(User user,
                                                         String action,
@@ -449,24 +448,24 @@ public interface ApiManager {
             UserUnauthenticatedException,
             ConversationIdValidator.InvalidIdException,
             InvalidAccessTokenException,
-            NotVerifiedEmailException;
+            NotVerifiedEmailException, OtherApplicationException;
 
     void ping(User user)
             throws ApiException,
             HttpRequest.HttpRequestException,
-            UserUnauthenticatedException;
+            UserUnauthenticatedException, OtherApplicationException;
 
     void offline(User currentUser)
             throws ApiException,
             HttpRequest.HttpRequestException,
-            UserUnauthenticatedException;
+            UserUnauthenticatedException, OtherApplicationException;
 
     int getUnreadCountForChatbox(User user,
                                  Integer chatboxId)
             throws ApiException,
             HttpRequest.HttpRequestException,
             UserUnauthenticatedException,
-            NotVerifiedEmailException;
+            NotVerifiedEmailException, OtherApplicationException;
 
 
     /**
@@ -508,7 +507,6 @@ public interface ApiManager {
     }
 
 
-
     /**
      * thrown when there is no account associate with the app.
      * This is for client-side checking. Usually, a friendly message would be displayed to user
@@ -526,47 +524,31 @@ public interface ApiManager {
 
     /**
      * thrown when user needs another identity to access resource.
-     * Eg. Needs differnt login type
+     * Eg. Needs different login type
      */
-    public static class InvalidIdentityException extends Exception {
-        private final ChatWingError error;
+    public static class InvalidIdentityException extends ChatWingException {
 
         public InvalidIdentityException(ChatWingError error) {
-            super(error.getMessage());
-            this.error = error;
+            super(error);
         }
 
-        public ChatWingError getError() {
-            return error;
-        }
     }
 
-    public static class ValidationException extends Exception {
-        private final ChatWingError error;
+    public static class ValidationException extends ChatWingException {
 
         public ValidationException(ChatWingError error) {
-            super(error.getMessage());
-            this.error = error;
+            super(error);
         }
 
-        public ChatWingError getError() {
-            return error;
-        }
     }
 
     /**
      * thrown when server fails to fetch data from social accounts
      */
-    public static class InvalidExternalAccessTokenException extends Exception {
-        private final ChatWingError error;
+    public static class InvalidExternalAccessTokenException extends ChatWingException {
 
         public InvalidExternalAccessTokenException(ChatWingError error) {
-            super(error.getMessage());
-            this.error = error;
-        }
-
-        public ChatWingError getError() {
-            return error;
+            super(error);
         }
     }
 
@@ -596,10 +578,27 @@ public interface ApiManager {
     /**
      * thrown when user haven't verified his/her email
      */
-    public static class NotVerifiedEmailException extends Exception {
-        private final ChatWingError error;
+    public static class NotVerifiedEmailException extends ChatWingException {
 
         public NotVerifiedEmailException(ChatWingError error) {
+            super(error);
+        }
+    }
+
+    public static class OtherApplicationException extends ChatWingException {
+
+        public OtherApplicationException(ChatWingError error) {
+            super(error);
+        }
+    }
+
+    public static class RequiredPermissionException extends Exception {
+    }
+
+    public abstract class ChatWingException extends Exception {
+        private final ChatWingError error;
+
+        public ChatWingException(ChatWingError error) {
             super(error.getMessage());
             this.error = error;
         }
@@ -607,8 +606,5 @@ public interface ApiManager {
         public ChatWingError getError() {
             return error;
         }
-    }
-
-    public static class RequiredPermissionException extends Exception {
     }
 }

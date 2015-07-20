@@ -255,7 +255,6 @@ public abstract class CommunicationMessagesFragment extends Fragment {
     }
 
     protected void onGotMoreMessagesEvent(GotMoreMessagesEvent event) {
-        LogUtils.v("onGotMoreMessagesEvent "+event.getMessagesFromServer().size());
         if (onMessageEvent(event, getString(R.string.error_while_loading_messages))) {
             return;
         }

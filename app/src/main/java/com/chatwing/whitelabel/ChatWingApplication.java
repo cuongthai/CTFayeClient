@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import dagger.ObjectGraph;
+import io.fabric.sdk.android.Fabric;
 
 /**
  * Created by cuongthai on 21/10/2014.
@@ -25,7 +26,7 @@ public class ChatWingApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Crashlytics.start(this);
+        Fabric.with(this, new Crashlytics());
         /**
          * App IDS
          * b4b391d0-e9bf-11e4-871f-f1829c245e2e : Test app id
@@ -34,10 +35,10 @@ public class ChatWingApplication extends Application {
          *
          */
         //Currently support only one chatbox enter from client, it should be loaded from server
-        ChatWing.initialize(this, "3181f6e0-2933-11e5-8bc8-6fdd6f0ea556", "", new String[]{"1873"}, isOfficialChatWingApp()
+        ChatWing.initialize(this, BuildConfig.APP_ID, "", new String[]{"1873"}, isOfficialChatWingApp()
                 ? WalkthroughActivity.class
                 : LegacyLoginActivity.class);
-        ChatWing.setIsDebugging(true);
+        ChatWing.setIsDebugging(false);
         ChatWing.instance(this).setMainActivityClass(ExtendCommunicationActivity.class);
         ChatWing.instance(this).getChatwingGraph().plus(getModules().toArray());
 

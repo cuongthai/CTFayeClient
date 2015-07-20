@@ -2,17 +2,17 @@ buildscript {
     repositories {
         mavenLocal()
         mavenCentral()
-        maven { url 'http://download.crashlytics.com/maven' }
+        maven { url 'https://maven.fabric.io/public' }
     }
 
     dependencies {
-        classpath 'com.crashlytics.tools.gradle:crashlytics-gradle:1.+'
+        classpath 'io.fabric.tools:gradle:1.+'
         classpath 'com.github.dcendents:android-maven-plugin:1.2'
     }
 }
 
 apply plugin: 'com.android.application'
-apply plugin: 'crashlytics'
+apply plugin: 'io.fabric'
 
 android {
     packagingOptions {
@@ -37,6 +37,8 @@ android {
         targetSdkVersion 20
         versionCode Integer.parseInt(VERSION_CODE)
         versionName VERSION_NAME
+
+        buildConfigField 'String', 'APP_ID', '"' + APP_ID + '"'
 
         buildConfigField 'String', 'TUMBLR_CALLBACK_URL', '"' + TUMBLR_CALLBACK_URL + '"'
         buildConfigField 'String', 'TUMBLR_API_KEY', '"' + TUMBLR_API_KEY + '"'
@@ -88,7 +90,7 @@ allprojects {
     repositories {
         mavenCentral()
         maven { url 'http://mente.github.io/facebook-api-android-aar' }
-        maven { url 'http://download.crashlytics.com/maven' }
+        maven { url 'https://maven.fabric.io/public' }
 
     }
 }
@@ -106,7 +108,9 @@ dependencies {
     compile 'com.viewpagerindicator:library:2.4.2-SNAPSHOT@aar'
     compile 'com.android.support:appcompat-v7:22.2.0'
     compile 'com.facebook:facebook-android-sdk:3.5.2@aar'
-    compile 'com.crashlytics.android:crashlytics:1.+'
+    compile('com.crashlytics.sdk.android:crashlytics:2.4.0@aar') {
+        transitive = true
+    }
     compile 'org.twitter4j:twitter4j-core:4.0.0'
     compile 'org.twitter4j:twitter4j-async:4.0.0'
     compile 'com.github.matthewyork:ColoursLibrary:1.0.+@aar'

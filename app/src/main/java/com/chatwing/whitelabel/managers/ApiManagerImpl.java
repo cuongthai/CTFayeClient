@@ -150,7 +150,7 @@ public class ApiManagerImpl implements ApiManager {
     protected static void setUpRequest(HttpRequest request,
                                        User user) {
         if (user != null && user.isSessionValid()) {
-            LogUtils.v("Access Token "+user.getAccessToken());
+            LogUtils.v("Access Token " + user.getAccessToken());
             request.authorization("Bearer " + user.getAccessToken());
         }
         request.acceptJson();
@@ -192,7 +192,8 @@ public class ApiManagerImpl implements ApiManager {
             InvalidAccessTokenException,
             ValidationException,
             InvalidIdentityException,
-            NotVerifiedEmailException {
+            NotVerifiedEmailException,
+            OtherApplicationException {
         if (!request.ok()) {
             LogUtils.e("Request failed with code " + request.code() + " url " + request.url());
             throw ApiException.createException(new Exception("Request failed with code " + request.code() + " url " + request.url()));
@@ -217,7 +218,8 @@ public class ApiManagerImpl implements ApiManager {
             ValidationException,
             InvalidIdentityException,
             ApiException,
-            NotVerifiedEmailException {
+            NotVerifiedEmailException,
+            OtherApplicationException {
         if (errorResponse == null || errorResponse.getError() == null) return;
         ChatWingError error = errorResponse.getError();
         switch (error.getCode()) {
@@ -247,6 +249,8 @@ public class ApiManagerImpl implements ApiManager {
                 throw new InvalidIdentityException(error);
             case ChatWingError.ERROR_CODE_VERIFY_EMAIL_ERR:
                 throw new NotVerifiedEmailException(error);
+            case ChatWingError.ERROR_CODE_OTHER_ERR:
+                throw new OtherApplicationException(error);
 
         }
     }
@@ -268,7 +272,8 @@ public class ApiManagerImpl implements ApiManager {
             throws ApiException,
             HttpRequest.HttpRequestException,
             ValidationException,
-            InvalidExternalAccessTokenException {
+            InvalidExternalAccessTokenException,
+            OtherApplicationException {
         StatisticTracker.trackLoginType(params.getType());
         if (params == null) {
             throw ApiException.createException(new Exception("Can't authenticate when params is null."));
@@ -310,7 +315,8 @@ public class ApiManagerImpl implements ApiManager {
             HttpRequest.HttpRequestException,
             InvalidAccessTokenException,
             InvalidIdentityException,
-            NotVerifiedEmailException {
+            NotVerifiedEmailException,
+            OtherApplicationException {
         validate(user);
 
         if (!mPermissionsValidator.canDoConversation(user)) {
@@ -355,7 +361,8 @@ public class ApiManagerImpl implements ApiManager {
             ChatBoxIdValidator.InvalidIdException,
             InvalidAccessTokenException,
             InvalidIdentityException,
-            NotVerifiedEmailException {
+            NotVerifiedEmailException,
+            OtherApplicationException {
         validate(user);
         mChatBoxIdValidator.validate(chatboxID);
 
@@ -388,7 +395,8 @@ public class ApiManagerImpl implements ApiManager {
             ConversationIdValidator.InvalidIdException,
             InvalidAccessTokenException,
             InvalidIdentityException,
-            NotVerifiedEmailException {
+            NotVerifiedEmailException,
+            OtherApplicationException {
         validate(user);
         mConversationIdValidator.validate(conversationID);
 
@@ -430,7 +438,8 @@ public class ApiManagerImpl implements ApiManager {
     public ChatBoxListResponse loadChatBoxes()
             throws ApiException,
             HttpRequest.HttpRequestException,
-            NotVerifiedEmailException {
+            NotVerifiedEmailException,
+            OtherApplicationException {
         Gson gson = new Gson();
 
         Params requestChatboxParams = new ConcreteParams();
@@ -465,7 +474,8 @@ public class ApiManagerImpl implements ApiManager {
             InvalidIdentityException,
             InvalidAccessTokenException,
             CreateMessageException,
-            NotVerifiedEmailException {
+            NotVerifiedEmailException,
+            OtherApplicationException {
         validate(user);
         validate(messageParams);
 
@@ -555,7 +565,8 @@ public class ApiManagerImpl implements ApiManager {
             HttpRequest.HttpRequestException,
             UserUnauthenticatedException,
             InvalidAccessTokenException,
-            NotVerifiedEmailException {
+            NotVerifiedEmailException,
+            OtherApplicationException {
         validate(user);
         if (TextUtils.isEmpty(gcmRegId)) {
             throw ApiException.createException(new Exception("GCM reg id is empty."));
@@ -581,7 +592,7 @@ public class ApiManagerImpl implements ApiManager {
 
         try {
             responseString = validate(request);
-            LogUtils.v(action+" GCM to server " + gcmRegId);
+            LogUtils.v(action + " GCM to server " + gcmRegId);
             return gson.fromJson(responseString, UpdateGcmResponse.class);
         } catch (JsonSyntaxException e) {
             throw ApiException.createJsonSyntaxException(e, responseString);
@@ -599,7 +610,8 @@ public class ApiManagerImpl implements ApiManager {
             HttpRequest.HttpRequestException,
             ChatBoxIdValidator.InvalidIdException,
             ValidationException, InvalidIdentityException,
-            NotVerifiedEmailException {
+            NotVerifiedEmailException,
+            OtherApplicationException {
         mChatBoxIdValidator.validate(chatBoxId);
         return loadChatBoxDetails(user, new LoadChatBoxDetailsParams(chatBoxId));
     }
@@ -613,7 +625,8 @@ public class ApiManagerImpl implements ApiManager {
             ChatBoxIdValidator.InvalidIdException,
             InvalidAccessTokenException,
             InvalidIdentityException,
-            NotVerifiedEmailException {
+            NotVerifiedEmailException,
+            OtherApplicationException {
         validate(user);
         mChatBoxIdValidator.validate(chatboxID);
         Gson gson = new Gson();
@@ -643,7 +656,7 @@ public class ApiManagerImpl implements ApiManager {
             ConversationIdValidator.InvalidIdException,
             InvalidAccessTokenException,
             InvalidIdentityException,
-            NotVerifiedEmailException {
+            NotVerifiedEmailException, OtherApplicationException {
         validate(user);
         mConversationIdValidator.validate(conversationId);
         Gson gson = new Gson();
@@ -674,7 +687,7 @@ public class ApiManagerImpl implements ApiManager {
             UserUnauthenticatedException,
             ConversationIdValidator.InvalidIdException,
             InvalidAccessTokenException,
-            NotVerifiedEmailException {
+            NotVerifiedEmailException, OtherApplicationException {
         validate(user);
         mConversationIdValidator.validate(conversationID);
         Gson gson = new Gson();
@@ -722,7 +735,8 @@ public class ApiManagerImpl implements ApiManager {
             UserUnauthenticatedException,
             ChatBoxIdValidator.InvalidIdException,
             InvalidAccessTokenException,
-            NotVerifiedEmailException {
+            NotVerifiedEmailException,
+            OtherApplicationException {
         validate(user);
         mChatBoxIdValidator.validate(chatboxID);
         Gson gson = new Gson();
@@ -763,7 +777,8 @@ public class ApiManagerImpl implements ApiManager {
     public void ping(User user)
             throws ApiException,
             HttpRequest.HttpRequestException,
-            UserUnauthenticatedException {
+            UserUnauthenticatedException,
+            OtherApplicationException {
         validate(user);
 
         HttpRequest request = HttpRequest.get(PING_URL + "?id=" + user.getId());
@@ -788,7 +803,8 @@ public class ApiManagerImpl implements ApiManager {
     public void offline(User user)
             throws ApiException,
             HttpRequest.HttpRequestException,
-            UserUnauthenticatedException {
+            UserUnauthenticatedException,
+            OtherApplicationException {
         validate(user);
 
         HttpRequest request = HttpRequest.get(OFFLINE_URL + appendParams(new ConcreteParams()));
@@ -817,7 +833,8 @@ public class ApiManagerImpl implements ApiManager {
             throws ApiException,
             HttpRequest.HttpRequestException,
             UserUnauthenticatedException,
-            NotVerifiedEmailException {
+            NotVerifiedEmailException,
+            OtherApplicationException {
         validate(user);
         MessageCountParams params = new MessageCountParams(chatboxId);
         HttpRequest request = HttpRequest.get(CHAT_BOX_MESSAGES_COUNT_URL + appendParams(params));
@@ -849,7 +866,9 @@ public class ApiManagerImpl implements ApiManager {
             HttpRequest.HttpRequestException,
             UserUnauthenticatedException,
             InvalidAccessTokenException,
-            InvalidIdentityException, NotVerifiedEmailException {
+            InvalidIdentityException,
+            NotVerifiedEmailException,
+            OtherApplicationException {
         validate(user);
 
         if (!mPermissionsValidator.canDoConversation(user)) {
@@ -883,7 +902,8 @@ public class ApiManagerImpl implements ApiManager {
             HttpRequest.HttpRequestException,
             ValidationException,
             InvalidIdentityException,
-            NotVerifiedEmailException {
+            NotVerifiedEmailException,
+            OtherApplicationException {
         Gson gson = new Gson();
         LogUtils.v("loadChatBoxDetails");
         HttpRequest request = HttpRequest.get(CHAT_BOX_DETAIL_URL + appendParams(params));
@@ -1016,7 +1036,8 @@ public class ApiManagerImpl implements ApiManager {
             throws ApiException,
             InvalidAccessTokenException,
             InvalidIdentityException,
-            NotVerifiedEmailException{
+            NotVerifiedEmailException,
+            OtherApplicationException {
         Gson gson = new Gson();
 
         HttpRequest request = HttpRequest.get(url + appendParams(params));
@@ -1046,7 +1067,8 @@ public class ApiManagerImpl implements ApiManager {
             HttpRequest.HttpRequestException,
             EmailValidator.InvalidEmailException,
             ValidationException,
-            NotVerifiedEmailException {
+            NotVerifiedEmailException,
+            OtherApplicationException {
         mEmailValidator.validate(email);
 
         Gson gson = new Gson();
@@ -1080,7 +1102,8 @@ public class ApiManagerImpl implements ApiManager {
             ChatBoxIdValidator.InvalidIdException,
             InvalidAccessTokenException,
             InvalidIdentityException,
-            NotVerifiedEmailException{
+            NotVerifiedEmailException,
+            OtherApplicationException {
         mChatBoxIdValidator.validate(chatBoxId);
 
         ChatBoxMessagesParams params = new ChatBoxMessagesParams(chatBoxId);
@@ -1101,7 +1124,8 @@ public class ApiManagerImpl implements ApiManager {
             UserUnauthenticatedException,
             InvalidAccessTokenException,
             InvalidIdentityException,
-            NotVerifiedEmailException{
+            NotVerifiedEmailException,
+            OtherApplicationException {
         validate(user);
         mConversationIdValidator.validate(conversationId);
 
@@ -1122,7 +1146,8 @@ public class ApiManagerImpl implements ApiManager {
             HttpRequest.HttpRequestException,
             EmailValidator.InvalidEmailException,
             PasswordValidator.InvalidPasswordException,
-            ValidationException {
+            ValidationException,
+            OtherApplicationException {
         mEmailValidator.validate(email);
         mPasswordValidator.validate(password);
         if (!agreeConditions) {
@@ -1170,7 +1195,8 @@ public class ApiManagerImpl implements ApiManager {
             HttpRequest.HttpRequestException,
             ApiException,
             InvalidAccessTokenException,
-            NotVerifiedEmailException {
+            NotVerifiedEmailException,
+            OtherApplicationException {
         validate(user);
 
         Gson gson = new Gson();
@@ -1181,7 +1207,7 @@ public class ApiManagerImpl implements ApiManager {
         try {
             LogUtils.v("Syncing user detail before load");
             responseString = validate(request);
-            LogUtils.v("Syncing user detail "+responseString);
+            LogUtils.v("Syncing user detail " + responseString);
             return gson.fromJson(responseString, UserResponse.class);
         } catch (ValidationException e) {
             throw ApiException.createException(e);
@@ -1195,7 +1221,8 @@ public class ApiManagerImpl implements ApiManager {
             throws ApiException,
             HttpRequest.HttpRequestException,
             ChatBoxIdValidator.InvalidIdException,
-            NotVerifiedEmailException {
+            NotVerifiedEmailException,
+            OtherApplicationException {
         mChatBoxIdValidator.validate(chatBoxId);
 
         Gson gson = new Gson();
@@ -1225,7 +1252,8 @@ public class ApiManagerImpl implements ApiManager {
             UserUnauthenticatedException,
             ValidationException,
             InvalidAccessTokenException,
-            NotVerifiedEmailException {
+            NotVerifiedEmailException,
+            OtherApplicationException {
         validate(user);
 
         Gson gson = new Gson();
@@ -1251,7 +1279,8 @@ public class ApiManagerImpl implements ApiManager {
             throws UserUnauthenticatedException,
             HttpRequest.HttpRequestException,
             ApiException,
-            NotVerifiedEmailException {
+            NotVerifiedEmailException,
+            OtherApplicationException {
         validate(user);
 
         Gson gson = new Gson();
@@ -1319,7 +1348,7 @@ public class ApiManagerImpl implements ApiManager {
         if (message == null) {
             return DEFAULT_AVATAR_URL;
         }
-        return ensureAbsoluteUrl(message.getAvatar(), DEFAULT_AVATAR_URL)+"?size="+Constants.AVATAR_SIZE;
+        return ensureAbsoluteUrl(message.getAvatar(), DEFAULT_AVATAR_URL) + "?size=" + Constants.AVATAR_SIZE;
     }
 
     @Override
@@ -1331,7 +1360,8 @@ public class ApiManagerImpl implements ApiManager {
             HttpRequest.HttpRequestException,
             ApiException,
             InvalidAccessTokenException,
-            NotVerifiedEmailException {
+            NotVerifiedEmailException,
+            OtherApplicationException {
         validate(user);
 
         Gson gson = new Gson();
@@ -1370,7 +1400,8 @@ public class ApiManagerImpl implements ApiManager {
             InvalidIdentityException,
             InvalidAccessTokenException,
             RequiredPermissionException,
-            NotVerifiedEmailException {
+            NotVerifiedEmailException,
+            OtherApplicationException {
         validate(user);
         mChatBoxIdValidator.validate(chatBoxId);
         mMessageIdValidator.validate(messageId);
@@ -1411,7 +1442,8 @@ public class ApiManagerImpl implements ApiManager {
             ValidationException,
             InvalidAccessTokenException,
             RequiredPermissionException,
-            NotVerifiedEmailException {
+            NotVerifiedEmailException,
+            OtherApplicationException {
         validate(user);
         Gson gson = new Gson();
 
@@ -1458,11 +1490,12 @@ public class ApiManagerImpl implements ApiManager {
             throws UserUnauthenticatedException,
             HttpRequest.HttpRequestException,
             ApiException,
-            NotVerifiedEmailException {
+            NotVerifiedEmailException,
+            OtherApplicationException {
         validate(user);
 
         HttpRequest request = HttpRequest.post(UPLOAD_AVATAR);
-        LogUtils.v("Access token "+user.getAccessToken());
+        LogUtils.v("Access token " + user.getAccessToken());
         setUpRequest(request, user);
         //We have to specify this temp_avatar.jpg in order to upload the file...
         //https://github.com/kevinsawicki/http-request/issues/22
@@ -1490,7 +1523,8 @@ public class ApiManagerImpl implements ApiManager {
             throws ApiException,
             HttpRequest.HttpRequestException,
             ValidationException,
-            NotVerifiedEmailException {
+            NotVerifiedEmailException,
+            OtherApplicationException {
         if (TextUtils.isEmpty(query)) {
             throw new ValidationException(
                     new ChatWingError(ChatWingError.ERROR_CODE_VALIDATION_ERR,
@@ -1523,7 +1557,8 @@ public class ApiManagerImpl implements ApiManager {
             HttpRequest.HttpRequestException,
             InvalidAccessTokenException,
             InvalidIdentityException,
-            NotVerifiedEmailException {
+            NotVerifiedEmailException,
+            OtherApplicationException {
         validate(user);
         if (!mPermissionsValidator.canCreateChatBox(user)) {
             throw new InvalidIdentityException(new ChatWingError(
@@ -1565,7 +1600,8 @@ public class ApiManagerImpl implements ApiManager {
             UserUnauthenticatedException,
             InvalidAccessTokenException,
             InvalidIdentityException,
-            NotVerifiedEmailException {
+            NotVerifiedEmailException,
+            OtherApplicationException {
         validate(user);
 
         if (bookmarkId == null) {
@@ -1584,7 +1620,7 @@ public class ApiManagerImpl implements ApiManager {
         DeleteBookmarkParams params = new DeleteBookmarkParams();
         params.setId(bookmarkId);
         String paramsString = gson.toJson(params);
-        LogUtils.v("Bookmark delete params "+paramsString+":"+user.getAccessToken());
+        LogUtils.v("Bookmark delete params " + paramsString + ":" + user.getAccessToken());
         HttpRequest request = HttpRequest.post(BOOKMARK_DELETE);
         setUpRequest(request, user);
         request.send(paramsString);
@@ -1610,7 +1646,8 @@ public class ApiManagerImpl implements ApiManager {
             ChatBoxIdValidator.InvalidIdException,
             InvalidAccessTokenException,
             InvalidIdentityException,
-            NotVerifiedEmailException {
+            NotVerifiedEmailException,
+            OtherApplicationException {
         validate(user);
         mChatBoxIdValidator.validate(chatboxId);
 
@@ -1651,7 +1688,8 @@ public class ApiManagerImpl implements ApiManager {
             UserUnauthenticatedException,
             InvalidAccessTokenException,
             InvalidIdentityException,
-            NotVerifiedEmailException {
+            NotVerifiedEmailException,
+            OtherApplicationException {
         validate(user);
 
         if (!mPermissionsValidator.canBookmark(user)) {
@@ -1684,7 +1722,8 @@ public class ApiManagerImpl implements ApiManager {
             HttpRequest.HttpRequestException,
             ApiException,
             InvalidAccessTokenException,
-            NotVerifiedEmailException {
+            NotVerifiedEmailException,
+            OtherApplicationException {
         validate(user);
 
         Gson gson = new Gson();
@@ -1708,7 +1747,7 @@ public class ApiManagerImpl implements ApiManager {
 
     @Override
     public String getDisplayUserLoginType(String loginType) {
-        if(mBuildManager.isCustomLoginType()){
+        if (mBuildManager.isCustomLoginType()) {
             return mContext.getString(R.string.app_name);
         }
 

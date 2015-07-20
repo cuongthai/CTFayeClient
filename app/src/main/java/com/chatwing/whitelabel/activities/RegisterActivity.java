@@ -108,6 +108,11 @@ public class RegisterActivity extends AuthenticateActivity
                 return;
             }
 
+            if(exception instanceof ApiManager.OtherApplicationException){
+                mErrorMessageView.show(((ApiManager.OtherApplicationException) exception).getError().getMessage());
+                return;
+            }
+
             //Other exceptions/error let boss handles it
             mErrorMessageView.show(exception);
             return;

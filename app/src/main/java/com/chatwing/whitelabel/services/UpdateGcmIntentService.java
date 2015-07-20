@@ -123,7 +123,8 @@ public class UpdateGcmIntentService extends BaseIntentService {
             throws ApiManager.ApiException,
             ApiManager.UserUnauthenticatedException,
             ApiManager.InvalidAccessTokenException,
-            ApiManager.NotVerifiedEmailException {
+            ApiManager.NotVerifiedEmailException,
+            ApiManager.OtherApplicationException {
         UpdateGcmResponse updateGcmResponse = mApiManager.updateGcm(user, regId, action);
         if (updateGcmResponse.getError() == null)
             return true;
