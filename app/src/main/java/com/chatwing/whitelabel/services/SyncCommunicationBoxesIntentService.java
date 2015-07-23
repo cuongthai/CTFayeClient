@@ -35,9 +35,11 @@ import com.chatwing.whitelabel.pojos.User;
 import com.chatwing.whitelabel.pojos.responses.ChatBoxDetailsResponse;
 import com.chatwing.whitelabel.pojos.responses.ChatBoxListResponse;
 import com.chatwing.whitelabel.pojos.responses.LoadConversationsResponse;
+import com.chatwing.whitelabel.pojos.responses.LoadModeratorsResponse;
 import com.chatwing.whitelabel.tables.CategoryTable;
 import com.chatwing.whitelabel.tables.ChatBoxTable;
 import com.chatwing.whitelabel.tables.ConversationTable;
+import com.chatwing.whitelabel.tables.DefaultUserTable;
 import com.chatwing.whitelabel.utils.LogUtils;
 
 import java.util.ArrayList;
@@ -92,9 +94,14 @@ public class SyncCommunicationBoxesIntentService extends BaseIntentService {
             if (mUserManager.userCanLoadConversations() && intent.getBooleanExtra(UPDATE_CONVERSATION_FLAG, true)) {
                 LoadConversationsResponse loadConversationsResponse =
                         mApiManager.loadConversations(user, Constants.MAX_NUMBER_OF_CONVERSATIONS, 0);
+                LoadModeratorsResponse loadModeratorsResponse =
+                        mApiManager.loadModerators(user, Constants.MAX_NUMBER_OF_DEFAULT_USERS, 0);
+
                 String conversationId = intent.getStringExtra(EXTRA_CONVERSATION_ID);
-                addUpdateConversationsOperations(loadConversationsResponse.getData(), batch);
+                addUpdateConversationsOperations(loadConversationsResponse.getData(), loadModeratorsResponse.getModerators(), batch);
                 addMarkAsReadCurrentConversationOperations(conversationId, batch);
+
+                addUpdateModeratorsOperations(loadModeratorsResponse.getModerators(), batch);
             }
 
             getContentResolver().applyBatch(ChatWingContentProvider.AUTHORITY, batch);
@@ -145,8 +152,8 @@ public class SyncCommunicationBoxesIntentService extends BaseIntentService {
 //        handleChatWingOfficial(intent);
 //        handleKentucky(intent);
 //        handleSeattle(intent);
-        handleDestiny(intent);
-//        handleDemo(intent);
+//        handleDestiny(intent);
+        handleDemo(intent);
 //        handleDebug(intent);
 //        handleStaging(intent);
     }
@@ -165,7 +172,7 @@ public class SyncCommunicationBoxesIntentService extends BaseIntentService {
             ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
             if (intent.getBooleanExtra(UPDATE_CATEGORIES_FLAG, true)) {
                 ChatBoxListResponse chatBoxListResponse = mApiManager.loadChatBoxes();
-                if(chatBoxListResponse==null){
+                if (chatBoxListResponse == null) {
                     throw ApiManager.ApiException.createException(new Exception(getString(R.string.error_failed_to_load_chatboxes)));
                 }
                 fetchUnreadCount(chatBoxListResponse);
@@ -176,9 +183,13 @@ public class SyncCommunicationBoxesIntentService extends BaseIntentService {
             if (mUserManager.userCanLoadConversations() && intent.getBooleanExtra(UPDATE_CONVERSATION_FLAG, true)) {
                 LoadConversationsResponse loadConversationsResponse =
                         mApiManager.loadConversations(user, Constants.MAX_NUMBER_OF_CONVERSATIONS, 0);
+                LoadModeratorsResponse loadModeratorsResponse =
+                        mApiManager.loadModerators(user, Constants.MAX_NUMBER_OF_DEFAULT_USERS, 0);
                 String conversationId = intent.getStringExtra(EXTRA_CONVERSATION_ID);
-                addUpdateConversationsOperations(loadConversationsResponse.getData(), batch);
+                addUpdateConversationsOperations(loadConversationsResponse.getData(), loadModeratorsResponse.getModerators(), batch);
                 addMarkAsReadCurrentConversationOperations(conversationId, batch);
+
+                addUpdateModeratorsOperations(loadModeratorsResponse.getModerators(), batch);
             }
 
             getContentResolver().applyBatch(ChatWingContentProvider.AUTHORITY, batch);
@@ -245,9 +256,14 @@ public class SyncCommunicationBoxesIntentService extends BaseIntentService {
             if (mUserManager.userCanLoadConversations() && intent.getBooleanExtra(UPDATE_CONVERSATION_FLAG, true)) {
                 LoadConversationsResponse loadConversationsResponse =
                         mApiManager.loadConversations(user, Constants.MAX_NUMBER_OF_CONVERSATIONS, 0);
+                LoadModeratorsResponse loadModeratorsResponse =
+                        mApiManager.loadModerators(user, Constants.MAX_NUMBER_OF_DEFAULT_USERS, 0);
+
                 String conversationId = intent.getStringExtra(EXTRA_CONVERSATION_ID);
-                addUpdateConversationsOperations(loadConversationsResponse.getData(), batch);
+                addUpdateConversationsOperations(loadConversationsResponse.getData(), loadModeratorsResponse.getModerators(), batch);
                 addMarkAsReadCurrentConversationOperations(conversationId, batch);
+
+                addUpdateModeratorsOperations(loadModeratorsResponse.getModerators(), batch);
             }
 
             getContentResolver().applyBatch(ChatWingContentProvider.AUTHORITY, batch);
@@ -330,9 +346,15 @@ public class SyncCommunicationBoxesIntentService extends BaseIntentService {
             if (mUserManager.userCanLoadConversations() && intent.getBooleanExtra(UPDATE_CONVERSATION_FLAG, true)) {
                 LoadConversationsResponse loadConversationsResponse =
                         mApiManager.loadConversations(user, Constants.MAX_NUMBER_OF_CONVERSATIONS, 0);
+                LoadModeratorsResponse loadModeratorsResponse =
+                        mApiManager.loadModerators(user, Constants.MAX_NUMBER_OF_DEFAULT_USERS, 0);
+
                 String conversationId = intent.getStringExtra(EXTRA_CONVERSATION_ID);
-                addUpdateConversationsOperations(loadConversationsResponse.getData(), batch);
+                addUpdateConversationsOperations(loadConversationsResponse.getData(), loadModeratorsResponse.getModerators(), batch);
                 addMarkAsReadCurrentConversationOperations(conversationId, batch);
+
+                addUpdateModeratorsOperations(loadModeratorsResponse.getModerators(), batch);
+
             }
 
             getContentResolver().applyBatch(ChatWingContentProvider.AUTHORITY, batch);
@@ -391,9 +413,14 @@ public class SyncCommunicationBoxesIntentService extends BaseIntentService {
             if (mUserManager.userCanLoadConversations() && intent.getBooleanExtra(UPDATE_CONVERSATION_FLAG, true)) {
                 LoadConversationsResponse loadConversationsResponse =
                         mApiManager.loadConversations(user, Constants.MAX_NUMBER_OF_CONVERSATIONS, 0);
+                LoadModeratorsResponse loadModeratorsResponse =
+                        mApiManager.loadModerators(user, Constants.MAX_NUMBER_OF_DEFAULT_USERS, 0);
+
                 String conversationId = intent.getStringExtra(EXTRA_CONVERSATION_ID);
-                addUpdateConversationsOperations(loadConversationsResponse.getData(), batch);
+                addUpdateConversationsOperations(loadConversationsResponse.getData(), loadModeratorsResponse.getModerators(), batch);
                 addMarkAsReadCurrentConversationOperations(conversationId, batch);
+
+                addUpdateModeratorsOperations(loadModeratorsResponse.getModerators(), batch);
             }
 
             getContentResolver().applyBatch(ChatWingContentProvider.AUTHORITY, batch);
@@ -432,9 +459,15 @@ public class SyncCommunicationBoxesIntentService extends BaseIntentService {
             if (mUserManager.userCanLoadConversations() && intent.getBooleanExtra(UPDATE_CONVERSATION_FLAG, true)) {
                 LoadConversationsResponse loadConversationsResponse =
                         mApiManager.loadConversations(user, Constants.MAX_NUMBER_OF_CONVERSATIONS, 0);
+                LoadModeratorsResponse loadModeratorsResponse =
+                        mApiManager.loadModerators(user, Constants.MAX_NUMBER_OF_DEFAULT_USERS, 0);
+
                 String conversationId = intent.getStringExtra(EXTRA_CONVERSATION_ID);
-                addUpdateConversationsOperations(loadConversationsResponse.getData(), batch);
+                addUpdateConversationsOperations(loadConversationsResponse.getData(), loadModeratorsResponse.getModerators(), batch);
                 addMarkAsReadCurrentConversationOperations(conversationId, batch);
+
+
+                addUpdateModeratorsOperations(loadModeratorsResponse.getModerators(), batch);
             }
 
             getContentResolver().applyBatch(ChatWingContentProvider.AUTHORITY, batch);
@@ -495,26 +528,66 @@ public class SyncCommunicationBoxesIntentService extends BaseIntentService {
         }
     }
 
+    private void addUpdateModeratorsOperations(LoadModeratorsResponse.Moderator[] moderators,
+                                               ArrayList<ContentProviderOperation> batch) {
+        Uri moderatorsUri = ChatWingContentProvider.getModeratorsUri();
+        batch.add(ContentProviderOperation
+                .newDelete(moderatorsUri)
+                .build());
+
+        addInsertModeratorsOperations(moderators, batch);
+    }
+
     private void addUpdateConversationsOperations(Conversation[] conversations,
+                                                  LoadModeratorsResponse.Moderator[] moderators,
                                                   ArrayList<ContentProviderOperation> batch) {
         Uri conversationUri = ChatWingContentProvider.getConversationsUri();
         batch.add(ContentProviderOperation
                 .newDelete(conversationUri)
                 .build());
 
-        addInsertConversationsOperations(conversations, batch);
+        addInsertConversationsOperations(conversations, moderators, batch);
     }
 
-    private void addInsertConversationsOperations(Conversation[] conversations, ArrayList<ContentProviderOperation> batch) {
-        Uri uri = ChatWingContentProvider.getConversationsUri();
+    private void addInsertModeratorsOperations(LoadModeratorsResponse.Moderator[] moderators, ArrayList<ContentProviderOperation> batch) {
+        Uri uri = ChatWingContentProvider.getModeratorsUri();
         ContentValues values;
 
-        for (Conversation conversation : conversations) {
-            values = ConversationTable.getContentValues(conversation);
+        for (LoadModeratorsResponse.Moderator moderator : moderators) {
+            values = DefaultUserTable.getContentValues(moderator);
             batch.add(ContentProviderOperation.newInsert(uri)
                     .withValues(values)
                     .build());
         }
+    }
+
+    private void addInsertConversationsOperations(Conversation[] conversations, LoadModeratorsResponse.Moderator[] moderators, ArrayList<ContentProviderOperation> batch) {
+        Uri uri = ChatWingContentProvider.getConversationsUri();
+        ContentValues values;
+
+        for (Conversation conversation : conversations) {
+            User targetUser = conversation.getTargetUser(mUserManager.getCurrentUser());
+
+            values = ConversationTable.getContentValues(conversation, mUserManager.getCurrentUser());
+            if (isModerator(targetUser, moderators)) {
+                values.put(ConversationTable.IS_MODERATOR, 1);
+            } else {
+                values.put(ConversationTable.IS_MODERATOR, 0);
+            }
+
+            batch.add(ContentProviderOperation.newInsert(uri)
+                    .withValues(values)
+                    .build());
+        }
+    }
+
+    private boolean isModerator(User targetUser, LoadModeratorsResponse.Moderator[] moderators) {
+        for (LoadModeratorsResponse.Moderator moderator : moderators) {
+            if (moderator.getIdentifier().equals(targetUser.getIdentifier())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

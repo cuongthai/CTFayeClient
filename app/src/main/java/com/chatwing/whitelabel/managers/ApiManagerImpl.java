@@ -53,6 +53,7 @@ import com.chatwing.whitelabel.pojos.params.IgnoreUserParams;
 import com.chatwing.whitelabel.pojos.params.LoadBookmarkParams;
 import com.chatwing.whitelabel.pojos.params.LoadChatBoxDetailsParams;
 import com.chatwing.whitelabel.pojos.params.LoadConversationParams;
+import com.chatwing.whitelabel.pojos.params.LoadModeratorParams;
 import com.chatwing.whitelabel.pojos.params.MessageCountParams;
 import com.chatwing.whitelabel.pojos.params.OnlineUserParams;
 import com.chatwing.whitelabel.pojos.params.Params;
@@ -78,6 +79,7 @@ import com.chatwing.whitelabel.pojos.responses.ErrorResponse;
 import com.chatwing.whitelabel.pojos.responses.FlagMessageResponse;
 import com.chatwing.whitelabel.pojos.responses.IgnoreUserResponse;
 import com.chatwing.whitelabel.pojos.responses.LoadConversationsResponse;
+import com.chatwing.whitelabel.pojos.responses.LoadModeratorsResponse;
 import com.chatwing.whitelabel.pojos.responses.LoadOnlineUsersResponse;
 import com.chatwing.whitelabel.pojos.responses.MessagesResponse;
 import com.chatwing.whitelabel.pojos.responses.RegisterResponse;
@@ -889,6 +891,39 @@ public class ApiManagerImpl implements ApiManager {
             LoadConversationsResponse loadConversationsResponse
                     = gson.fromJson(responseString, LoadConversationsResponse.class);
             return loadConversationsResponse;
+        } catch (JsonSyntaxException e) {
+            throw ApiException.createJsonSyntaxException(e, responseString);
+        } catch (ValidationException e) {
+            throw ApiException.createException(e);
+        }
+    }
+
+    @Override
+    public LoadModeratorsResponse loadModerators(User user,
+                                                       int limit,
+                                                       int offset)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            UserUnauthenticatedException,
+            InvalidAccessTokenException,
+            InvalidIdentityException,
+            NotVerifiedEmailException,
+            OtherApplicationException {
+        validate(user);
+
+
+        Gson gson = new Gson();
+        LoadModeratorParams params = new LoadModeratorParams(limit, offset);
+
+        HttpRequest request = HttpRequest.get(MODERATOR_LIST_URL + appendParams(params));
+        setUpRequest(request, user);
+        String responseString = null;
+
+        try {
+            responseString = validate(request);
+            LoadModeratorsResponse loadModeratorsResponse
+                    = gson.fromJson(responseString, LoadModeratorsResponse.class);
+            return loadModeratorsResponse;
         } catch (JsonSyntaxException e) {
             throw ApiException.createJsonSyntaxException(e, responseString);
         } catch (ValidationException e) {

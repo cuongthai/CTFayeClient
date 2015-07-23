@@ -24,6 +24,7 @@ import com.chatwing.whitelabel.pojos.responses.DeleteMessageResponse;
 import com.chatwing.whitelabel.pojos.responses.FlagMessageResponse;
 import com.chatwing.whitelabel.pojos.responses.IgnoreUserResponse;
 import com.chatwing.whitelabel.pojos.responses.LoadConversationsResponse;
+import com.chatwing.whitelabel.pojos.responses.LoadModeratorsResponse;
 import com.chatwing.whitelabel.pojos.responses.LoadOnlineUsersResponse;
 import com.chatwing.whitelabel.pojos.responses.MessagesResponse;
 import com.chatwing.whitelabel.pojos.responses.RegisterResponse;
@@ -73,6 +74,7 @@ public interface ApiManager {
 
 
     public final String CONVERSATION_LIST_URL = URL_END_POINT + "/chat-user/conversation/list";
+    public final String MODERATOR_LIST_URL = URL_END_POINT + "/app/moderator/list";
     public final String ADD_GCM_URL = URL_END_POINT + "/chat-user/gcm/add";
     public final String REMOVE_GCM_URL = URL_END_POINT + "/chat-user/gcm/remove";
     public final String PING_URL = URL_END_POINT + "/chat-user/ping";
@@ -363,7 +365,8 @@ public interface ApiManager {
             InvalidIdentityException,
             InvalidAccessTokenException,
             CreateMessageException,
-            NotVerifiedEmailException, OtherApplicationException;
+            NotVerifiedEmailException,
+            OtherApplicationException;
 
     public LoadConversationsResponse loadConversations(User user,
                                                        int limit,
@@ -373,7 +376,19 @@ public interface ApiManager {
             UserUnauthenticatedException,
             InvalidAccessTokenException,
             InvalidIdentityException,
-            NotVerifiedEmailException, OtherApplicationException;
+            NotVerifiedEmailException,
+            OtherApplicationException;
+
+    public LoadModeratorsResponse loadModerators(User user,
+                                                       int limit,
+                                                       int offset)
+            throws ApiException,
+            HttpRequest.HttpRequestException,
+            UserUnauthenticatedException,
+            InvalidAccessTokenException,
+            InvalidIdentityException,
+            NotVerifiedEmailException,
+            OtherApplicationException;
 
     public String getAvatarUrl(User user);
 
@@ -395,7 +410,7 @@ public interface ApiManager {
             ConversationIdValidator.InvalidIdException,
             InvalidAccessTokenException,
             InvalidIdentityException,
-            NotVerifiedEmailException, OtherApplicationException;
+            NotVerifiedEmailException,OtherApplicationException;
 
     void ackChatbox(User user,
                     Integer chatboxID)
@@ -405,7 +420,8 @@ public interface ApiManager {
             ChatBoxIdValidator.InvalidIdException,
             InvalidAccessTokenException,
             InvalidIdentityException,
-            NotVerifiedEmailException, OtherApplicationException;
+            NotVerifiedEmailException,
+            OtherApplicationException;
 
 
     public SubscriptionStatusResponse loadCommunicationSetting(User user,
@@ -416,7 +432,8 @@ public interface ApiManager {
             ChatBoxIdValidator.InvalidIdException,
             InvalidAccessTokenException,
             InvalidIdentityException,
-            NotVerifiedEmailException, OtherApplicationException;
+            NotVerifiedEmailException,
+            OtherApplicationException;
 
     public SubscriptionStatusResponse loadCommunicationSetting(User user,
                                                                String conversationID)

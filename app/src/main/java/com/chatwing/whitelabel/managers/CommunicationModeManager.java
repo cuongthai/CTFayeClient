@@ -42,6 +42,7 @@ import com.chatwing.whitelabel.fragments.CommunicationMessagesFragment;
 import com.chatwing.whitelabel.fragments.NotificationFragment;
 import com.chatwing.whitelabel.pojos.Event;
 import com.chatwing.whitelabel.pojos.Message;
+import com.chatwing.whitelabel.pojos.params.CreateConversationParams;
 import com.chatwing.whitelabel.services.SyncCommunicationBoxesIntentService;
 import com.chatwing.whitelabel.tables.ChatBoxTable;
 import com.chatwing.whitelabel.tables.ConversationTable;
@@ -258,6 +259,8 @@ public abstract class CommunicationModeManager {
         public DrawerLayout getDrawerLayout();
 
         public void ensureWebViewAndSubscribeToChannels();
+
+        public void showConversation(CreateConversationParams.SimpleUser simpleUser);
 
 
 

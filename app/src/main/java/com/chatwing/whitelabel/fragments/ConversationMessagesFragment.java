@@ -186,7 +186,7 @@ public class ConversationMessagesFragment extends CommunicationMessagesFragment 
             return;
         }
         //Create conversation if not existed
-        ContentValues conversationContentValues = ConversationTable.getContentValues(conversation);
+        ContentValues conversationContentValues = ConversationTable.getContentValues(conversation, mUserManager.getCurrentUser());
         Cursor cursor = null;
         try {
             cursor = getActivity().getContentResolver().query(

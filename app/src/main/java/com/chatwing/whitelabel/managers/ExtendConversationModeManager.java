@@ -10,6 +10,7 @@ import com.chatwing.whitelabel.events.CurrentConversationEvent;
 import com.chatwing.whitelabel.events.PostAuthenticationEvent;
 import com.chatwing.whitelabel.events.UpdateSubscriptionEvent;
 import com.chatwing.whitelabel.events.UserSelectedConversationEvent;
+import com.chatwing.whitelabel.events.UserSelectedDefaultUsersEvent;
 import com.chatwing.whitelabel.validators.ConversationIdValidator;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -56,6 +57,11 @@ public class ExtendConversationModeManager extends ConversationModeManager {
     @com.squareup.otto.Subscribe
     public void onUserSelectedConversationEvent(UserSelectedConversationEvent event) {
         super.onUserSelectedConversationEvent(event);
+    }
+
+    @com.squareup.otto.Subscribe
+    public void onUserSelectedDefaultUsersEvent(UserSelectedDefaultUsersEvent event) {
+        super.onUserSelectedDefaultUsersEvent(event);
     }
 
     @Subscribe

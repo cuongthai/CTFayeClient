@@ -145,26 +145,6 @@ public class Conversation implements Serializable {
         return false;
     }
 
-    public boolean allowPushNotification(User currentUser) {
-        if (users == null || currentUser == null) return false;
-        for (User user : users) {
-            if (user.getIdentifier().equals(currentUser.getIdentifier())) {
-                return user.isConversationPushNotification();
-            }
-        }
-        return false;
-    }
-
-    public boolean allowEmailNotification(User currentUser) {
-        if (users == null || currentUser == null) return false;
-        for (User user : users) {
-            if (user.getIdentifier().equals(currentUser.getIdentifier())) {
-                return user.isConversationEmailNotification();
-            }
-        }
-        return false;
-    }
-
     public User getMe(User currentUser) {
         if (users == null || currentUser == null) return null;
         for (User user : users) {
@@ -175,9 +155,20 @@ public class Conversation implements Serializable {
         return null;
     }
 
+    public User getTargetUser(User currentUser) {
+        if (users == null || currentUser == null) return null;
+
+        for (User user : users) {
+            if (!user.getIdentifier().equals(currentUser.getIdentifier())) {
+                return user;
+            }
+        }
+        return null;
+    }
+
     public Map<String, String> getEmoticonsAsMap() {
-        Map<String, String> emos =new HashMap<String, String>();
-        for(Emoticon emoticon:JsonConstantsProvider.emoticonObject){
+        Map<String, String> emos = new HashMap<String, String>();
+        for (Emoticon emoticon : JsonConstantsProvider.emoticonObject) {
             emos.put(emoticon.getSymbol(), emoticon.getImage());
         }
         return emos;

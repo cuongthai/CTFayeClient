@@ -32,6 +32,7 @@ import com.chatwing.whitelabel.helpers.ChatWingSQLiteOpenHelper;
 import com.chatwing.whitelabel.tables.CategoryTable;
 import com.chatwing.whitelabel.tables.ChatBoxTable;
 import com.chatwing.whitelabel.tables.ConversationTable;
+import com.chatwing.whitelabel.tables.DefaultUserTable;
 import com.chatwing.whitelabel.tables.MessageTable;
 import com.chatwing.whitelabel.tables.NotificationMessagesTable;
 import com.chatwing.whitelabel.tables.SyncedBookmarkTable;
@@ -55,6 +56,7 @@ public class ChatWingContentProvider extends ContentProvider {
     public static final String PATH_AGGREGATED_CATEGORIES = "aggregated_categories";
     public static final String PATH_NOTIFICATION_MESSAGES = "notification_messages";
     public static final String PATH_SYNCED_BOOKMARKS = "synced_bookmarks";
+    public static final String PATH_MODERATORS = "moderators";
 
 
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY);
@@ -76,6 +78,8 @@ public class ChatWingContentProvider extends ContentProvider {
     private static final int CODE_MESSAGE = 31;
     private static final int CODE_CHAT_BOXES_ID_MESSAGES = 32;
 
+    private static final int CODE_MODERATORS = 50;
+
 
     private static final int CODE_AGGREEGATED_CATEGORIES = 90;
 
@@ -96,6 +100,8 @@ public class ChatWingContentProvider extends ContentProvider {
                 AUTHORITY,
                 PATH_CONVERSATIONS + "/*/" + PATH_MESSAGES,
                 CODE_CONVERSATIONS_ID_MESSAGES);
+
+        sUriMatcher.addURI(AUTHORITY, PATH_MODERATORS, CODE_MODERATORS);
 
 
         sUriMatcher.addURI(AUTHORITY, PATH_CHAT_BOXES, CODE_CHAT_BOXES);
@@ -133,6 +139,7 @@ public class ChatWingContentProvider extends ContentProvider {
         sUriMatcher.addURI(AUTHORITY, PATH_SYNCED_BOOKMARKS + "/#", CODE_SYNCED_BOOKMARK);
     }
 
+    private static Uri sModeratorsUri;
     private static Uri sConversationsUri;
     private static Uri sChatBoxesUri;
     private static Uri sMessagesUri;
@@ -141,6 +148,15 @@ public class ChatWingContentProvider extends ContentProvider {
     private static Uri sCategorizedChatBoxesUri;
     private static Uri sNotificationMessagesUri;
     private static Uri sSyncedBookmarksUri;
+
+    public static Uri getModeratorsUri() {
+        if (sModeratorsUri == null) {
+            sModeratorsUri = CONTENT_URI.buildUpon()
+                    .appendEncodedPath(PATH_MODERATORS)
+                    .build();
+        }
+        return sModeratorsUri;
+    }
 
     public static Uri getConversationsUri() {
         if (sConversationsUri == null) {
@@ -254,6 +270,7 @@ public class ChatWingContentProvider extends ContentProvider {
         batch.add(ContentProviderOperation.newDelete(getMessagesUri()).build());
         batch.add(ContentProviderOperation.newDelete(getSyncedBookmarksUri()).build());
         batch.add(ContentProviderOperation.newDelete(getCategoriesUri()).build());
+        batch.add(ContentProviderOperation.newDelete(getModeratorsUri()).build());
 
         return batch;
     }
@@ -417,6 +434,21 @@ public class ChatWingContentProvider extends ContentProvider {
                         .append(")");
                 builder.setTables(sb.toString());
                 break;
+            case CODE_MODERATORS:
+                sb = new StringBuilder(DefaultUserTable.TABLE)
+                        .append(" LEFT OUTER JOIN ")
+                        .append(ConversationTable.TABLE)
+                        .append(" ON (")
+                        .append(DefaultUserTable.TABLE)
+                        .append(".")
+                        .append(DefaultUserTable.TARGET_USER_IDENTIFIER)
+                        .append(" = ")
+                        .append(ConversationTable.TABLE)
+                        .append(".")
+                        .append(ConversationTable.TARGET_USER_IDENTIFIER)
+                        .append(")");
+                builder.setTables(sb.toString());
+                break;
             case CODE_SYNCED_BOOKMARK:
                 builder.appendWhere(
                         SyncedBookmarkTable.CHAT_BOX_ID + "=" + uri.getLastPathSegment());
@@ -453,6 +485,10 @@ public class ChatWingContentProvider extends ContentProvider {
             case CODE_CONVERSATIONS:
                 id = db.insert(ConversationTable.TABLE, null, values);
                 path = PATH_CONVERSATIONS;
+                break;
+            case CODE_MODERATORS:
+                id = db.insert(DefaultUserTable.TABLE, null, values);
+                path = PATH_MODERATORS;
                 break;
             case CODE_MESSAGES:
                 id = db.insertWithOnConflict(MessageTable.TABLE, null, values, SQLiteDatabase.CONFLICT_IGNORE);
@@ -505,6 +541,10 @@ public class ChatWingContentProvider extends ContentProvider {
                 break;
             case CODE_CONVERSATIONS:
                 rowsDeleted = db.delete(ConversationTable.TABLE,
+                        selection, selectionArgs);
+                break;
+            case CODE_MODERATORS:
+                rowsDeleted = db.delete(DefaultUserTable.TABLE,
                         selection, selectionArgs);
                 break;
             case CODE_CONVERSATION:

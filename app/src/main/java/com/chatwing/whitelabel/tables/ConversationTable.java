@@ -24,6 +24,7 @@ import android.provider.BaseColumns;
 import com.chatwing.whitelabel.Constants;
 import com.chatwing.whitelabel.helpers.ChatWingSQLiteOpenHelper;
 import com.chatwing.whitelabel.pojos.Conversation;
+import com.chatwing.whitelabel.pojos.User;
 import com.google.gson.Gson;
 
 /**
@@ -38,6 +39,8 @@ public class ConversationTable implements BaseColumns {
     public static final String DATA = "data";
     public static final String UNREAD_COUNT = "unread_count";
     public static final String DATE_UPDATED = "date_updated";
+    public static final String TARGET_USER_IDENTIFIER = "user_identifier";
+    public static final String IS_MODERATOR = "is_moderator";
 
     private static final String DATABASE_CREATE = "CREATE TABLE "
             + TABLE
@@ -48,6 +51,8 @@ public class ConversationTable implements BaseColumns {
             + CREATED_DATE + " INTEGER NOT NULL, "
             + LAST_DATE + " INTEGER NOT NULL, "
             + DATE_UPDATED + " INTEGER NOT NULL, "
+            + TARGET_USER_IDENTIFIER + " TEXT, "
+            + IS_MODERATOR + " INTEGER NOT NULL DEFAULT 0, "
             + DATA + " TEXT NOT NULL "
             + ");";
 
@@ -60,15 +65,19 @@ public class ConversationTable implements BaseColumns {
         if (Constants.DEBUG) {
             database.execSQL("DROP TABLE IF EXISTS " + TABLE);
             onCreate(database);
-        }else {
+        } else {
             int version = oldVersion;
             // Upgrade this table step by step. That's why all "fall through"s
             // in this switch are intended.
-            switch (version){
+            switch (version) {
                 case ChatWingSQLiteOpenHelper.VERSION_0_4:
                 case ChatWingSQLiteOpenHelper.VERSION_0_5:
                 case ChatWingSQLiteOpenHelper.VERSION_1_2:
                 case ChatWingSQLiteOpenHelper.VERSION_1_2_1:
+                    database.execSQL("ALTER TABLE " + TABLE
+                            + " ADD COLUMN" + TARGET_USER_IDENTIFIER + " TEXT");
+                    database.execSQL("ALTER TABLE " + TABLE
+                            + " ADD COLUMN" + IS_MODERATOR + " INTEGER NOT NULL DEFAULT 0, ");
                     version = ChatWingSQLiteOpenHelper.VERSION_1_5;
             }
 
@@ -80,7 +89,7 @@ public class ConversationTable implements BaseColumns {
     }
 
     public static String[] getMinimumProjection() {
-        return new String[]{_ID, CONVERSATION_ID, CREATED_DATE, DATA, UNREAD_COUNT, DATE_UPDATED, LAST_DATE};
+        return new String[]{_ID, CONVERSATION_ID, CREATED_DATE, DATA, UNREAD_COUNT, DATE_UPDATED, LAST_DATE, IS_MODERATOR};
     }
 
     public static Conversation getConversation(Cursor cursor) {
@@ -105,13 +114,18 @@ public class ConversationTable implements BaseColumns {
         return conversation;
     }
 
-    public static ContentValues getContentValues(Conversation conversation) {
+    public static ContentValues getContentValues(Conversation conversation, User currentUser) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(CONVERSATION_ID, conversation.getId());
         contentValues.put(CREATED_DATE, conversation.getCreatedDate());
         contentValues.put(LAST_DATE, conversation.getLastMessageDate());
         contentValues.put(UNREAD_COUNT, conversation.getUnreadCount());
         contentValues.put(DATE_UPDATED, conversation.getDateUpdated());
+        if (currentUser != null) {
+            User targetUser = conversation.getTargetUser(currentUser);
+            if (targetUser != null)
+                contentValues.put(TARGET_USER_IDENTIFIER, targetUser.getIdentifier());
+        }
         contentValues.put(DATA, new Gson().toJson(conversation));
         return contentValues;
     }

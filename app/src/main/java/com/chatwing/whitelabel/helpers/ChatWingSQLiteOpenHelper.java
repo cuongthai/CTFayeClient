@@ -23,6 +23,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.chatwing.whitelabel.tables.CategoryTable;
 import com.chatwing.whitelabel.tables.ChatBoxTable;
 import com.chatwing.whitelabel.tables.ConversationTable;
+import com.chatwing.whitelabel.tables.DefaultUserTable;
 import com.chatwing.whitelabel.tables.MessageTable;
 import com.chatwing.whitelabel.tables.NotificationMessagesTable;
 import com.chatwing.whitelabel.tables.SyncedBookmarkTable;
@@ -51,6 +52,10 @@ public class ChatWingSQLiteOpenHelper extends SQLiteOpenHelper {
 
     public static final int VERSION_1_2_1 = 11;
 
+    /**
+     * Bring back message table
+     * Add default user table
+     */
     public static final int VERSION_1_5 = 20;
 
     public static final int DATABASE_VERSION = VERSION_1_5;
@@ -67,6 +72,7 @@ public class ChatWingSQLiteOpenHelper extends SQLiteOpenHelper {
         NotificationMessagesTable.onCreate(db);
         SyncedBookmarkTable.onCreate(db);
         MessageTable.onCreate(db);
+        DefaultUserTable.onCreate(db);
     }
 
     @Override
@@ -77,5 +83,6 @@ public class ChatWingSQLiteOpenHelper extends SQLiteOpenHelper {
         NotificationMessagesTable.onUpgrade(db, oldVersion, newVersion);
         SyncedBookmarkTable.onUpgrade(db, oldVersion, newVersion);
         MessageTable.onUpgrade(db, oldVersion, newVersion);
+        DefaultUserTable.onUpgrade(db, oldVersion, newVersion);
     }
 }

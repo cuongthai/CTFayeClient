@@ -11,12 +11,14 @@ import java.util.List;
 public interface Constants {
     boolean DEBUG = ChatWing.isDebugging();
     String CHATWING_SDK_TAG = "ChatWingSDK";
-    String CHATWING_BASE_URL =  "http://chatwing.com";
+    String CHATWING_BASE_URL =  "http://staging.chatwing.com";
     String FAYE_CLIENT_URL = CHATWING_BASE_URL + "/mobile/client/1";
 
     String MAIN_COLOR = "#05b0ff";
 
     int MAX_NUMBER_OF_CONVERSATIONS = 100;
+
+    int MAX_NUMBER_OF_DEFAULT_USERS= 100;
 
     /**
      * Authentication types
