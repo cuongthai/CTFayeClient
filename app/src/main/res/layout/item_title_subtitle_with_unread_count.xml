@@ -4,7 +4,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/item_selector"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:paddingBottom="@dimen/spacing_large"
+                android:paddingRight="@dimen/spacing_large"
+                android:paddingTop="@dimen/spacing_large">
     <!-- Unread count indicator -->
     <TextView android:id="@android:id/text2"
               style="@style/Theme.ChatWing.DrawerItemCounter"
@@ -19,6 +22,7 @@
         <TextView android:id="@android:id/text1"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
+                  android:textAppearance="?android:attr/textAppearanceMedium"
                   style="@style/Theme.ChatWing.DrawerItemTitle"
                   android:background="@android:color/transparent"
                   android:paddingBottom="0dp"/>

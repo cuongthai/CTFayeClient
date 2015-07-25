@@ -1,6 +1,14 @@
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.chatwing.activities.CreateChatBoxActivity">
+    tools:context="com.chatwing.activities.CreateChatBoxActivity"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+
+    <include
+        layout="@layout/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true" />
 
     <!-- Create progress -->
     <LinearLayout
@@ -8,8 +16,7 @@
         android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center_horizontal"
+        android:layout_centerInParent="true"
         android:orientation="vertical">
 
         <ProgressBar
@@ -32,7 +39,8 @@
         android:id="@+id/create_chat_box_form"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/bg_color">
+        android:background="@color/bg_color"
+        android:layout_below="@+id/toolbar">
 
         <LinearLayout style="@style/FormContainer">
 
@@ -56,4 +64,4 @@
 
         </LinearLayout>
     </ScrollView>
-</merge>
+</RelativeLayout>

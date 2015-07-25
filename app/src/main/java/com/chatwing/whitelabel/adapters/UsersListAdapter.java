@@ -1,6 +1,7 @@
 package com.chatwing.whitelabel.adapters;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,20 +52,22 @@ public class UsersListAdapter extends BaseAdapter {
 
             holder = new ViewHolder();
             holder.usernameTv = (TextView) convertView.findViewById(android.R.id.text1);
-            holder.unreadCountTv = (TextView) convertView.findViewById(android.R.id.text2);
+            convertView.findViewById(android.R.id.text2).setVisibility(View.GONE);
+            convertView.findViewById(R.id.unread_count).setVisibility(View.GONE);
+            holder.usernameTv.setTypeface(null, Typeface.ITALIC);
 
             convertView.setTag(holder);
         } else
             holder = (ViewHolder) convertView.getTag();
 
-        LogUtils.v("Moderators "+moderator.getIdentifier());
+        LogUtils.v("Moderators " + moderator.getIdentifier());
 
         holder.usernameTv.setText(moderator.getName());
         return convertView;
     }
 
     public void setUsers(List<LoadModeratorsResponse.Moderator> moderators) {
-        LogUtils.v("Moderators "+moderators.size());
+        LogUtils.v("Moderators " + moderators.size());
         this.moderators.clear();
         this.moderators.addAll(moderators);
         notifyDataSetChanged();
@@ -77,6 +80,5 @@ public class UsersListAdapter extends BaseAdapter {
 
     private class ViewHolder {
         public TextView usernameTv;
-        public TextView unreadCountTv;
     }
 }

@@ -85,12 +85,14 @@
             android:name=".activities.LegacyLoginActivity"
             android:icon="@drawable/ic_launcher"
             android:label="@string/title_activity_login"
-            android:theme="@style/Theme.ChatWing" />
+            android:theme="@style/Theme.ChatWing"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".activities.RegisterActivity"
             android:icon="@drawable/ic_launcher"
             android:label="@string/title_activity_register"
-            android:theme="@style/Theme.ChatWing" />
+            android:theme="@style/Theme.ChatWing"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".activities.SearchChatBoxActivity"
             android:label="@string/title_activity_search_chat_box"
@@ -112,7 +114,8 @@
             android:name=".activities.MainPreferenceActivity"
             android:icon="@drawable/ic_launcher"
             android:label="@string/title_activity_user_profile_preference"
-            android:theme="@style/Theme.ChatWing" />
+            android:theme="@style/Theme.ChatWing"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".activities.NoMenuWebViewActivity"
             android:icon="@drawable/ic_launcher"

@@ -24,6 +24,7 @@ import com.chatwing.whitelabel.pojos.Message;
 import com.chatwing.whitelabel.pojos.User;
 import com.chatwing.whitelabel.pojos.responses.CreateMessageResponse;
 import com.chatwing.whitelabel.tables.MessageTable;
+import com.chatwing.whitelabel.utils.StatisticTracker;
 
 
 /**
@@ -60,6 +61,7 @@ public class CreateMessageIntentService extends BaseIntentService {
             } else {
                 event = new CreateMessageEvent(message.getConversationID(), response);
             }
+            StatisticTracker.trackMessageSent();
         } catch (Exception e) {
             if (!message.isPrivate()) {
                 event = new CreateMessageEvent(message.getChatBoxId(), e);

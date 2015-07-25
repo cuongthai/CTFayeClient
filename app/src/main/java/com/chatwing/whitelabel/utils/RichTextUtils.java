@@ -55,7 +55,7 @@ public class RichTextUtils {
             new URL(imageUrl);
             return true;
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+
         }
         return false;
     }
@@ -72,8 +72,11 @@ public class RichTextUtils {
         for (String item : parts) {
             try {
                 URL url = new URL(item);
-                // If possible then replace with anchor...
-                builder.append("[url]" + url + "[/url] ");
+                if(isImageLink(item)){
+                    builder.append("[img]" + url + "[/img] ");
+                }else{
+                    builder.append("[url]" + url + "[/url] ");
+                }
             } catch (MalformedURLException e) {
                 // If there was an URL that was not it!...
                 builder.append(item + " ");
@@ -85,4 +88,13 @@ public class RichTextUtils {
         }
         return builder.toString().trim();
     }
+
+    private static boolean isImageLink(String content) {
+        return content.matches("(http(s?):/)(/[^/]+)+" + "\\.(?:jpg|gif|png)");
+//        return content.replaceAll("(http(s?):/)(/[^/]+)+" + "\\.(?:jpg|gif|png)", "[img]$0[/img]");
+    }
+
+
+
+
 }

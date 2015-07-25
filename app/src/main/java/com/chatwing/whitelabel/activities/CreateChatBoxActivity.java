@@ -3,6 +3,7 @@ package com.chatwing.whitelabel.activities;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -53,6 +54,9 @@ public class CreateChatBoxActivity extends BaseABFragmentActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_create_chat_box);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);

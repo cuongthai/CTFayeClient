@@ -28,6 +28,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -39,6 +40,7 @@ import com.chatwing.whitelabel.events.UserSelectedConversationEvent;
 import com.chatwing.whitelabel.events.UserSelectedDefaultUsersEvent;
 import com.chatwing.whitelabel.managers.CurrentConversationManager;
 import com.chatwing.whitelabel.managers.UserManager;
+import com.chatwing.whitelabel.pojos.User;
 import com.chatwing.whitelabel.pojos.params.CreateConversationParams;
 import com.chatwing.whitelabel.pojos.responses.LoadModeratorsResponse;
 import com.chatwing.whitelabel.tables.ConversationTable;
@@ -133,8 +135,12 @@ public class ConversationsFragment extends Fragment implements LoaderManager.Loa
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 LoadModeratorsResponse.Moderator moderator = mUsersAdapter.getItem(position);
-                mBus.post(new UserSelectedDefaultUsersEvent(
-                        new CreateConversationParams.SimpleUser(moderator.getLoginId(), moderator.getLoginType())));
+                User currentUser = mUserManager.getCurrentUser();
+
+                if (currentUser != null && !currentUser.getIdentifier().equals(moderator.getIdentifier())) { // Dont send message to ourself
+                    mBus.post(new UserSelectedDefaultUsersEvent(
+                            new CreateConversationParams.SimpleUser(moderator.getLoginId(), moderator.getLoginType())));
+                }
             }
         });
 
@@ -180,7 +186,7 @@ public class ConversationsFragment extends Fragment implements LoaderManager.Loa
                         getActivity(),
                         ChatWingContentProvider.getModeratorsUri(),
                         DefaultUserTable.getMinimumProjection(),
-                        ConversationTable.TABLE+"."+ConversationTable.TARGET_USER_IDENTIFIER+" IS NULL",
+                        ConversationTable.TABLE + "." + ConversationTable.TARGET_USER_IDENTIFIER + " IS NULL",
                         null,
                         null);
         }
@@ -196,8 +202,21 @@ public class ConversationsFragment extends Fragment implements LoaderManager.Loa
                 loadDefaultUsersFromDb();
                 break;
             case DEFAULT_USERS_LOADER_ID:
-                mUsersAdapter.setUsers(createUsersList(cursor));
+                List<LoadModeratorsResponse.Moderator> usersList = createUsersList(cursor);
+                mUsersAdapter.setUsers(usersList);
+                LinearLayout.LayoutParams params;
+                if (usersList.size() != 0) {
+                    View item = mUsersAdapter.getView(0, null, mDefaultUsersListView);
+                    item.measure(0, 0);
+                    params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                            (int) ((usersList.size() < 3 ? usersList.size() : 3 + 0.5) * item.getMeasuredHeight()));
+                    mDefaultUsersListView.setLayoutParams(params);
+                    mDefaultUsersListView.setVisibility(View.VISIBLE);
+                } else {
+                    mDefaultUsersListView.setVisibility(View.GONE);
+                }
 
+                break;
         }
     }
 

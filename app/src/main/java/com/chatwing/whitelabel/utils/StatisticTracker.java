@@ -69,4 +69,8 @@ public class StatisticTracker {
         params.put("login_type", type);
         FlurryAgent.logEvent("UserAuthenticate", params);
     }
+
+    public static void trackMessageSent(){
+        FlurryAgent.logEvent("MessageSent");
+    }
 }

@@ -48,7 +48,6 @@ public class WalkthroughActivity extends BaseABFragmentActivity implements SafeC
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getSupportActionBar().hide();
         setContentView(R.layout.activity_walkthrough);
         setupViews();
     }

@@ -42,10 +42,10 @@
                         android:id="@+id/next"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
                         android:layout_alignParentBottom="true"
-                        android:layout_marginRight="@dimen/spacing_large"
+                        android:layout_alignParentRight="true"
                         android:layout_marginBottom="@dimen/spacing_large"
+                        android:layout_marginRight="@dimen/spacing_large"
                         android:src="@drawable/ic_next" />
 
                     <LinearLayout
@@ -54,8 +54,8 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
                         android:layout_centerVertical="true"
-                        android:layout_marginLeft="@dimen/spacing_large"
                         android:layout_marginBottom="@dimen/spacing_large"
+                        android:layout_marginLeft="@dimen/spacing_large"
                         android:layout_toLeftOf="@id/next"
                         android:orientation="vertical">
 
@@ -78,27 +78,29 @@
                             android:gravity="left|center_vertical"
                             android:lines="1"
                             android:textAppearance="?android:attr/textAppearanceSmall"
-                            android:textColor="@color/text_on_primary"/>
+                            android:textColor="@color/text_on_primary" />
                     </LinearLayout>
+
                     <com.chatwing.whitelabel.views.CircleImageView
                         android:id="@+id/avatar"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/drawer_avatar_height"
+                        android:layout_above="@id/account"
                         android:layout_alignParentLeft="true"
                         android:layout_centerVertical="true"
-                        android:layout_marginLeft="@dimen/spacing_large"
                         android:layout_marginBottom="@dimen/spacing_large"
-                        android:layout_above="@id/account"
+                        android:layout_marginLeft="@dimen/spacing_large"
                         android:scaleType="fitCenter" />
                 </RelativeLayout>
             </LinearLayout>
 
             <Button
                 android:id="@+id/login"
-                style="@style/ButtonChatWing"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@color/primary"
                 android:text="@string/title_login"
+                android:textColor="@color/text_on_primary"
                 android:textSize="@dimen/authenticate_button_text_size"
                 android:textStyle="bold"
                 android:visibility="gone" />
@@ -166,7 +168,8 @@
 
                 <TextView
                     android:id="@+id/bookmarks_unread_count"
-                    style="@style/Theme.ChatWing.DrawerItemCounter" />
+                    style="@style/Theme.ChatWing.DrawerItemCounter"
+                    android:layout_marginRight="@dimen/spacing_large" />
 
             </LinearLayout>
 
@@ -188,7 +191,8 @@
                 <TextView
                     android:id="@+id/categories_unread_count"
                     style="@style/Theme.ChatWing.DrawerItemCounter"
-                    android:visibility="gone" />
+                    android:visibility="gone"
+                    android:layout_marginRight="@dimen/spacing_large"/>
             </LinearLayout>
 
             <LinearLayout
@@ -209,7 +213,8 @@
                 <TextView
                     android:id="@+id/conversation_unread_count"
                     style="@style/Theme.ChatWing.DrawerItemCounter"
-                    android:visibility="gone" />
+                    android:visibility="gone"
+                    android:layout_marginRight="@dimen/spacing_large"/>
             </LinearLayout>
 
             <TextView

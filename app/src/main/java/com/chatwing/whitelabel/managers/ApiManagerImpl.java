@@ -900,8 +900,8 @@ public class ApiManagerImpl implements ApiManager {
 
     @Override
     public LoadModeratorsResponse loadModerators(User user,
-                                                       int limit,
-                                                       int offset)
+                                                 int limit,
+                                                 int offset)
             throws ApiException,
             HttpRequest.HttpRequestException,
             UserUnauthenticatedException,
@@ -909,6 +909,9 @@ public class ApiManagerImpl implements ApiManager {
             InvalidIdentityException,
             NotVerifiedEmailException,
             OtherApplicationException {
+        if (!mBuildManager.isCustomLoginType()) {
+            return new LoadModeratorsResponse();
+        }
         validate(user);
 
 

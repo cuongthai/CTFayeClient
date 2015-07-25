@@ -197,7 +197,6 @@ public class CommunicationMessagesAdapter extends RecyclerView.Adapter<Communica
             if (!TextUtils.isEmpty(k) && randomKey.equals(k)) {
                 return m;
             }
-            LogUtils.v("NOT FOUND!!!!!!!!!!! Check next");
         }
         return null;
     }

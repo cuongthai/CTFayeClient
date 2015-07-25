@@ -43,6 +43,7 @@ public class Conversation implements Serializable {
 
     @SerializedName("date_updated")
     private long dateUpdated;
+    private boolean isModerator;
 
     public Conversation(String id, long createdDate) {
         this.id = id;
@@ -172,5 +173,13 @@ public class Conversation implements Serializable {
             emos.put(emoticon.getSymbol(), emoticon.getImage());
         }
         return emos;
+    }
+
+    public void setIsModerator(boolean isMod) {
+        this.isModerator = isMod;
+    }
+
+    public boolean isModerator() {
+        return isModerator;
     }
 }

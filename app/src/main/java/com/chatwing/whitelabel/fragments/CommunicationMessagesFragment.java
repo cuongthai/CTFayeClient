@@ -729,9 +729,6 @@ public abstract class CommunicationMessagesFragment extends Fragment {
             return;
         }
 
-        content = autoAppendBBCode(content);
-        LogUtils.v("autoAppendBBCode " + content);
-
         if (!hasCurrentCommunication()) {
             // No current communication box to send new message to
             return;
@@ -762,9 +759,6 @@ public abstract class CommunicationMessagesFragment extends Fragment {
         getActivity().startService(i);
     }
 
-    private String autoAppendBBCode(String content) {
-        return content.replaceAll("(http(s?):/)(/[^/]+)+" + "\\.(?:jpg|gif|png)", "[img]$0[/img]");
-    }
 
     private void syncBBCodeControlsState() {
         for (BBCodeParser.BBCode code : mBBCodeControls.keySet()) {

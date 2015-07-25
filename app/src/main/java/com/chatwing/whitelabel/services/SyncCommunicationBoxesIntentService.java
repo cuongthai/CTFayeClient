@@ -149,11 +149,11 @@ public class SyncCommunicationBoxesIntentService extends BaseIntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-//        handleChatWingOfficial(intent);
+        handleChatWingOfficial(intent);
 //        handleKentucky(intent);
 //        handleSeattle(intent);
 //        handleDestiny(intent);
-        handleDemo(intent);
+//        handleDemo(intent);
 //        handleDebug(intent);
 //        handleStaging(intent);
     }
@@ -530,6 +530,9 @@ public class SyncCommunicationBoxesIntentService extends BaseIntentService {
 
     private void addUpdateModeratorsOperations(LoadModeratorsResponse.Moderator[] moderators,
                                                ArrayList<ContentProviderOperation> batch) {
+        if (moderators == null) {
+            return;
+        }
         Uri moderatorsUri = ChatWingContentProvider.getModeratorsUri();
         batch.add(ContentProviderOperation
                 .newDelete(moderatorsUri)
@@ -541,6 +544,7 @@ public class SyncCommunicationBoxesIntentService extends BaseIntentService {
     private void addUpdateConversationsOperations(Conversation[] conversations,
                                                   LoadModeratorsResponse.Moderator[] moderators,
                                                   ArrayList<ContentProviderOperation> batch) {
+
         Uri conversationUri = ChatWingContentProvider.getConversationsUri();
         batch.add(ContentProviderOperation
                 .newDelete(conversationUri)
@@ -561,7 +565,9 @@ public class SyncCommunicationBoxesIntentService extends BaseIntentService {
         }
     }
 
-    private void addInsertConversationsOperations(Conversation[] conversations, LoadModeratorsResponse.Moderator[] moderators, ArrayList<ContentProviderOperation> batch) {
+    private void addInsertConversationsOperations(Conversation[] conversations,
+                                                  LoadModeratorsResponse.Moderator[] moderators,
+                                                  ArrayList<ContentProviderOperation> batch) {
         Uri uri = ChatWingContentProvider.getConversationsUri();
         ContentValues values;
 
@@ -569,7 +575,7 @@ public class SyncCommunicationBoxesIntentService extends BaseIntentService {
             User targetUser = conversation.getTargetUser(mUserManager.getCurrentUser());
 
             values = ConversationTable.getContentValues(conversation, mUserManager.getCurrentUser());
-            if (isModerator(targetUser, moderators)) {
+            if (moderators != null && targetUser != null && isModerator(targetUser, moderators)) {
                 values.put(ConversationTable.IS_MODERATOR, 1);
             } else {
                 values.put(ConversationTable.IS_MODERATOR, 0);

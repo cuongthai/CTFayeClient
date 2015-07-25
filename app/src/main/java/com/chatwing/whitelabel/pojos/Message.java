@@ -169,7 +169,6 @@ public class Message extends Params implements Comparable<Message> {
         c.set(Calendar.MINUTE, 0);
         c.set(Calendar.SECOND, 0);
         c.set(Calendar.MILLISECOND, 0);
-        LogUtils.v("Sending Date " + createdDate + " Midnight " + c.getTimeInMillis() + " Passed " + (createdDate - c.getTimeInMillis()));
         return c.getTimeInMillis();
     }
 

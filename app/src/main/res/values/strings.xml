@@ -253,7 +253,7 @@
     <string name="error_auth_required">"You need to login to use these awesome features."</string>
     <string name="error_invalid_access_token">"Your session has expired. Please login again to use this feature"</string>
     <string name="error_invalid_external_access_token">"There was an error while exchanging credentials with ChatWing"</string>
-    <string name="error_email_verify">Email is missing or not verified. Please update it before update notification setting</string>
+    <string name="error_email_verify">Please verify your email before continue</string>
     <string name="error_failed_to_sync_data">"Failed to sync data"</string>
     <string name="error_failed_to_load_chatboxes">There was an error while loading chatboxes</string>
 

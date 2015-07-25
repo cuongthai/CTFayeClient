@@ -18,6 +18,7 @@ package com.chatwing.whitelabel.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Typeface;
 import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,7 +29,7 @@ import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.pojos.Conversation;
 import com.chatwing.whitelabel.pojos.User;
 import com.chatwing.whitelabel.tables.ConversationTable;
-import com.google.gson.Gson;
+import com.chatwing.whitelabel.utils.LogUtils;
 
 /**
  * Created by cuongthai on 4/4/14.
@@ -51,11 +52,10 @@ public class ConversationsAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        int dataIndexColumn = cursor.getColumnIndex(ConversationTable.DATA);
-        Conversation conversation = new Gson().fromJson(cursor.getString(dataIndexColumn), Conversation.class);
+        Conversation conversation = ConversationTable.getConversation(cursor);
 
-        ((TextView) view.findViewById(android.R.id.text1))
-                .setText(conversation.getConversationAlias(mCurrentUser.getId()));
+        TextView aliasTv = (TextView) view.findViewById(android.R.id.text1);
+        aliasTv.setText(conversation.getConversationAlias(mCurrentUser.getId()));
 
         int countIndexColumn = cursor.getColumnIndex(ConversationTable.UNREAD_COUNT);
         int count = cursor.getInt(countIndexColumn);
@@ -65,6 +65,13 @@ public class ConversationsAdapter extends CursorAdapter {
         } else {
             countTv.setText(String.valueOf(count));
             countTv.setVisibility(View.VISIBLE);
+        }
+
+        LogUtils.v("Conversation "+aliasTv.getText()+":"+conversation.isModerator());
+        if(conversation.isModerator()){
+            aliasTv.setTypeface(null, Typeface.ITALIC);
+        }else{
+            aliasTv.setTypeface(null, Typeface.NORMAL);
         }
     }
 }

@@ -25,6 +25,7 @@ import com.chatwing.whitelabel.Constants;
 import com.chatwing.whitelabel.helpers.ChatWingSQLiteOpenHelper;
 import com.chatwing.whitelabel.pojos.Conversation;
 import com.chatwing.whitelabel.pojos.User;
+import com.chatwing.whitelabel.utils.LogUtils;
 import com.google.gson.Gson;
 
 /**
@@ -99,6 +100,7 @@ public class ConversationTable implements BaseColumns {
         int createdDateIndex = cursor.getColumnIndex(CREATED_DATE);
         int lastDateIndex = cursor.getColumnIndex(LAST_DATE);
         int dateUpdatedIndex = cursor.getColumnIndex(DATE_UPDATED);
+        int isModeratorIndex = cursor.getColumnIndex(IS_MODERATOR);
         if (dataIndex == -1) {
             throw new IllegalArgumentException("data column is " +
                     "expected to transform to conversation object.");
@@ -111,6 +113,8 @@ public class ConversationTable implements BaseColumns {
         conversation.setCreatedDate(cursor.getLong(createdDateIndex));
         conversation.setLastDate(cursor.getLong(lastDateIndex));
         conversation.setDateUpdated(cursor.getLong(dateUpdatedIndex));
+        conversation.setIsModerator(cursor.getInt(isModeratorIndex) == 1 ? true : false);
+        LogUtils.v("Is moderator "+conversation.isModerator());
         return conversation;
     }
 

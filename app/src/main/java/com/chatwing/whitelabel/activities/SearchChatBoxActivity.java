@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -84,6 +85,10 @@ public class SearchChatBoxActivity extends ActionBarActivity implements View.OnC
         mObjectGraph.inject(this);
 
         setContentView(R.layout.activity_search_chat_box);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         mListView = (ListView) findViewById(R.id.listview);
 
         configViews();
