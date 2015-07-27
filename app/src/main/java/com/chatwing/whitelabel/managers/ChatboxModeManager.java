@@ -28,6 +28,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.webkit.WebView;
 import android.widget.Toast;
 
 import com.chatwing.whitelabel.R;
@@ -344,6 +345,7 @@ public class ChatboxModeManager extends CommunicationModeManager {
                 break;
             case LOADED:
                 invalidateOptionsMenu();
+                subscribeToCurrentChatBox();
                 markNotificationRead(event.getChatbox().getId());
                 mCurrentChatBoxManager.markAsRead();
                 updateChatBoxUnreadCountInDB(event.getChatbox().getId(), 0);
@@ -371,6 +373,17 @@ public class ChatboxModeManager extends CommunicationModeManager {
                 savedInstanceState != null
                 && savedInstanceState.containsKey(Delegate.EXTRA_CHAT_BOX_ID)) {
             mRequestedChatboxId = savedInstanceState.getInt(Delegate.EXTRA_CHAT_BOX_ID);
+        }
+    }
+
+    private void subscribeToCurrentChatBox() {
+        WebView webView = mActivityDelegate.getFayeWebView();
+        if (webView == null) {
+            mActivityDelegate.ensureWebViewAndSubscribeToChannels();
+        } else {
+            String js = String.format("javascript:subscribe('%s')",
+                    mCurrentChatBoxManager.getCurrentChatBox().getFayeChannel());
+            webView.loadUrl(js);
         }
     }
 }

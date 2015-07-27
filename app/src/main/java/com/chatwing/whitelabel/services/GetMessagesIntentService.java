@@ -32,6 +32,7 @@ public class GetMessagesIntentService extends BaseIntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        if (intent == null) return;
         isRunning = true;
         int chatBoxId = intent.getIntExtra(EXTRA_CHAT_BOX_ID, 0);
         String conversationId = intent.getStringExtra(EXTRA_CONVERSATION_ID);
@@ -54,7 +55,7 @@ public class GetMessagesIntentService extends BaseIntentService {
                         oldestMessage);
             }
             List<Message> messagesFromServer = messagesResponse.getMessages();
-            LogUtils.v(oldestMessage+ "<==oldest Loaded from server "+(messagesFromServer!=null?messagesFromServer.size():"null"));
+            LogUtils.v(oldestMessage + "<==oldest Loaded from server " + (messagesFromServer != null ? messagesFromServer.size() : "null"));
             List<Message> insertedMessages = new ArrayList<Message>();
             Uri uri = ChatWingContentProvider.getMessagesUri();
             ContentResolver contentResolver = getContentResolver();

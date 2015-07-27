@@ -73,6 +73,7 @@ public class CurrentChatBoxManager extends CurrentCommunicationManager {
 
         removeCurrentChatbox();
         mBus.post(new CurrentChatBoxEvent(CurrentChatBoxEvent.Status.LOADING, null));
+
         loadChatboxDetail(chatBoxId);
     }
 

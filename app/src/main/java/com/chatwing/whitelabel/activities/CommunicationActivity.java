@@ -535,6 +535,11 @@ public class CommunicationActivity
         return mDrawerLayout;
     }
 
+    @Override
+    public WebView getFayeWebView() {
+        return mWebView;
+    }
+
     /**
      * Calls this in subclass to use it as Conversation Mode
      */
@@ -727,14 +732,6 @@ public class CommunicationActivity
     @Subscribe
     public void onMessageReceived(MessageReceivedEvent event) {
         //Faye
-//        LogUtils.v("Java -----------");
-//        LogUtils.v(System.currentTimeMillis() + "");
-//        LogUtils.v("------------------");
-
-//        LogUtils.v("Java main thread -----------");
-//        LogUtils.v(System.currentTimeMillis() + "");
-//        LogUtils.v("------------------");
-
         try {
             Event e = mEventParser.parse(event.getMessage());
             if (Constants.DEBUG) {

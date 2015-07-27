@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_color">
@@ -81,16 +82,21 @@
                             android:textColor="@color/text_on_primary" />
                     </LinearLayout>
 
-                    <com.chatwing.whitelabel.views.CircleImageView
+                    <com.pkmmte.view.CircularImageView
                         android:id="@+id/avatar"
-                        android:layout_width="match_parent"
+                        android:layout_width="@dimen/drawer_avatar_width"
                         android:layout_height="@dimen/drawer_avatar_height"
                         android:layout_above="@id/account"
                         android:layout_alignParentLeft="true"
                         android:layout_centerVertical="true"
                         android:layout_marginBottom="@dimen/spacing_large"
                         android:layout_marginLeft="@dimen/spacing_large"
-                        android:scaleType="fitCenter" />
+                        app:border="true"
+                        app:border_color="@color/white"
+                        app:selector="true"
+                        app:selector_stroke_color="@color/accent"
+                        app:border_width="2dp"
+                        app:shadow="true" />
                 </RelativeLayout>
             </LinearLayout>
 

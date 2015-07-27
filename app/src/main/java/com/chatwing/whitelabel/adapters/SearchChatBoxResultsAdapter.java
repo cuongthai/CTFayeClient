@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.modules.ForActivity;
 import com.chatwing.whitelabel.pojos.LightWeightChatBox;
@@ -33,10 +34,11 @@ public class SearchChatBoxResultsAdapter extends CompatArrayAdapter<LightWeightC
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
         if (convertView == null) {
-            convertView = mLayoutInflater.inflate(android.R.layout.simple_list_item_2, parent, false);
+            convertView = mLayoutInflater.inflate(R.layout.item_title_subtitle_with_unread_count, parent, false);
             viewHolder = new ViewHolder();
             viewHolder.mainText = (TextView) convertView.findViewById(android.R.id.text1);
-            viewHolder.subText = (TextView) convertView.findViewById(android.R.id.text2);
+            viewHolder.subText = (TextView) convertView.findViewById(android.R.id.summary);
+            convertView.findViewById(android.R.id.text2).setVisibility(View.GONE);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();

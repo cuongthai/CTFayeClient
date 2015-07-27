@@ -46,7 +46,7 @@
 -keep class javax.** { *; }
 -keep class org.** { *; }
 -keep class twitter4j.** { *; }
-
+-keep class com.squareup.leakcanary.** { *; }
 # Google Play Services
 -keep class * extends java.util.ListResourceBundle {
     protected Object[][] getContents();

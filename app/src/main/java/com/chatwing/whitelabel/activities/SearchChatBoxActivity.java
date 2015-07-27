@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.chatwing.whitelabel.ChatWingApplication;
@@ -46,7 +47,7 @@ import javax.inject.Provider;
 
 import dagger.ObjectGraph;
 
-public class SearchChatBoxActivity extends ActionBarActivity implements View.OnClickListener {
+public class SearchChatBoxActivity extends AppCompatActivity implements View.OnClickListener {
     public static final String EXTRA_RESULT_CHAT_BOX = "chat_box";
     private static final int SEARCH_RESULTS_LIMIT = 40;
     private static final int SEARCH_ADAPTER_VISIBLE_THRESHOLD = 10;
@@ -66,6 +67,7 @@ public class SearchChatBoxActivity extends ActionBarActivity implements View.OnC
     SearchChatBoxResultsAdapter mAdapter;
     @Inject
     ErrorMessageView mErrorMessageView;
+
     private MenuItem mSearchMenuItem;
     private TextView mProgressTextView;
     private Button mCreateChatBoxButton;
@@ -95,6 +97,8 @@ public class SearchChatBoxActivity extends ActionBarActivity implements View.OnC
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+
+        ((ProgressBar)toolbar.findViewById(R.id.progress_bar)).setIndeterminate(false);
     }
 
     @Override
@@ -336,6 +340,7 @@ public class SearchChatBoxActivity extends ActionBarActivity implements View.OnC
         mCreateChatBoxButton = (Button) findViewById(R.id.create);
         mCreateChatBoxButton.setOnClickListener(this);
         showEmptyQueryText();
+
     }
 
     private void doSearch(String query) {

@@ -36,6 +36,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ToggleButton;
 
+import com.chatwing.whitelabel.ChatWingApplication;
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.adapters.CommunicationMessagesAdapter;
 import com.chatwing.whitelabel.adapters.EmoticonPackagesAdapter;
@@ -210,14 +211,12 @@ public abstract class CommunicationMessagesFragment extends Fragment {
     public boolean addNewMessage(Message newMessage) {
 
         String randomKey = newMessage.getRandomKey();
-        LogUtils.v("Check send message addNewMessage randomkey " + randomKey);
         boolean isAdded = false;
         if (TextUtils.isEmpty(randomKey)) {
             mAdapter.addToHead(newMessage);
             scrollToLast(false);
             isAdded = true;
         } else {
-            LogUtils.v("Check send message ");
             Message existingMessage = mAdapter.getItemByRandomKey(randomKey);
             LogUtils.v("Check send message " + existingMessage);
             if (existingMessage != null) {
@@ -574,6 +573,8 @@ public abstract class CommunicationMessagesFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         getLoaderManager().destroyLoader(MESSAGE_LOADER_ID);
+
+        ChatWingApplication.getRefWatcher(getActivity()).watch(this);
     }
 
     @Override
@@ -784,6 +785,7 @@ public abstract class CommunicationMessagesFragment extends Fragment {
         emoticonsPager.setAdapter(adapter);
         indicator.setViewPager(emoticonsPager);
         indicator.notifyDataSetChanged();
+
     }
 
     public abstract class CommunicationBoxMessagesLoaderCallbacks implements

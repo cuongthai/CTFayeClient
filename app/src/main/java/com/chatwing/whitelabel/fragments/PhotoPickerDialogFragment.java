@@ -83,7 +83,7 @@ public class PhotoPickerDialogFragment extends DialogFragment {
                 .setNegativeButton(getString(R.string.title_cancel), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        dismiss();
+                        dismissAllowingStateLoss();
                     }
                 })
                 .setView(promptView);
@@ -129,7 +129,7 @@ public class PhotoPickerDialogFragment extends DialogFragment {
         if (uri != null) {
             File cropped = new File(getActivity().getCacheDir(), "cropped");
             Uri outputUri = Uri.fromFile(cropped);
-            new Crop(uri).output(outputUri).asSquare().start(getActivity());
+            Crop.of(uri, outputUri).asSquare().start(getActivity());
         }
     }
 }

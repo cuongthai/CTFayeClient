@@ -99,6 +99,8 @@ public class CommunicationMessagesAdapter extends RecyclerView.Adapter<Communica
                 .displayer(new SimpleBitmapDisplayer())
                 .resetViewBeforeLoading(true)
                 .build();
+
+
     }
 
     @Override
@@ -114,8 +116,6 @@ public class CommunicationMessagesAdapter extends RecyclerView.Adapter<Communica
         viewHolder.username.setText(message.getUserName());
 
         viewHolder.createTime.setText(Utils.formatTimeOnly(message.getCreatedDate()));
-        LogUtils.v("message.isStartedDateMessage() " + message.isStartedDateMessage());
-        LogUtils.v("message content " + message.getContent() + ":" + message.getCreatedDate());
         if (message.isStartedDateMessage()) {
             viewHolder.createdDate.setVisibility(View.VISIBLE);
             viewHolder.createdDate.setText(Utils.formatDateMonth(message.getStartDate()));
@@ -131,7 +131,6 @@ public class CommunicationMessagesAdapter extends RecyclerView.Adapter<Communica
 
         //Load avatar
         String avatarUrl = mApiManager.getAvatarUrl(message);
-        LogUtils.v("Avatar "+avatarUrl);
         mImageLoader.displayImage(avatarUrl, viewHolder.avatarImageView, displayImageOptions);
 
         viewHolder.content.setMovementMethod(LinkMovementMethod.getInstance());
@@ -147,6 +146,7 @@ public class CommunicationMessagesAdapter extends RecyclerView.Adapter<Communica
         }else{
             viewHolder.content.setBBCodeText("[i]"+mContext.getString(R.string.message_ignored_content)+"[/i]");
         }
+
 
     }
 
@@ -174,7 +174,6 @@ public class CommunicationMessagesAdapter extends RecyclerView.Adapter<Communica
     }
 
     public void addToHead(Message message) {
-        LogUtils.v("Check send message addToHead ");
         mDataSet.add(0, message);
         fillStartDate();
         notifyItemInserted(0);
@@ -227,7 +226,6 @@ public class CommunicationMessagesAdapter extends RecyclerView.Adapter<Communica
 
 
     public void replace(Message existingMessage, Message newMessage) {
-        LogUtils.v("Check send message replacing " + existingMessage);
         int oldIndex = mDataSet.indexOf(existingMessage);
         mDataSet.remove(oldIndex);
         notifyItemRemoved(oldIndex);

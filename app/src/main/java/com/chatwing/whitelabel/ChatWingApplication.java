@@ -1,6 +1,7 @@
 package com.chatwing.whitelabel;
 
 import android.app.Application;
+import android.content.Context;
 import android.view.ViewConfiguration;
 
 import com.chatwing.whitelabel.activities.ExtendCommunicationActivity;
@@ -10,6 +11,8 @@ import com.chatwing.whitelabel.modules.ChatWingModule;
 import com.chatwing.whitelabel.utils.Utils;
 import com.crashlytics.android.Crashlytics;
 import com.flurry.android.FlurryAgent;
+import com.squareup.leakcanary.LeakCanary;
+import com.squareup.leakcanary.RefWatcher;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -22,11 +25,18 @@ import io.fabric.sdk.android.Fabric;
  * Created by cuongthai on 21/10/2014.
  */
 public class ChatWingApplication extends Application {
+    public static RefWatcher getRefWatcher(Context context) {
+        ChatWingApplication application = (ChatWingApplication) context.getApplicationContext();
+        return application.refWatcher;
+    }
+
+    private RefWatcher refWatcher;
 
     @Override
     public void onCreate() {
         super.onCreate();
         Fabric.with(this, new Crashlytics());
+
         /**
          * App IDS
          * b4b391d0-e9bf-11e4-871f-f1829c245e2e : Test app id
@@ -38,7 +48,7 @@ public class ChatWingApplication extends Application {
         ChatWing.initialize(this, BuildConfig.APP_ID, "", new String[]{"1873"}, isOfficialChatWingApp()
                 ? WalkthroughActivity.class
                 : LegacyLoginActivity.class);
-        ChatWing.setIsDebugging(false);
+        ChatWing.setIsDebugging(true);
         ChatWing.instance(this).setMainActivityClass(ExtendCommunicationActivity.class);
         ChatWing.instance(this).getChatwingGraph().plus(getModules().toArray());
 
@@ -47,13 +57,19 @@ public class ChatWingApplication extends Application {
 
         // Build Custom Singleton, required by PkRSS
         Utils.buildSingleton(this);
+
+        refWatcher = installLeakCanary();
+    }
+
+    protected RefWatcher installLeakCanary() {
+        return ChatWing.isDebugging() ? LeakCanary.install(this) : RefWatcher.DISABLED;
     }
 
     private void workaroundOverflowMenuKey() {
         try {
             ViewConfiguration config = ViewConfiguration.get(this);
             Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
-            if(menuKeyField != null) {
+            if (menuKeyField != null) {
                 menuKeyField.setAccessible(true);
                 menuKeyField.setBoolean(config, false);
             }

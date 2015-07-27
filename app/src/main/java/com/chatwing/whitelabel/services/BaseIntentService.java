@@ -44,6 +44,8 @@ public abstract class BaseIntentService extends IntentService {
 
     public BaseIntentService(String name) {
         super(name);
+        //Auto redelivery intent when process die
+        setIntentRedelivery(true);
     }
 
     @Inject

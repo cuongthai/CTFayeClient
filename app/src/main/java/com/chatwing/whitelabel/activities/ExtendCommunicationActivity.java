@@ -145,13 +145,19 @@ public class ExtendCommunicationActivity
     @Override
     protected void onStart() {
         super.onStart();
-        if (playIntent == null) {
-            playIntent = new Intent(this, MusicService.class);
-            startService(playIntent);
-        }
-        bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
+        startAndBindMusicService();
 
         FlurryAgent.onStartSession(this, getString(R.string.flurry_api_key));
+    }
+
+    private void startAndBindMusicService() {
+        if(mBuildManager.isSupportedMusicBox()) {
+            if (playIntent == null) {
+                playIntent = new Intent(this, MusicService.class);
+                startService(playIntent);
+            }
+            bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
+        }
     }
 
     @Override
@@ -167,7 +173,6 @@ public class ExtendCommunicationActivity
     protected void onResume() {
         super.onResume();
         chatboxUnreadDownloadManager.downloadUnread();
-
     }
 
     @Override

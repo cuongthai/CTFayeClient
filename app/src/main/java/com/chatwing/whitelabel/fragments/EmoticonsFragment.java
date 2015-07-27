@@ -25,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 
+import com.chatwing.whitelabel.ChatWingApplication;
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.adapters.EmoticonsPageAdapter;
 import com.chatwing.whitelabel.pojos.Emoticon;
@@ -93,5 +94,12 @@ public class EmoticonsFragment extends Fragment {
         adapter.setEmoticons(emoticons);
         GridView viewPager = (GridView) view.findViewById(R.id.gridview);
         viewPager.setAdapter(adapter);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        ChatWingApplication.getRefWatcher(getActivity()).watch(this);
     }
 }

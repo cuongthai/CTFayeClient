@@ -8,7 +8,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -160,7 +160,7 @@ public class BookmarkedChatBoxesDrawerFragment extends ListFragment
             return false;
         }
         mAdapter.setBookmarkChecked((Cursor) mAdapter.getItem(pos), true);
-        mActionMode = ((ActionBarActivity)getActivity()).startSupportActionMode(new ActionModeCallback());
+        mActionMode = ((AppCompatActivity)getActivity()).startSupportActionMode(new ActionModeCallback());
         mActionMode.invalidate();
         return true;
     }

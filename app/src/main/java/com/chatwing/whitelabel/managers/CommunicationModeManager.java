@@ -95,6 +95,7 @@ public abstract class CommunicationModeManager {
                 mActivityDelegate.setContentShown(false);
                 break;
             case LOADED:
+                LogUtils.v("Loaded chatbox "+event.getUrl());
                 mActivityDelegate.setContentShown(true);
                 break;
         }
@@ -257,6 +258,8 @@ public abstract class CommunicationModeManager {
         public void setContentShown(boolean show);
 
         public DrawerLayout getDrawerLayout();
+
+        public WebView getFayeWebView();
 
         public void ensureWebViewAndSubscribeToChannels();
 
