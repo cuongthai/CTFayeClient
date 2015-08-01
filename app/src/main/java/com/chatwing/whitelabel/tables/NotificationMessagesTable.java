@@ -91,6 +91,10 @@ public class NotificationMessagesTable implements BaseColumns {
     public static Message getMessage(Cursor cursor) {
         int dataIndex = cursor.getColumnIndex(DATA);
         String data = cursor.getString(dataIndex);
+        /**
+         * Random crashes on random Samsung phones (5.0+)
+         * https://code.google.com/p/android/issues/detail?id=172339
+         */
         Message message = new Gson().fromJson(data, Message.class);
         return message;
     }

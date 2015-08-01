@@ -83,7 +83,7 @@ public class ChatBoxTable implements BaseColumns {
             switch (version){
                 case ChatWingSQLiteOpenHelper.VERSION_0_4:
                     database.execSQL("ALTER TABLE " + TABLE_CHAT_BOX
-                            + " ADD COLUMN" + LAST_READ + " INTEGER DEFAULT 0");
+                            + " ADD COLUMN " + LAST_READ + " INTEGER DEFAULT 0");
                 case ChatWingSQLiteOpenHelper.VERSION_0_5:
                 case ChatWingSQLiteOpenHelper.VERSION_1_2:
                 case ChatWingSQLiteOpenHelper.VERSION_1_2_1:

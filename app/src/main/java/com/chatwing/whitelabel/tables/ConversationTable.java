@@ -76,9 +76,9 @@ public class ConversationTable implements BaseColumns {
                 case ChatWingSQLiteOpenHelper.VERSION_1_2:
                 case ChatWingSQLiteOpenHelper.VERSION_1_2_1:
                     database.execSQL("ALTER TABLE " + TABLE
-                            + " ADD COLUMN" + TARGET_USER_IDENTIFIER + " TEXT");
+                            + " ADD COLUMN " + TARGET_USER_IDENTIFIER + " TEXT");
                     database.execSQL("ALTER TABLE " + TABLE
-                            + " ADD COLUMN" + IS_MODERATOR + " INTEGER NOT NULL DEFAULT 0, ");
+                            + " ADD COLUMN " + IS_MODERATOR + " INTEGER NOT NULL DEFAULT 0");
                     version = ChatWingSQLiteOpenHelper.VERSION_1_5;
             }
 

@@ -381,9 +381,11 @@ public class ChatboxModeManager extends CommunicationModeManager {
         if (webView == null) {
             mActivityDelegate.ensureWebViewAndSubscribeToChannels();
         } else {
-            String js = String.format("javascript:subscribe('%s')",
-                    mCurrentChatBoxManager.getCurrentChatBox().getFayeChannel());
-            webView.loadUrl(js);
+            ChatBox currentChatBox = mCurrentChatBoxManager.getCurrentChatBox();
+            if (currentChatBox != null) {
+                String js = String.format("javascript:subscribe('%s')", currentChatBox.getFayeChannel());
+                webView.loadUrl(js);
+            }
         }
     }
 }
