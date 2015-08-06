@@ -21,6 +21,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 
 import com.chatwing.whitelabel.activities.CommunicationActivity;
+import com.chatwing.whitelabel.fragments.AdminListFragment;
 import com.chatwing.whitelabel.fragments.CategoriesFragment;
 import com.chatwing.whitelabel.fragments.ChatMessagesFragment;
 import com.chatwing.whitelabel.fragments.ChatboxesFragment;
@@ -66,6 +67,7 @@ import dagger.Provides;
                 ChatMessagesFragment.class,
                 ConversationMessagesFragment.class,
                 ConversationsFragment.class,
+                AdminListFragment.class,
                 CommunicationActivity.class,
                 CommunicationDrawerFragment.class,
                 PasswordDialogFragment.class,

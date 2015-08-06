@@ -10,6 +10,7 @@ import com.chatwing.whitelabel.activities.WalkthroughActivity;
 import com.chatwing.whitelabel.modules.ChatWingModule;
 import com.chatwing.whitelabel.utils.Utils;
 import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.core.CrashlyticsCore;
 import com.flurry.android.FlurryAgent;
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
@@ -35,7 +36,7 @@ public class ChatWingApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Fabric.with(this, new Crashlytics());
+        Fabric.with(this, new Crashlytics.Builder().core(new CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build()).build());
 
         /**
          * App IDS
@@ -48,7 +49,7 @@ public class ChatWingApplication extends Application {
         ChatWing.initialize(this, BuildConfig.APP_ID, "", new String[]{"1873"}, isOfficialChatWingApp()
                 ? WalkthroughActivity.class
                 : LegacyLoginActivity.class);
-        ChatWing.setIsDebugging(false);
+        ChatWing.setIsDebugging(true);
         ChatWing.instance(this).setMainActivityClass(ExtendCommunicationActivity.class);
         ChatWing.instance(this).getChatwingGraph().plus(getModules().toArray());
 

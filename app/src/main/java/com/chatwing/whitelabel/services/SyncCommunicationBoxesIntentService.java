@@ -149,11 +149,11 @@ public class SyncCommunicationBoxesIntentService extends BaseIntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        handleChatWingOfficial(intent);
+//        handleChatWingOfficial(intent);
 //        handleKentucky(intent);
 //        handleSeattle(intent);
 //        handleDestiny(intent);
-//        handleDemo(intent);
+        handleDemo(intent);
 //        handleDebug(intent);
 //        handleStaging(intent);
     }

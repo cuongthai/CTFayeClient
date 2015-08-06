@@ -55,6 +55,7 @@ import com.chatwing.whitelabel.events.faye.ChannelSubscriptionChangedEvent;
 import com.chatwing.whitelabel.events.faye.FayePublishEvent;
 import com.chatwing.whitelabel.events.faye.MessageReceivedEvent;
 import com.chatwing.whitelabel.events.faye.ServerConnectionChangedEvent;
+import com.chatwing.whitelabel.fragments.AdminListFragment;
 import com.chatwing.whitelabel.fragments.CategoriesFragment;
 import com.chatwing.whitelabel.fragments.ChatMessagesFragment;
 import com.chatwing.whitelabel.fragments.ColorPickerDialogFragment;
@@ -70,6 +71,7 @@ import com.chatwing.whitelabel.fragments.PasswordDialogFragment;
 import com.chatwing.whitelabel.fragments.ProfileFragment;
 import com.chatwing.whitelabel.interfaces.ChatWingJSInterface;
 import com.chatwing.whitelabel.managers.ApiManager;
+import com.chatwing.whitelabel.managers.BuildManager;
 import com.chatwing.whitelabel.managers.ChatboxModeManager;
 import com.chatwing.whitelabel.managers.CommunicationActivityManager;
 import com.chatwing.whitelabel.managers.CommunicationModeManager;
@@ -153,7 +155,8 @@ public class CommunicationActivity
     ChatWingJSInterface mFayeJsInterface;
     @Inject
     protected ChatboxModeManager mChatboxModeManager;
-
+    @Inject
+    BuildManager mBuildManager;
     @Inject
     ConversationModeManager mConversationModeManager;
     @Inject
@@ -587,6 +590,14 @@ public class CommunicationActivity
         }
     }
 
+    @Override
+    public void showAdminList() {
+        if (mBuildManager.canShowAdminList()) {
+            addToLeftDrawer(new AdminListFragment());
+        } else {
+            mErrorMessageView.show(R.string.error_empty_message);
+        }
+    }
 
     @Override
     public void back(Fragment from) {

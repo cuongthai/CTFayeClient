@@ -23,7 +23,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,19 +31,17 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.chatwing.whitelabel.R;
-import com.chatwing.whitelabel.adapters.ConversationsAdapter;
+import com.chatwing.whitelabel.adapters.UsersListAdapter;
 import com.chatwing.whitelabel.contentproviders.ChatWingContentProvider;
-import com.chatwing.whitelabel.events.UserSelectedConversationEvent;
+import com.chatwing.whitelabel.events.UserSelectedDefaultUsersEvent;
 import com.chatwing.whitelabel.managers.CurrentConversationManager;
 import com.chatwing.whitelabel.managers.UserManager;
+import com.chatwing.whitelabel.pojos.User;
+import com.chatwing.whitelabel.pojos.params.CreateConversationParams;
 import com.chatwing.whitelabel.pojos.responses.LoadModeratorsResponse;
-import com.chatwing.whitelabel.tables.ConversationTable;
 import com.chatwing.whitelabel.tables.DefaultUserTable;
 import com.chatwing.whitelabel.utils.LogUtils;
 import com.squareup.otto.Bus;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -53,13 +50,13 @@ import javax.inject.Inject;
  * Date: 7/25/13
  * Time: 9:29 AM
  */
-public class ConversationsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
-    public static final int CONVERSATIONS_LOADER_ID = 10;
+public class AdminListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+    public static final int DEFAULT_USERS_LOADER_ID = 20;
 
     protected NavigatableFragmentListener mDelegate;
     private TextView mEmptyTextView;
-    private ListView mConversationsListView;
-    private CursorAdapter mListAdapter;
+    private ListView mDefaultUsersListView;
+    private UsersListAdapter mUsersAdapter;
 
     @Inject
     CurrentConversationManager mCurrentConversationManager;
@@ -68,7 +65,7 @@ public class ConversationsFragment extends Fragment implements LoaderManager.Loa
     @Inject
     Bus mBus;
 
-    public ConversationsFragment() {
+    public AdminListFragment() {
 
     }
 
@@ -103,33 +100,42 @@ public class ConversationsFragment extends Fragment implements LoaderManager.Loa
         mDelegate.inject(this);
         LogUtils.v("Load conversation boxes");
         mEmptyTextView = (TextView) view.findViewById(android.R.id.empty);
-        mConversationsListView = (ListView) view.findViewById(R.id.listview);
-        mListAdapter = new ConversationsAdapter(getActivity(),
-                mUserManager.getCurrentUser(),
+        mDefaultUsersListView = (ListView) view.findViewById(R.id.listview);
+        mUsersAdapter = new UsersListAdapter(getActivity(),
                 null,
                 0);
 
-        mConversationsListView.setAdapter(mListAdapter);
-        mConversationsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mDefaultUsersListView.setAdapter(mUsersAdapter);
+
+        mDefaultUsersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                Cursor cursor = (Cursor) mListAdapter.getItem(position);
-                int columnConversationIndex = cursor.getColumnIndexOrThrow(ConversationTable.CONVERSATION_ID);
-                String conversationId = cursor.getString(columnConversationIndex);
-                mBus.post(new UserSelectedConversationEvent(conversationId));
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Cursor cursor = (Cursor) mUsersAdapter.getItem(position);
+                LoadModeratorsResponse.Moderator moderator = DefaultUserTable.getModerator(cursor);
+
+                User currentUser = mUserManager.getCurrentUser();
+
+                if (currentUser != null && !currentUser.getIdentifier().equals(moderator.getIdentifier())) { // Dont send message to ourself
+                    mBus.post(new UserSelectedDefaultUsersEvent(
+                            new CreateConversationParams.SimpleUser(moderator.getLoginId(), moderator.getLoginType())));
+                }
             }
         });
 
         view.findViewById(R.id.back).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mDelegate.back(ConversationsFragment.this);
+                mDelegate.back(AdminListFragment.this);
             }
         });
 
-        loadConversationsFromDb();
+        loadDefaultUsersFromDb();
     }
 
+    private void loadDefaultUsersFromDb() {
+        mEmptyTextView.setVisibility(View.GONE);
+        getLoaderManager().initLoader(DEFAULT_USERS_LOADER_ID, null, this);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -137,23 +143,17 @@ public class ConversationsFragment extends Fragment implements LoaderManager.Loa
                 container, false);
     }
 
-    private void loadConversationsFromDb() {
-        mEmptyTextView.setVisibility(View.GONE);
-        getLoaderManager().initLoader(CONVERSATIONS_LOADER_ID, null, this);
-    }
-
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         switch (id) {
-            case CONVERSATIONS_LOADER_ID:
+            case DEFAULT_USERS_LOADER_ID:
                 return new CursorLoader(
                         getActivity(),
-                        ChatWingContentProvider.getConversationsUri(),
-                        ConversationTable.getMinimumProjection(),
+                        ChatWingContentProvider.getModeratorsUri(),
+                        DefaultUserTable.getMinimumProjection(),
                         null,
                         null,
-                        ConversationTable.TABLE + "." + ConversationTable.IS_MODERATOR + " DESC, " +
-                                ConversationTable.TABLE + "." + ConversationTable.DATE_UPDATED + " DESC");
+                        null);
         }
         return null;
     }
@@ -161,18 +161,17 @@ public class ConversationsFragment extends Fragment implements LoaderManager.Loa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         switch (loader.getId()) {
-            case CONVERSATIONS_LOADER_ID:
-                mListAdapter.swapCursor(cursor);
+            case DEFAULT_USERS_LOADER_ID:
+                mUsersAdapter.swapCursor(cursor);
                 break;
         }
     }
 
-
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         switch (loader.getId()) {
-            case CONVERSATIONS_LOADER_ID:
-                mListAdapter.swapCursor(null);
+            case DEFAULT_USERS_LOADER_ID:
+                mUsersAdapter.swapCursor(null);
                 break;
         }
 

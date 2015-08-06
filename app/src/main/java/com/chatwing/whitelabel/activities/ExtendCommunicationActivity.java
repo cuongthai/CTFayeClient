@@ -98,8 +98,6 @@ public class ExtendCommunicationActivity
     @Inject
     UserManager mUserManager;
     @Inject
-    BuildManager mBuildManager;
-    @Inject
     ChatboxUnreadDownloadManager chatboxUnreadDownloadManager;
     @Inject
     protected FeedModeManager mFeedModeManager;

@@ -223,6 +223,23 @@
                     android:layout_marginRight="@dimen/spacing_large"/>
             </LinearLayout>
 
+            <LinearLayout
+                android:id="@+id/admin_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/item_selector"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/Theme.ChatWing.DrawerItemTitle"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:drawableLeft="@drawable/ic_action_admins"
+                    android:text="@string/title_activity_admins" />
+
+            </LinearLayout>
+
             <TextView
                 android:id="@+id/settings"
                 style="@style/Theme.ChatWing.DrawerItemTitle"

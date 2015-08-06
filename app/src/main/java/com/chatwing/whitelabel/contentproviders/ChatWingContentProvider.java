@@ -435,19 +435,7 @@ public class ChatWingContentProvider extends ContentProvider {
                 builder.setTables(sb.toString());
                 break;
             case CODE_MODERATORS:
-                sb = new StringBuilder(DefaultUserTable.TABLE)
-                        .append(" LEFT OUTER JOIN ")
-                        .append(ConversationTable.TABLE)
-                        .append(" ON (")
-                        .append(DefaultUserTable.TABLE)
-                        .append(".")
-                        .append(DefaultUserTable.TARGET_USER_IDENTIFIER)
-                        .append(" = ")
-                        .append(ConversationTable.TABLE)
-                        .append(".")
-                        .append(ConversationTable.TARGET_USER_IDENTIFIER)
-                        .append(")");
-                builder.setTables(sb.toString());
+                builder.setTables(DefaultUserTable.TABLE);
                 break;
             case CODE_SYNCED_BOOKMARK:
                 builder.appendWhere(

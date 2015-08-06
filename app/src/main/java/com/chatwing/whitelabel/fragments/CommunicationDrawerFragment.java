@@ -71,6 +71,8 @@ public class CommunicationDrawerFragment extends Fragment implements LoaderManag
 
         void showConversations();
 
+        void showAdminList();
+
         public WebView getWebView();
 
         void logout();
@@ -98,6 +100,7 @@ public class CommunicationDrawerFragment extends Fragment implements LoaderManag
     private View mCategoriesView;
     private TextView mCategoriesUnreadCountView;
     private View mConversationsView;
+    private View mAdminContactsView;
     private TextView mConversationsUnreadCountView;
 
     public CommunicationDrawerFragment() {
@@ -138,6 +141,13 @@ public class CommunicationDrawerFragment extends Fragment implements LoaderManag
             @Override
             public void onClick(View v) {
                 mListener.showConversations();
+            }
+        });
+        mAdminContactsView = view.findViewById(R.id.admin_list);
+        mAdminContactsView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.showAdminList();
             }
         });
         mConversationsUnreadCountView = (TextView) view.findViewById(R.id.conversation_unread_count);

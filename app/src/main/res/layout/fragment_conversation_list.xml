@@ -46,18 +46,6 @@
                 android:layout_below="@+id/back">
 
                 <ListView
-                    android:id="@+id/default_user_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:listSelector="@drawable/item_selector" />
-
-                <View
-                    android:id="@+id/lists_dividers"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/divider" />
-
-                <ListView
                     android:id="@+id/listview"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"

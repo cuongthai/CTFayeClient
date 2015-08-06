@@ -44,4 +44,7 @@ public class BuildManager {
     }
 
 
+    public boolean canShowAdminList() {
+        return isCustomLoginType();
+    }
 }

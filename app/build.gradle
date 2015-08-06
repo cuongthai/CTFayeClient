@@ -63,6 +63,9 @@ android {
     }
 
     buildTypes {
+        debug {
+            ext.enableCrashlytics = false
+        }
         release {
             debuggable false
             zipAlignEnabled true

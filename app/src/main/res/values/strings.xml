@@ -7,6 +7,7 @@
     <string name="title_login">"Log In"</string>
     <string name="title_categories">"Lobby"</string>
     <string name="title_activity_conversation">Conversations</string>
+    <string name="title_activity_admins">Admin Contacts</string>
     <string name="title_activity_online_users">Online Users</string>
     <string name="title_settings">"Settings"</string>
     <string name="fragment_tag_left_drawer">"left-drawer-fragment"</string>
@@ -247,6 +248,7 @@
     <string name="error_obtain_access_token">"There was an error while authenticating with external service"</string>
     <string name="error_required_login">"You need to login to use these awesome features."</string>
     <string name="error_empty_message">"Empty message."</string>
+    <string name="error_not_support">"This feature is not support. Please contact admin for more information."</string>
     <string name="error_too_long_message">"The message is too long."</string>
     <string name="error_illegal_input">"Please don't hurt us!"</string>
     <string name="error_while_sending_message">"There was an error while sending message."</string>
