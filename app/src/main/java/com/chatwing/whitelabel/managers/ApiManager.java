@@ -32,6 +32,7 @@ import com.chatwing.whitelabel.pojos.responses.ResetPasswordResponse;
 import com.chatwing.whitelabel.pojos.responses.SearchChatBoxResponse;
 import com.chatwing.whitelabel.pojos.responses.SubscriptionResponse;
 import com.chatwing.whitelabel.pojos.responses.SubscriptionStatusResponse;
+import com.chatwing.whitelabel.pojos.responses.UnreadCountResponse;
 import com.chatwing.whitelabel.pojos.responses.UpdateGcmResponse;
 import com.chatwing.whitelabel.pojos.responses.UpdateUserProfileResponse;
 import com.chatwing.whitelabel.pojos.responses.UserResponse;
@@ -477,12 +478,13 @@ public interface ApiManager {
             HttpRequest.HttpRequestException,
             UserUnauthenticatedException, OtherApplicationException;
 
-    int getUnreadCountForChatbox(User user,
+    UnreadCountResponse getUnreadCountForChatbox(User user,
                                  Integer chatboxId)
             throws ApiException,
             HttpRequest.HttpRequestException,
             UserUnauthenticatedException,
-            NotVerifiedEmailException, OtherApplicationException;
+            NotVerifiedEmailException,
+            OtherApplicationException;
 
 
     /**

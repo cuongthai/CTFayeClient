@@ -114,8 +114,7 @@ public class BookmarkedChatBoxesDrawerFragment extends ListFragment
                         ChatBoxTable.TABLE_CHAT_BOX + "." + ChatBoxTable.KEY,
                         ChatBoxTable.TABLE_CHAT_BOX + "." + ChatBoxTable.FAYE_CHANNEL,
                         ChatBoxTable.TABLE_CHAT_BOX + "." + ChatBoxTable.ALIAS,
-                        ChatBoxTable.UNREAD_COUNT,
-                        ChatBoxTable.LAST_READ
+                        ChatBoxTable.UNREAD_COUNT
                 },
                 null,
                 null,

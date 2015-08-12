@@ -830,7 +830,7 @@ public class ApiManagerImpl implements ApiManager {
     }
 
     @Override
-    public int getUnreadCountForChatbox(User user,
+    public UnreadCountResponse getUnreadCountForChatbox(User user,
                                         Integer chatboxId)
             throws ApiException,
             HttpRequest.HttpRequestException,
@@ -847,7 +847,7 @@ public class ApiManagerImpl implements ApiManager {
         try {
             responseString = validate(request);
             UnreadCountResponse unreadCountResponse = new Gson().fromJson(responseString, UnreadCountResponse.class);
-            return unreadCountResponse.getData().getCount();
+            return unreadCountResponse;
         } catch (JsonSyntaxException e) {
             throw ApiException.createJsonSyntaxException(e, responseString);
         } catch (ValidationException e) {

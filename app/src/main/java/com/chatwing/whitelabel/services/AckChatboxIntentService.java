@@ -30,11 +30,17 @@ import com.chatwing.whitelabel.utils.LogUtils;
  * Created by steve on 15/05/2014.
  */
 public class AckChatboxIntentService extends BaseIntentService {
-    public static final String EXTRA_CHATBOX_ID = "chatbox_id";
+    public static final String EXTRA_CHATBOX_IDS = "chatbox_ids";
 
     public static void ack(Context context, Integer chatboxID) {
         Intent ack = new Intent(context, AckChatboxIntentService.class);
-        ack.putExtra(AckChatboxIntentService.EXTRA_CHATBOX_ID, chatboxID);
+        ack.putExtra(AckChatboxIntentService.EXTRA_CHATBOX_IDS, new Integer[]{chatboxID});
+        context.startService(ack);
+    }
+
+    public static void ack(Context context, Integer[] chatboxIDs) {
+        Intent ack = new Intent(context, AckChatboxIntentService.class);
+        ack.putExtra(AckChatboxIntentService.EXTRA_CHATBOX_IDS, chatboxIDs);
         context.startService(ack);
     }
 
@@ -45,23 +51,26 @@ public class AckChatboxIntentService extends BaseIntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent == null) return;
-        Integer chatboxID = intent.getIntExtra(EXTRA_CHATBOX_ID, 0);
-        /**
-         * This should be called in these cases:
-         * 1. Open chatbox DONE
-         * 2. Message received with limit DONE
-         * 3. Pause chatbox message fragment DONE
-         * 4. When detect out of sync.
-         *    (Read in offline)  NO NEED
-         *    (Sync categories while in chatbox) DONE
-         * 5. Go to another box, current one should ack to flush current messages DONE
-         */
-        try {
-            mApiManager.ackChatbox(mUserManager.getCurrentUser(),
-                    chatboxID);
-            markAsRead(chatboxID);
-            LogUtils.v("Test ACK Chatbox onHandleIntent");
-        } catch (Exception e) {
+        Integer[] chatboxIDs = (Integer[]) intent.getSerializableExtra(EXTRA_CHATBOX_IDS);
+
+        for(Integer chatboxID: chatboxIDs) {
+            /**
+             * This should be called in these cases:
+             * 1. Open chatbox DONE
+             * 2. Message received with limit DONE
+             * 3. Pause chatbox message fragment DONE
+             * 4. When detect out of sync.
+             *    (Read in offline)  NO NEED
+             *    (Sync categories while in chatbox) DONE
+             * 5. Go to another box, current one should ack to flush current messages DONE
+             */
+            try {
+                mApiManager.ackChatbox(mUserManager.getCurrentUser(),
+                        chatboxID);
+                markAsRead(chatboxID);
+                LogUtils.v("Test ACK Chatbox onHandleIntent");
+            } catch (Exception e) {
+            }
         }
     }
 

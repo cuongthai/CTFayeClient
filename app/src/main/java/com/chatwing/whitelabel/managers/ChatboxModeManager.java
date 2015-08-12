@@ -89,7 +89,6 @@ public class ChatboxModeManager extends CommunicationModeManager {
     public void onResume() {
         super.onResume();
         mCurrentChatBoxManager.onResume();
-        mCurrentChatBoxManager.markAsRead();
     }
 
     @Override
@@ -196,10 +195,6 @@ public class ChatboxModeManager extends CommunicationModeManager {
 
     @Override
     public void processMessageInCurrentCommunicationBox(Message message) {
-        //Message is coming and screen is on, so let's assume he is reading it
-        if (mActivityDelegate.getActivity().isVisible()) {
-            mCurrentChatBoxManager.markAsRead();
-        }
     }
 
     @Override
@@ -347,7 +342,6 @@ public class ChatboxModeManager extends CommunicationModeManager {
                 invalidateOptionsMenu();
                 subscribeToCurrentChatBox();
                 markNotificationRead(event.getChatbox().getId());
-                mCurrentChatBoxManager.markAsRead();
                 updateChatBoxUnreadCountInDB(event.getChatbox().getId(), 0);
                 //When open conversation, this means user read all unread messages
                 AckChatboxIntentService.ack(mActivityDelegate.getActivity(), event.getChatbox().getId());

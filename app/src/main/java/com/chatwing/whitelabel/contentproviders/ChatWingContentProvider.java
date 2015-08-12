@@ -36,6 +36,7 @@ import com.chatwing.whitelabel.tables.DefaultUserTable;
 import com.chatwing.whitelabel.tables.MessageTable;
 import com.chatwing.whitelabel.tables.NotificationMessagesTable;
 import com.chatwing.whitelabel.tables.SyncedBookmarkTable;
+import com.chatwing.whitelabel.utils.LogUtils;
 
 import java.util.ArrayList;
 
@@ -445,6 +446,7 @@ public class ChatWingContentProvider extends ContentProvider {
             default:
                 throw new IllegalArgumentException("Unknown query URI: " + uri);
         }
+        LogUtils.v("Query for "+uri);
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         Cursor c = builder.query(db, projection, selection, selectionArgs,
                 groupBy, null, sortOrder);

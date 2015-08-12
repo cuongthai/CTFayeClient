@@ -105,7 +105,7 @@ public class ChatBoxTable implements BaseColumns {
      * TODO: Together with ConversationTable, this and getChatBox may give out of dated data because DATA override UNREAD_COUNT e.g
      */
     public static String[] getMinimumProjection() {
-        return new String[]{_ID, DATA, UNREAD_COUNT, NAME, FAYE_CHANNEL, KEY, ALIAS, LAST_READ};
+        return new String[]{_ID, DATA, UNREAD_COUNT, NAME, FAYE_CHANNEL, KEY, ALIAS};
     }
 
 
@@ -141,7 +141,6 @@ public class ChatBoxTable implements BaseColumns {
         int keyIndex = cursor.getColumnIndex(KEY);
         int fayeIndex = cursor.getColumnIndex(FAYE_CHANNEL);
         int aliasIndex = cursor.getColumnIndex(ALIAS);
-        int lastReadIndex = cursor.getColumnIndex(LAST_READ);
         if (dataIndex == -1) {
             throw new IllegalArgumentException("data column is expected to " +
                     "transform to ChatBox object.");
@@ -160,9 +159,6 @@ public class ChatBoxTable implements BaseColumns {
         }
         if (aliasIndex == -1) {
             throw new IllegalArgumentException("alias column is expected.");
-        }
-        if(lastReadIndex == -1){
-            throw new IllegalArgumentException("last_read column is expected.");
         }
 
         String data = cursor.getString(dataIndex);

@@ -29,12 +29,16 @@ public class UnreadCountResponse extends BaseResponse {
         return data;
     }
 
-    public static class UnreadCount{
+    public static class UnreadCount {
         private int count;
         private long since;
 
         public int getCount() {
             return count;
+        }
+
+        public boolean hasChatboxFirstAck() {
+            return since > 0;
         }
     }
 }

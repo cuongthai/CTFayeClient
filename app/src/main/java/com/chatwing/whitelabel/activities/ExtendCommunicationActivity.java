@@ -59,6 +59,7 @@ import com.chatwing.whitelabel.pojos.errors.ChatWingError;
 import com.chatwing.whitelabel.pojos.params.CreateConversationParams;
 import com.chatwing.whitelabel.pojos.responses.ChatBoxDetailsResponse;
 import com.chatwing.whitelabel.pojos.responses.DeleteBookmarkResponse;
+import com.chatwing.whitelabel.services.AckChatboxIntentService;
 import com.chatwing.whitelabel.services.DownloadUserDetailIntentService;
 import com.chatwing.whitelabel.services.MusicService;
 import com.chatwing.whitelabel.services.SyncBookmarkIntentService;
@@ -211,6 +212,7 @@ public class ExtendCommunicationActivity
     @Subscribe
     public void onSyncUnreadEvent(SyncUnreadEvent event) {
         syncRefreshAnimationState();
+        AckChatboxIntentService.ack(this, event.getUnAckChatboxIds().toArray(new Integer[event.getUnAckChatboxIds().size()]));
     }
 
     @Subscribe

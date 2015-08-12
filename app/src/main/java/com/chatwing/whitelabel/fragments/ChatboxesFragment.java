@@ -68,7 +68,7 @@ public class ChatboxesFragment extends Fragment implements LoaderManager.LoaderC
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mDelegate.inject(this);
-        LogUtils.v("Load conversation boxes");
+        LogUtils.v("Load chatbox");
         mEmptyTextView = (TextView) view.findViewById(android.R.id.empty);
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
         mListView = (ListView) view.findViewById(R.id.listview);

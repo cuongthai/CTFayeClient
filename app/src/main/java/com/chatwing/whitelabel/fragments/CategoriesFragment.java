@@ -32,6 +32,7 @@ import com.chatwing.whitelabel.events.SyncUnreadEvent;
 import com.chatwing.whitelabel.events.UserSelectedChatBoxEvent;
 import com.chatwing.whitelabel.tables.CategoryTable;
 import com.chatwing.whitelabel.tables.ChatBoxTable;
+import com.chatwing.whitelabel.utils.LogUtils;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -99,6 +100,7 @@ public class CategoriesFragment extends BaseExpandableListFragment {
 
     @Subscribe
     public void onSyncUnreadEvent(SyncUnreadEvent event){
+        LogUtils.v("Unread Download Done, loading to UI");
         getLoaderManager().restartLoader(getLoaderId(), null, this);
     }
 

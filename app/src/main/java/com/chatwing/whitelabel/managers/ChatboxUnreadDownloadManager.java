@@ -9,12 +9,15 @@ import com.arasthel.asyncjob.AsyncJob;
 import com.chatwing.whitelabel.contentproviders.ChatWingContentProvider;
 import com.chatwing.whitelabel.events.SyncUnreadEvent;
 import com.chatwing.whitelabel.modules.ForApplication;
+import com.chatwing.whitelabel.pojos.ChatBox;
+import com.chatwing.whitelabel.pojos.responses.UnreadCountResponse;
 import com.chatwing.whitelabel.tables.ChatBoxTable;
 import com.chatwing.whitelabel.utils.LogUtils;
 import com.squareup.otto.Bus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -36,6 +39,9 @@ public class ChatboxUnreadDownloadManager {
     ApiManager mApiManager;
     @Inject
     Bus mBus;
+    @Inject
+    CurrentChatBoxManager mCurrentChatboxManager;
+
     private static boolean isRunning;
 
     public synchronized void downloadUnread() {
@@ -43,6 +49,7 @@ public class ChatboxUnreadDownloadManager {
         if (isRunning || mUserManager.getCurrentUser() == null) {
             return;
         }
+        final List<Integer> unAckChatboxIds=new ArrayList<Integer>();
         AsyncJob.OnBackgroundJob backgroundJob = new AsyncJob.OnBackgroundJob() {
             @Override
             public void doOnBackground() {
@@ -64,7 +71,12 @@ public class ChatboxUnreadDownloadManager {
                             @Override
                             public void doOnBackground() {
                                 try {
-                                    int count = mApiManager.getUnreadCountForChatbox(mUserManager.getCurrentUser(), chatboxID);
+                                    UnreadCountResponse unreadCountForChatbox = mApiManager.getUnreadCountForChatbox(mUserManager.getCurrentUser(), chatboxID);
+                                    int count = unreadCountForChatbox.getData().getCount();
+                                    if(!unreadCountForChatbox.getData().hasChatboxFirstAck()){
+                                        unAckChatboxIds.add(chatboxID);
+                                    }
+                                    LogUtils.v("Unread Count = "+count +" since > 0? "+unreadCountForChatbox.getData().hasChatboxFirstAck());
                                     chatboxIDUnreadMap.put(chatboxID, count);
                                 } catch (Exception e) {
                                     e.printStackTrace();
@@ -95,7 +107,7 @@ public class ChatboxUnreadDownloadManager {
                     AsyncJob.doOnMainThread(new AsyncJob.OnMainThreadJob() {
                         @Override
                         public void doInUIThread() {
-                            mBus.post(new SyncUnreadEvent());
+                            mBus.post(new SyncUnreadEvent(unAckChatboxIds));
 //                            LogUtils.v("Download unread: Synced Done");
                         }
                     });
@@ -120,7 +132,13 @@ public class ChatboxUnreadDownloadManager {
         Set<Integer> chatboxIDs = chatboxIDUnreadMap.keySet();
         for (Integer chatboxID : chatboxIDs) {
             ContentValues contentValues = new ContentValues();
-            contentValues.put(ChatBoxTable.UNREAD_COUNT, chatboxIDUnreadMap.get(chatboxID));
+            ChatBox currentChatBox = mCurrentChatboxManager.getCurrentChatBox();
+            if(currentChatBox!=null && currentChatBox.getId()==chatboxID){
+                //We ignore updating unread count for opening chatbox
+                contentValues.put(ChatBoxTable.UNREAD_COUNT, 0);
+            }else {
+                contentValues.put(ChatBoxTable.UNREAD_COUNT, chatboxIDUnreadMap.get(chatboxID));
+            }
             batch.add(ContentProviderOperation.newUpdate(ChatWingContentProvider.getChatBoxWithIdUri(chatboxID))
                     .withValues(contentValues)
                     .build());

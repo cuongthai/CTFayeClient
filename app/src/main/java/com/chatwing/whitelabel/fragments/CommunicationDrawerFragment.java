@@ -40,6 +40,7 @@ import com.chatwing.whitelabel.contentproviders.ChatWingContentProvider;
 import com.chatwing.whitelabel.events.SyncUnreadEvent;
 import com.chatwing.whitelabel.events.UpdateUserEvent;
 import com.chatwing.whitelabel.managers.ApiManager;
+import com.chatwing.whitelabel.managers.BuildManager;
 import com.chatwing.whitelabel.managers.UserManager;
 import com.chatwing.whitelabel.managers.VolleyManager;
 import com.chatwing.whitelabel.pojos.User;
@@ -90,6 +91,8 @@ public class CommunicationDrawerFragment extends Fragment implements LoaderManag
     ErrorMessageView mErrorView;
     @Inject
     ProgressDialog mProgressDialog;
+    @Inject
+    BuildManager mBuildManager;
 
     private Listener mListener;
     protected ImageView mUserAvatarView;
@@ -159,6 +162,7 @@ public class CommunicationDrawerFragment extends Fragment implements LoaderManag
                 getActivity().startActivityForResult(i, CommunicationActivity.REQUEST_CODE_AUTHENTICATION);
             }
         });
+
 
         mLogoutButton = view.findViewById(R.id.logout);
         mLogoutButton.setOnClickListener(new View.OnClickListener() {
@@ -251,10 +255,13 @@ public class CommunicationDrawerFragment extends Fragment implements LoaderManag
 
         String avatarUrl = mApiManager.getAvatarUrl(user);
         LogUtils.v("Avatar drawer "+avatarUrl);
-//        ImageLoader.getInstance().clearDiskCache();
         ImageLoader.getInstance().displayImage(avatarUrl, mUserAvatarView);
         mUsernameView.setText(user.getName());
         mAccountTypeView.setText(mApiManager.getDisplayUserLoginType(user.getLoginType()));
+
+        if(!mBuildManager.canShowAdminList()){
+            mAdminContactsView.setVisibility(View.GONE);
+        }
     }
 
     protected void showLoginButton(boolean show) {

@@ -19,9 +19,8 @@
 <TwoLineListItem xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="?android:attr/listPreferredItemHeight"
-    android:paddingTop="@dimen/item_padding"
-    android:paddingRight="@dimen/item_padding"
-    android:paddingBottom="@dimen/item_padding"
+    android:paddingRight="@dimen/spacing_large"
+    android:paddingTop="@dimen/spacing_large"
     android:paddingLeft="?android:attr/expandableListPreferredItemPaddingLeft"
     android:mode="oneLine">
 

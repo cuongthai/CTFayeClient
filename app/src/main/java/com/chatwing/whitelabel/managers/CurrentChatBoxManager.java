@@ -147,18 +147,6 @@ public class CurrentChatBoxManager extends CurrentCommunicationManager {
 
     }
 
-    public void markAsRead() {
-        ChatBox currentChatBox = getCurrentChatBox();
-        if (currentChatBox == null) return;
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(ChatBoxTable.LAST_READ, System.currentTimeMillis());
-        mContext.getContentResolver().update(ChatWingContentProvider.getChatBoxWithIdUri(currentChatBox.getId()),
-                contentValues,
-                null,
-                null);
-
-    }
-
     public ChatBox getLastKnownGoodChatBox() {
         return mCurrentChatBox == null ? mLastKnownGoodChatBox : mCurrentChatBox;
     }
