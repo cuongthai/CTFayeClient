@@ -16,7 +16,6 @@
 
 package com.chatwing.whitelabel.services;
 
-import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ContentProviderOperation;
@@ -43,6 +42,7 @@ import com.chatwing.whitelabel.pojos.jspojos.MessageResponse;
 import com.chatwing.whitelabel.tables.NotificationMessagesTable;
 import com.chatwing.whitelabel.utils.LogUtils;
 import com.chatwing.whitelabel.utils.StatisticTracker;
+import com.google.android.gms.gcm.GcmListenerService;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -56,7 +56,7 @@ import javax.inject.Inject;
  * Date: 9/11/13
  * Time: 7:29 AM
  */
-public class NotificationIntentService extends IntentService {
+public class NotificationIntentService extends GcmListenerService {
     private static final int MAX_MESSAGES_PER_GROUP = 5;
 
     /**
@@ -74,52 +74,54 @@ public class NotificationIntentService extends IntentService {
     UserManager mUserManager;
 
     public NotificationIntentService() {
-        super("GcmIntentService");
         ChatWing.instance(this).getChatwingGraph().inject(this);
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
+    public void onMessageReceived(String from, Bundle extras) {
         if (mUserManager.getCurrentUser() == null) return;//No login no push
-        Bundle extras = intent.getExtras();
-        Set<String> keys = extras.keySet();
-        for (String k : keys) {
-            LogUtils.v("Key in GCM " + k + ":" + extras.get(k));
-        }
-
-        if (!supportVersion(extras)) {
-            return;
-        }
-
-        if (handleBroadCastEvent(extras)) {
-            return;
-        }
-        String params = extras.getString("params");
-        if (params == null) return;
-        MessageResponse messageResponse = getMessagesFromParams(params);
-        if (messageResponse == null) return;
-        Message[] messages = messageResponse.getMessages();
-        User targetUser = messageResponse.getChatUser();
-        if (messages == null || messages.length == 0) {
-            return;
-        }
-
-        //Fill chatbox_id or conversation_id to message
-        fillGroupIDToMessage(messages, extras.getString("type"), messageResponse);
-
-        insertNotificationMessagesToDb(messages);
-
-        if (extras.getString("type").equals("conversation_notification")) {
-            String conversationId = messageResponse.getConversation().getId();
-            List<Message> freshConversations = getMessagesByGroup(conversationId);
-            LogUtils.v("Test notification not receive getMessagesByGroup " + freshConversations.size());
-
-            notifyForBox(freshConversations, messageResponse.getConversation(), targetUser);
+        if (from.startsWith("/topics/")) {
+            // message received from some topic.
         } else {
-            ChatBox chatbox = messageResponse.getChatbox();
+            Set<String> keys = extras.keySet();
+            for (String k : keys) {
+                LogUtils.v("Key in GCM " + k + ":" + extras.get(k));
+            }
 
-            List<Message> freshChatboxes = getMessagesByGroup(chatbox.getId());
-            notifyForBox(freshChatboxes, chatbox);
+            if (!supportVersion(extras)) {
+                return;
+            }
+
+            if (handleBroadCastEvent(extras)) {
+                return;
+            }
+            String params = extras.getString("params");
+            if (params == null) return;
+            MessageResponse messageResponse = getMessagesFromParams(params);
+            if (messageResponse == null) return;
+            Message[] messages = messageResponse.getMessages();
+            User targetUser = messageResponse.getChatUser();
+            if (messages == null || messages.length == 0) {
+                return;
+            }
+
+            //Fill chatbox_id or conversation_id to message
+            fillGroupIDToMessage(messages, extras.getString("type"), messageResponse);
+
+            insertNotificationMessagesToDb(messages);
+
+            if (extras.getString("type").equals("conversation_notification")) {
+                String conversationId = messageResponse.getConversation().getId();
+                List<Message> freshConversations = getMessagesByGroup(conversationId);
+                LogUtils.v("Test notification not receive getMessagesByGroup " + freshConversations.size());
+
+                notifyForBox(freshConversations, messageResponse.getConversation(), targetUser);
+            } else {
+                ChatBox chatbox = messageResponse.getChatbox();
+
+                List<Message> freshChatboxes = getMessagesByGroup(chatbox.getId());
+                notifyForBox(freshChatboxes, chatbox);
+            }
         }
     }
 
@@ -128,7 +130,7 @@ public class NotificationIntentService extends IntentService {
             return false;
         }
         int pushVersion = extras.getInt("version");
-        if(pushVersion<=CURRENT_PUSH_VERSION){
+        if (pushVersion <= CURRENT_PUSH_VERSION) {
             return true;
         }
         return false;

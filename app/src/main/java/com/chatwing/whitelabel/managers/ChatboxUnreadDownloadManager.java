@@ -49,7 +49,7 @@ public class ChatboxUnreadDownloadManager {
         if (isRunning || mUserManager.getCurrentUser() == null) {
             return;
         }
-        final List<Integer> unAckChatboxIds=new ArrayList<Integer>();
+        final ArrayList<Integer> unAckChatboxIds=new ArrayList<Integer>();
         AsyncJob.OnBackgroundJob backgroundJob = new AsyncJob.OnBackgroundJob() {
             @Override
             public void doOnBackground() {

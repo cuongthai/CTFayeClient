@@ -212,7 +212,8 @@ public class ExtendCommunicationActivity
     @Subscribe
     public void onSyncUnreadEvent(SyncUnreadEvent event) {
         syncRefreshAnimationState();
-        AckChatboxIntentService.ack(this, event.getUnAckChatboxIds().toArray(new Integer[event.getUnAckChatboxIds().size()]));
+
+        AckChatboxIntentService.ack(this, event.getUnAckChatboxIds());
     }
 
     @Subscribe

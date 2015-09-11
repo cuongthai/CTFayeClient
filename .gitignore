@@ -11,3 +11,7 @@ todo~
 /app/app.iml
 *.iml
 /app/build-types
+
+*.pyc
+
+*.pyc

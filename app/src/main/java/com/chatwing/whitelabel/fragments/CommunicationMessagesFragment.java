@@ -573,8 +573,6 @@ public abstract class CommunicationMessagesFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         getLoaderManager().destroyLoader(MESSAGE_LOADER_ID);
-
-        ChatWingApplication.getRefWatcher(getActivity()).watch(this);
     }
 
     @Override

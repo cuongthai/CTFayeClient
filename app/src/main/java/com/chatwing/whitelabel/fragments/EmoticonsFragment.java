@@ -95,11 +95,4 @@ public class EmoticonsFragment extends Fragment {
         GridView viewPager = (GridView) view.findViewById(R.id.gridview);
         viewPager.setAdapter(adapter);
     }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        ChatWingApplication.getRefWatcher(getActivity()).watch(this);
-    }
 }

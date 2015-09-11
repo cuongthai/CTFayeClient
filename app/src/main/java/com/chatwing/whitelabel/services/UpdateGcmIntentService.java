@@ -26,6 +26,7 @@ import com.chatwing.whitelabel.pojos.User;
 import com.chatwing.whitelabel.pojos.responses.UpdateGcmResponse;
 import com.chatwing.whitelabel.utils.LogUtils;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.android.gms.iid.InstanceID;
 
 import javax.inject.Inject;
 
@@ -77,8 +78,9 @@ public class UpdateGcmIntentService extends BaseIntentService {
 
     private void addGcmRegistrationIdToBackend(User user) {
         try {
-            GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
-            String regId = gcm.register(getString(R.string.gcm_sender_id));
+            InstanceID instanceID = InstanceID.getInstance(this);
+            String regId = instanceID.getToken(getString(R.string.gcm_sender_id),
+                    GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
             LogUtils.v("GCM registration id: " + regId);
 
             boolean sent = updateGcmRegistrationIdWithBackend(

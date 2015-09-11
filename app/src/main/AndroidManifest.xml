@@ -134,7 +134,6 @@
         <service android:name=".services.AckChatboxIntentService" />
         <service android:name=".services.UpdateGcmIntentService" />
         <service android:name=".services.OfflineIntentService" />
-        <service android:name=".services.NotificationIntentService" />
         <service android:name=".services.NotificationStatusIntentService" />
         <service android:name=".services.UpdateNotificationSettingsService" />
         <service android:name=".services.GetMessagesIntentService" />
@@ -151,6 +150,19 @@
         <service android:name=".services.SyncBookmarkIntentService" />
         <service android:name=".services.CreateBookmarkIntentService" />
         <service android:name=".services.DeleteBookmarkIntentService" />
+        <service android:name=".services.NotificationIntentService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".services.ChatWingInstanceIDListenerService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.android.gms.iid.InstanceID"/>
+            </intent-filter>
+        </service>
         <service android:name=".services.MusicService">
             <intent-filter>
                 <action android:name="${applicationId}.action.TOGGLE_PLAYBACK" />
@@ -187,7 +199,8 @@
 
 
         <receiver
-            android:name=".receivers.GcmBroadcastReceiver"
+            android:name="com.google.android.gms.gcm.GcmReceiver"
+            android:exported="true"
             android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE"/>

@@ -1,5 +1,6 @@
 package com.chatwing.whitelabel.events;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -7,12 +8,12 @@ import java.util.List;
  */
 public class SyncUnreadEvent {
     //List of chatboxes that has never been acked
-    private List<Integer> unAckChatboxIds;
-    public SyncUnreadEvent(List<Integer> unAckChatboxIds) {
+    private ArrayList<Integer> unAckChatboxIds;
+    public SyncUnreadEvent(ArrayList<Integer> unAckChatboxIds) {
         this.unAckChatboxIds = unAckChatboxIds;
     }
 
-    public List<Integer> getUnAckChatboxIds() {
+    public ArrayList<Integer> getUnAckChatboxIds() {
         return unAckChatboxIds;
     }
 }

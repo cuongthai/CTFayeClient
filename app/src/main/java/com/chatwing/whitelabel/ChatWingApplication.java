@@ -12,8 +12,6 @@ import com.chatwing.whitelabel.utils.Utils;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
 import com.flurry.android.FlurryAgent;
-import com.squareup.leakcanary.LeakCanary;
-import com.squareup.leakcanary.RefWatcher;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -26,12 +24,6 @@ import io.fabric.sdk.android.Fabric;
  * Created by cuongthai on 21/10/2014.
  */
 public class ChatWingApplication extends Application {
-    public static RefWatcher getRefWatcher(Context context) {
-        ChatWingApplication application = (ChatWingApplication) context.getApplicationContext();
-        return application.refWatcher;
-    }
-
-    private RefWatcher refWatcher;
 
     @Override
     public void onCreate() {
@@ -58,12 +50,6 @@ public class ChatWingApplication extends Application {
 
         // Build Custom Singleton, required by PkRSS
         Utils.buildSingleton(this);
-
-        refWatcher = installLeakCanary();
-    }
-
-    protected RefWatcher installLeakCanary() {
-        return ChatWing.isDebugging() ? LeakCanary.install(this) : RefWatcher.DISABLED;
     }
 
     private void workaroundOverflowMenuKey() {

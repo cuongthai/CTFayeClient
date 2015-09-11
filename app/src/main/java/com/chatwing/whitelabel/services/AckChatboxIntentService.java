@@ -25,6 +25,9 @@ import com.chatwing.whitelabel.contentproviders.ChatWingContentProvider;
 import com.chatwing.whitelabel.tables.ChatBoxTable;
 import com.chatwing.whitelabel.utils.LogUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * Created by steve on 15/05/2014.
@@ -34,13 +37,15 @@ public class AckChatboxIntentService extends BaseIntentService {
 
     public static void ack(Context context, Integer chatboxID) {
         Intent ack = new Intent(context, AckChatboxIntentService.class);
-        ack.putExtra(AckChatboxIntentService.EXTRA_CHATBOX_IDS, new Integer[]{chatboxID});
+        ArrayList<Integer> chatboxIds =new ArrayList<Integer>();
+        chatboxIds.add(chatboxID);
+        ack.putIntegerArrayListExtra(AckChatboxIntentService.EXTRA_CHATBOX_IDS, chatboxIds);
         context.startService(ack);
     }
 
-    public static void ack(Context context, Integer[] chatboxIDs) {
+    public static void ack(Context context, ArrayList<Integer> chatboxIDs) {
         Intent ack = new Intent(context, AckChatboxIntentService.class);
-        ack.putExtra(AckChatboxIntentService.EXTRA_CHATBOX_IDS, chatboxIDs);
+        ack.putIntegerArrayListExtra(AckChatboxIntentService.EXTRA_CHATBOX_IDS, chatboxIDs);
         context.startService(ack);
     }
 
@@ -51,7 +56,7 @@ public class AckChatboxIntentService extends BaseIntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent == null) return;
-        Integer[] chatboxIDs = (Integer[]) intent.getSerializableExtra(EXTRA_CHATBOX_IDS);
+        List<Integer> chatboxIDs =  intent.getIntegerArrayListExtra(EXTRA_CHATBOX_IDS);
 
         for(Integer chatboxID: chatboxIDs) {
             /**
