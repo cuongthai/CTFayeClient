@@ -242,7 +242,9 @@ public class NotificationIntentService extends GcmListenerService {
             List<Message> messages = new ArrayList<Message>();
             while (hasNext) {
                 Message message = NotificationMessagesTable.getMessage(cursor);
-                messages.add(message);
+                if (message!=null) {
+                    messages.add(message);
+                }
 
                 hasNext = cursor.moveToNext();
             }
@@ -266,7 +268,9 @@ public class NotificationIntentService extends GcmListenerService {
             List<Message> messages = new ArrayList<Message>();
             while (hasNext) {
                 Message message = NotificationMessagesTable.getMessage(cursor);
-                messages.add(message);
+                if (message!=null) {
+                    messages.add(message);
+                }
                 hasNext = cursor.moveToNext();
             }
             return messages;

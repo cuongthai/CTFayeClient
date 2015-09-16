@@ -75,7 +75,6 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
     public static final int DRAWER_GRAVITY_ONLINE_USER = Gravity.RIGHT;
     private final MediaControlInterface mMediaControlInterface;
 
-    private MenuItem mOnlineUsersItem;
     private BadgeView mOnlineUsersBadgeView;
     private ApiManager mApiManager;
     protected int mNumOfOnlineUser;
@@ -200,7 +199,7 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
         AppCompatActivity activity = mActivityDelegate.getActivity();
         final DrawerLayout drawerLayout = mActivityDelegate.getDrawerLayout();
         activity.getMenuInflater().inflate(R.menu.chatbox_menu, menu);
-        mOnlineUsersItem = menu.findItem(R.id.online_users);
+        MenuItem onlineUsersItem = menu.findItem(R.id.online_users);
         mediaAddItem = menu.findItem(R.id.audio_add);
 
         /**
@@ -208,7 +207,7 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
          */
         ImageButton iconView = new ImageButton(activity, null,
                 R.style.Widget_AppCompat_ActionButton);
-        iconView.setImageDrawable(mOnlineUsersItem.getIcon());
+        iconView.setImageDrawable(onlineUsersItem.getIcon());
         iconView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -235,7 +234,7 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
                 res.getDimension(R.dimen.badge_view_text_size));
         mOnlineUsersBadgeView.setBadgeMargin(res.getDimensionPixelSize(
                 R.dimen.default_margin));
-        mOnlineUsersItem.setActionView(container);
+        onlineUsersItem.setActionView(container);
         mOnlineUsersBadgeView.setBadgeBackgroundColor(mActivityDelegate.getActivity().getResources().getColor(R.color.accent));
 
         return true;
@@ -265,9 +264,10 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
         MenuItem copyAliasItem = menu.findItem(R.id.copy_alias);
         MenuItem manageBlackListItem = menu.findItem(R.id.manage_blacklist);
         MenuItem bookmarkChatBoxItem = menu.findItem(R.id.bookmark_chat_box);
+        MenuItem onlineUsersItem = menu.findItem(R.id.bookmark_chat_box);
 
         // Invalidate all menu related objects
-        mOnlineUsersItem.setVisible(false);
+        onlineUsersItem.setVisible(false);
         mOnlineUsersBadgeView.hide();
         shareChatBoxItem.setVisible(false);
         copyAliasItem.setVisible(false);
@@ -279,7 +279,7 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
         if (mCurrentChatBoxManager.getCurrentChatBox() != null) {
             // When main view or online users drawer is opened
             // and current chat box is available.
-            mOnlineUsersItem.setVisible(true);
+            onlineUsersItem.setVisible(true);
             shareChatBoxItem.setVisible(true && Constants.ALLOW_SHARE_CHATBOX);
             if (mNumOfOnlineUser > 0) {
                 mOnlineUsersBadgeView.setText(Integer.toString(mNumOfOnlineUser));
@@ -486,6 +486,10 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
         }
         if (exception instanceof OperationApplicationException || exception instanceof RemoteException) {
             mActivityDelegate.handle(exception, R.string.error_failed_to_save_chat_box);
+            return true;
+        }
+        if (exception instanceof ApiManager.NotVerifiedEmailException){
+            mActivityDelegate.handle(exception, R.string.error_email_verify);
             return true;
         }
         mActivityDelegate.handle(exception, R.string.error_failed_to_save_bookmark);

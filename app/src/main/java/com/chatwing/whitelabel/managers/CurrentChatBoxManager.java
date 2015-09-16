@@ -60,12 +60,6 @@ public class CurrentChatBoxManager extends CurrentCommunicationManager {
         mLastKnownGoodChatBox = null;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        LogUtils.v("Test Chatbox not display, onResume " + mCurrentChatBox);
-    }
-
     public void loadCurrentChatBox(final int chatBoxId) {
         if (!mChatBoxIdValidator.isValid(chatBoxId)) {
             return;

@@ -328,7 +328,6 @@ public class ChatboxModeManager extends CommunicationModeManager {
         super.onCurrentCommunicationChanged(event);
         switch (event.getStatus()) {
             case REMOVED:
-
                 mActivityDelegate.setProgressText(R.string.message_select_chat_box, false);
                 setTitle(mOriginalTitle.toString());
                 setSubTitle(null);

@@ -51,6 +51,8 @@ public class EventParserImpl implements EventParser {
             return new Event(event, params);
         } catch (Exception ex) {
             throw new JSONException(ex.getLocalizedMessage());
+        } catch (IncompatibleClassChangeError ex){
+            throw new JSONException(ex.getLocalizedMessage());
         }
     }
 

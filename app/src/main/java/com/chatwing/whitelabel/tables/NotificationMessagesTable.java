@@ -95,7 +95,11 @@ public class NotificationMessagesTable implements BaseColumns {
          * Random crashes on random Samsung phones (5.0+)
          * https://code.google.com/p/android/issues/detail?id=172339
          */
-        Message message = new Gson().fromJson(data, Message.class);
-        return message;
+        try {
+            Message message = new Gson().fromJson(data, Message.class);
+            return message;
+        } catch (IncompatibleClassChangeError e) {
+            return null;
+        }
     }
 }

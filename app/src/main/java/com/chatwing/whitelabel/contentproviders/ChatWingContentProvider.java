@@ -448,13 +448,17 @@ public class ChatWingContentProvider extends ContentProvider {
         }
         LogUtils.v("Query for "+uri);
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-        Cursor c = builder.query(db, projection, selection, selectionArgs,
-                groupBy, null, sortOrder);
+        try {
+            Cursor c = builder.query(db, projection, selection, selectionArgs,
+                    groupBy, null, sortOrder);
 
-        c.setNotificationUri(getContext().getContentResolver(), uri);
-        return c;
+            c.setNotificationUri(getContext().getContentResolver(), uri);
+            return c;
+        }catch (RuntimeException re) {
+            LogUtils.v("Well, we got you "+re.getMessage());
+            throw re;
+        }
     }
-
 
     @Override
     public String getType(Uri uri) {

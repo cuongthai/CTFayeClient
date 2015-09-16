@@ -87,8 +87,6 @@ public abstract class CommunicationModeManager {
 
 
     protected void onCurrentCommunicationChanged(CurrentCommunicationEvent event) {
-        LogUtils.v("Test Chatbox not display, onCurrentCommunicationChanged: " + event.getStatus());
-
         switch (event.getStatus()) {
             case REMOVED:
             case LOADING:

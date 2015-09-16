@@ -523,7 +523,6 @@ public class CommunicationActivity
 
     @Override
     public final void setContentShown(boolean shown) {
-        LogUtils.v("Test Chatbox not display, shown: " + shown);
         if (shown) {
             mContentView.setVisibility(View.VISIBLE);
             mProgressView.setVisibility(View.GONE);
