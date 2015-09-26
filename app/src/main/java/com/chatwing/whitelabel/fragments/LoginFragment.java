@@ -1,6 +1,7 @@
 package com.chatwing.whitelabel.fragments;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -29,35 +30,37 @@ import com.squareup.otto.Bus;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-public class LoginFragment extends Fragment implements View.OnClickListener {
+public class LoginFragment extends BaseFragment implements View.OnClickListener {
 
     public interface Delegate extends InjectableFragmentDelegate {
         void forgotPassword();
     }
 
     @Inject
-    EmailValidator mEmailValidator;
+    protected EmailValidator mEmailValidator;
     @Inject
-    PasswordValidator mPasswordValidator;
+    protected PasswordValidator mPasswordValidator;
     @Inject
-    Bus mBus;
+    protected Bus mBus;
     @Inject
-    EmailsAdapterFactory mEmailsAdapterFactory;
+    protected EmailsAdapterFactory mEmailsAdapterFactory;
     @Inject
-    Provider<Typeface> mIconTypefaceProvider;
-    @Inject
-    BuildManager mBuildManager;
+    protected BuildManager mBuildManager;
+
     private Delegate mDelegate;
     private AutoCompleteTextView mEmailEditText;
     private EditText mPasswordEditText;
 
-    public LoginFragment() {
-    }
-
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mDelegate = (Delegate) activity;
+    }
+
+    @Override
+    protected void onAttachToContext(Context context) {
+        if (context instanceof Delegate){
+            mDelegate = (Delegate) context;
+        }
     }
 
     @Override
@@ -120,10 +123,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
     public void setEmailError(String error) {
         mEmailEditText.setError(error);
-    }
-
-    public void setPasswordError(String error) {
-        mPasswordEditText.setError(error);
     }
 
     private void loginChatWing() {

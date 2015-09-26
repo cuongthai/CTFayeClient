@@ -12,11 +12,11 @@ import javax.inject.Inject;
 /**
  * Created by steve on 15/05/2014.
  */
-public class VerifyEmailIntentService extends ExtendBaseIntentService {
+public class VerifyEmailIntentService extends BaseIntentService {
     private static boolean sIsInProgress;
     private static final Object sLock = new Object();
     @Inject
-    ApiManager mApiManager;
+    protected ApiManager mApiManager;
 
     public VerifyEmailIntentService() {
         super("VerifyEmailIntentService");
@@ -32,7 +32,7 @@ public class VerifyEmailIntentService extends ExtendBaseIntentService {
         post(VerifyEmailEvent.started());
         LogUtils.v("Syncing user detail");
         try {
-             mApiManager.verifyEmail(user);
+            mApiManager.verifyEmail(user);
             post(VerifyEmailEvent.success());
         } catch (Exception e) {
             LogUtils.e(e);
@@ -61,5 +61,4 @@ public class VerifyEmailIntentService extends ExtendBaseIntentService {
             return sIsInProgress;
         }
     }
-
 }

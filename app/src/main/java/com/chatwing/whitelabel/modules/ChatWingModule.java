@@ -17,6 +17,7 @@
 package com.chatwing.whitelabel.modules;
 
 import android.app.NotificationManager;
+import android.app.SearchManager;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
@@ -32,16 +33,27 @@ import com.chatwing.whitelabel.managers.UserManager;
 import com.chatwing.whitelabel.managers.VolleyManager;
 import com.chatwing.whitelabel.services.AckChatboxIntentService;
 import com.chatwing.whitelabel.services.AckConversationIntentService;
+import com.chatwing.whitelabel.services.BlockUserIntentService;
+import com.chatwing.whitelabel.services.CreateBookmarkIntentService;
 import com.chatwing.whitelabel.services.CreateConversationIntentService;
 import com.chatwing.whitelabel.services.CreateMessageIntentService;
+import com.chatwing.whitelabel.services.DeleteBookmarkIntentService;
+import com.chatwing.whitelabel.services.DeleteMessageIntentService;
+import com.chatwing.whitelabel.services.DownloadUserDetailIntentService;
+import com.chatwing.whitelabel.services.FlagMessageIntentService;
 import com.chatwing.whitelabel.services.GetMessagesIntentService;
+import com.chatwing.whitelabel.services.IgnoreUserIntentService;
 import com.chatwing.whitelabel.services.LoadChatBoxDetailsService;
 import com.chatwing.whitelabel.services.NotificationIntentService;
 import com.chatwing.whitelabel.services.NotificationStatusIntentService;
 import com.chatwing.whitelabel.services.OfflineIntentService;
+import com.chatwing.whitelabel.services.SyncBookmarkIntentService;
 import com.chatwing.whitelabel.services.SyncCommunicationBoxesIntentService;
+import com.chatwing.whitelabel.services.UpdateAvatarIntentService;
 import com.chatwing.whitelabel.services.UpdateGcmIntentService;
 import com.chatwing.whitelabel.services.UpdateNotificationSettingsService;
+import com.chatwing.whitelabel.services.UpdateUserProfileService;
+import com.chatwing.whitelabel.services.VerifyEmailIntentService;
 import com.chatwing.whitelabel.tasks.PingUserTask;
 import com.chatwing.whitelabel.utils.NetworkUtils;
 import com.chatwing.whitelabel.validators.PermissionsValidator;
@@ -71,7 +83,18 @@ import dagger.Provides;
                 NotificationStatusIntentService.class,
                 AckConversationIntentService.class,
                 GetMessagesIntentService.class,
-                AckChatboxIntentService.class
+                AckChatboxIntentService.class,
+                UpdateUserProfileService.class,
+                DeleteMessageIntentService.class,
+                BlockUserIntentService.class,
+                IgnoreUserIntentService.class,
+                FlagMessageIntentService.class,
+                DownloadUserDetailIntentService.class,
+                SyncBookmarkIntentService.class,
+                CreateBookmarkIntentService.class,
+                VerifyEmailIntentService.class,
+                DeleteBookmarkIntentService.class,
+                UpdateAvatarIntentService.class
         },
         library = true
 )
@@ -155,6 +178,12 @@ public class ChatWingModule {
     @Singleton
     NotificationManager provideNotificationManager() {
         return (NotificationManager) mApplication.getSystemService(Context.NOTIFICATION_SERVICE);
+    }
+
+    @Singleton
+    @Provides
+    SearchManager provideSearchManager() {
+        return (SearchManager) mApplication.getSystemService(Context.SEARCH_SERVICE);
     }
 
 }

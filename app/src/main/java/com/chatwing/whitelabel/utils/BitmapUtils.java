@@ -139,7 +139,9 @@ public class BitmapUtils {
             if (path == null) {
                 return null;
             }
-            Bitmap sample = decodeSampledBitmapFromFile(path, Constants.AVATAR_SIZE, Constants.AVATAR_SIZE);
+            Bitmap sample = decodeSampledBitmapFromFile(path,
+                    Constants.AVATAR_SIZE,
+                    Constants.AVATAR_SIZE);
 
             ExifInterface exif = new ExifInterface(path);
 

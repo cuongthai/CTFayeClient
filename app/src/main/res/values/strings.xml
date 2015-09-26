@@ -16,7 +16,6 @@
     <string name="error_invalid_name_length">"Name must be a string from 3 to 32 characters"</string>
 
     <string name="message_or">or</string>
-    <string name="fragment_tag_authenticate">"authenticate-fragment"</string>
     <string name="fragment_tag_settings">"settings-fragment"</string>
     <string name="fragment_tag_online_user">"online-user-fragment"</string>
     <string name="fragment_tag_ads">"ads-fragment"</string>
@@ -80,9 +79,11 @@
     <string name="empty_search_chat_box_query">"Let's start searching chat boxes by name."</string>
     <string name="error_required_chat_wing_login">"You need to login with a ChatWing account to use these awesome features."</string>
     <string name="error_required_chat_wing_login_to_create_chat_boxes">"You need to login with a ChatWing account to create chat boxes."</string>
+    <string name="error_blank_chatbox">"Chatbox cannot be blank"</string>
     <string name="error_required_agree_conditions">"You must read and agree the Terms of Service and License"</string>
     <string name="error_block_user_no_permission">"You do not have permission to block user."</string>
     <string name="error_delete_message_no_permission">"You do not have permission to delete messages."</string>
+    <string name="error_no_permission">"You do not have permission to do this."</string>
     <string name="error_ignore_message_no_permission">"You can't ignore this message"</string>
     <string name="error_flag_message_no_permission">"You can't flag this message"</string>
     <string name="error_duration_cant_blank">"Duration must be numeric and greater than 0."</string>
@@ -243,6 +244,7 @@
     <string name="error_required_login_except_guest">"You need to login with a ChatWing/Social/Custom accounts to use these awesome features."</string>
     <string name="error_network_connection">"Network failure. Please check your network connection"</string>
     <string name="error_unknown">"There was an error while processing your request. Please try again or report to ChatWing"</string>
+    <string name="error_email_not_verified">"You need to verify your email to continue"</string>
     <string name="error_while_creating_conversation">There was an error while creating conversation.</string>
     <string name="error_failed_to_load_chat_box_details">"Failed to load chat box details"</string>
     <string name="error_obtain_access_token">"There was an error while authenticating with external service"</string>

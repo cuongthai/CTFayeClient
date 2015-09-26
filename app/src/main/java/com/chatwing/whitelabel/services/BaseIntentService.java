@@ -23,11 +23,14 @@ import com.chatwing.whitelabel.ChatWing;
 import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.managers.SyncManager;
 import com.chatwing.whitelabel.managers.UserManager;
+import com.chatwing.whitelabel.modules.ChatWingModule;
 import com.chatwing.whitelabel.modules.ForMainThread;
 import com.chatwing.whitelabel.utils.NetworkUtils;
 import com.squareup.otto.Bus;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -58,7 +61,7 @@ public abstract class BaseIntentService extends IntentService {
     @Inject
     protected UserManager mUserManager;
     @Inject
-    NetworkUtils mNetworkUtils;
+    protected NetworkUtils mNetworkUtils;
     @Inject
     protected SyncManager mSyncManager;
 
@@ -71,7 +74,7 @@ public abstract class BaseIntentService extends IntentService {
         mObjectGraph.inject(this);
     }
 
-    protected List<Object> getModules() {
-        return new ArrayList<Object>();
+    protected List<Object> getModules(){
+        return Collections.<Object>singletonList(new ChatWingModule(this));
     }
 }

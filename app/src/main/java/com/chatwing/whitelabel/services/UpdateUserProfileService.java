@@ -15,11 +15,11 @@ import javax.inject.Inject;
  * Date: 8/6/13
  * Time: 4:14 AM
  */
-public class UpdateUserProfileService extends ExtendBaseIntentService {
+public class UpdateUserProfileService extends BaseIntentService {
     public static final String EXTRA_OLD_PROFILE = "old_profile";
 
     @Inject
-    ApiManager mApiManager;
+    protected ApiManager mApiManager;
 
     @Override
     public void onCreate() {

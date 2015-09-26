@@ -3,6 +3,7 @@ package com.chatwing.whitelabel.modules;
 import android.accounts.AccountManager;
 import android.content.Context;
 import android.content.res.Resources;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 
 import com.chatwing.whitelabel.activities.LegacyLoginActivity;
@@ -34,7 +35,7 @@ import dagger.Provides;
                 ForgotPasswordFragment.class,
                 LoginScribeFragment.class
         },
-        addsTo = ExtendChatWingModule.class,
+        addsTo = ChatWingModule.class,
         overrides = true
 )
 public class LegacyActivityModule {
@@ -44,6 +45,7 @@ public class LegacyActivityModule {
     public LegacyActivityModule(LegacyLoginActivity activity) {
         this.mActivity = activity;
     }
+
     @Provides
     @Singleton
     @ForActivity
@@ -90,7 +92,7 @@ public class LegacyActivityModule {
 
     @Provides
     @Singleton
-    String[] provideAvatars(){
+    String[] provideAvatars() {
         return new String[]{
                 "Aladie.png", "Amie.png"
                 , "Andie.png", "Beetie.png", "Benie.png", "Billie.png"
@@ -103,5 +105,11 @@ public class LegacyActivityModule {
                 , "Madie3.png", "Maradie.png", "Powie.png", "Putie.png"
                 , "Rockie.png"
         };
+    }
+
+    @Provides
+    @Singleton
+    ForgotPasswordFragment provideForgotPasswordFragment() {
+        return new ForgotPasswordFragment();
     }
 }

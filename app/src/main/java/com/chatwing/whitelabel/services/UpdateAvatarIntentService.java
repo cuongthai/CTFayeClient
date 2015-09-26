@@ -18,15 +18,16 @@ import java.io.IOException;
 
 import javax.inject.Inject;
 
-public class UpdateAvatarIntentService extends ExtendBaseIntentService {
-    private static final Object sLock = new Object();
+public class UpdateAvatarIntentService extends BaseIntentService {
     public static final String EXTRA_AVATAR_PATH = "bitmap";
-    private static boolean sIsInProgress;
+    private static final Object sLock = new Object();
     @Inject
-    VolleyManager mVolleyManager;
+    protected VolleyManager mVolleyManager;
+    @Inject
+    protected ApiManager mApiManager;
 
-    @Inject
-    ApiManager mApiManager;
+    private static boolean sIsInProgress;
+
 
     public UpdateAvatarIntentService() {
         super("UpdateAvatarIntentService");
@@ -39,22 +40,30 @@ public class UpdateAvatarIntentService extends ExtendBaseIntentService {
             return;
         }
         setIsInProgress(true);
-        LogUtils.v("Update avatar service");
+
         String path = intent.getStringExtra(EXTRA_AVATAR_PATH);
         try {
             post(UpdateUserEvent.started());
             //Make sure avatar is set in right direction
             fixImageExif(path);
+
             mApiManager.updateAvatar(currentUser, path);
+
+            //Invalidate caches
             String permanentAvatarUrl = mApiManager.getAvatarUrl(currentUser);
+
             mVolleyManager.mQueue.getCache().remove(permanentAvatarUrl);
-            DiskCacheUtils.removeFromCache(permanentAvatarUrl, ImageLoader.getInstance().getDiskCache());
-            MemoryCacheUtils.removeFromCache(permanentAvatarUrl, ImageLoader.getInstance().getMemoryCache());
+            DiskCacheUtils.removeFromCache(permanentAvatarUrl,
+                    ImageLoader.getInstance().getDiskCache());
+            MemoryCacheUtils.removeFromCache(permanentAvatarUrl,
+                    ImageLoader.getInstance().getMemoryCache());
+
             post(UpdateUserEvent.success());
         } catch (Exception e) {
             LogUtils.e(e);
             post(new UpdateUserEvent(e));
         }
+
         setIsInProgress(false);
     }
 
@@ -91,5 +100,4 @@ public class UpdateAvatarIntentService extends ExtendBaseIntentService {
             return sIsInProgress;
         }
     }
-
 }

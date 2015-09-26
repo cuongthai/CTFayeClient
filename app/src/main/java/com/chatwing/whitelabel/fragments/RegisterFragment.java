@@ -1,7 +1,9 @@
 package com.chatwing.whitelabel.fragments;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
-import android.graphics.Typeface;
+import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.InputType;
@@ -23,39 +25,32 @@ import com.chatwing.whitelabel.validators.PasswordValidator;
 import com.squareup.otto.Bus;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 
 /**
  * Created by nguyenthanhhuy on 4/14/14.
  */
-public class RegisterFragment extends Fragment {
+public class RegisterFragment extends BaseFragment {
+
     public interface Delegate extends InjectableFragmentDelegate {
-        public void register(String email, String password,
-                             boolean agreeConditions, boolean autoCreateChatbox);
+        void register(String email,
+                      String password,
+                      boolean agreeConditions,
+                      boolean autoCreateChatbox);
     }
 
     @Inject
-    EmailValidator emailValidator;
+    protected EmailValidator emailValidator;
     @Inject
-    PasswordValidator passwordValidator;
+    protected PasswordValidator passwordValidator;
     @Inject
-    Bus mBus;
+    protected Bus mBus;
     @Inject
-    EmailsAdapterFactory mEmailsAdapterFactory;
-    @Inject
-    Provider<Typeface> mIconTypefaceProvider;
+    protected EmailsAdapterFactory mEmailsAdapterFactory;
+
     private Delegate mDelegate;
     private AutoCompleteTextView mEmailEditText;
     private EditText mPasswordEditText;
-
-    public RegisterFragment() {
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        mDelegate = (Delegate) activity;
-    }
+    private CheckBox autoCreateChatBoxCheckBox;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -66,10 +61,11 @@ public class RegisterFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         mEmailEditText = (AutoCompleteTextView) view.findViewById(R.id.email);
         mPasswordEditText = (EditText) view.findViewById(R.id.password);
+        autoCreateChatBoxCheckBox = (CheckBox) view.findViewById(R.id.auto_create_chatbox);
         CheckBox showPasswordCheckBox = (CheckBox) view.findViewById(R.id.show_password);
-        final CheckBox autoCreateChatBoxCheckBox = (CheckBox) view.findViewById(R.id.auto_create_chatbox);
         TextView agreeConditionsTextView = (TextView) view.findViewById(R.id.agree_conditions);
         Button registerButton = (Button) view.findViewById(R.id.register);
+
         showPasswordCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -84,8 +80,6 @@ public class RegisterFragment extends Fragment {
                 mPasswordEditText.setSelection(mPasswordEditText.getText().length());
             }
         });
-
-        agreeConditionsTextView.setMovementMethod(LinkMovementMethod.getInstance());
 
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,6 +99,8 @@ public class RegisterFragment extends Fragment {
                 }
             }
         });
+
+        agreeConditionsTextView.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
     @Override
@@ -120,6 +116,13 @@ public class RegisterFragment extends Fragment {
         mDelegate = null;
     }
 
+    @Override
+    protected void onAttachToContext(Context context) {
+        if (context instanceof Delegate) {
+            mDelegate = (Delegate) context;
+        }
+    }
+
     public void setEmailError(String error) {
         mEmailEditText.setError(error);
     }
@@ -127,4 +130,5 @@ public class RegisterFragment extends Fragment {
     public void setPasswordError(String error) {
         mPasswordEditText.setError(error);
     }
+
 }

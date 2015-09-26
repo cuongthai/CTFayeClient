@@ -11,12 +11,12 @@ import javax.inject.Inject;
 /**
  * Created by nguyenthanhhuy on 12/21/13.
  */
-public class DeleteMessageIntentService extends ExtendBaseIntentService {
+public class DeleteMessageIntentService extends BaseIntentService {
     public static final String EXTRA_CHAT_BOX_ID = "chat_box_id";
     public static final String EXTRA_MESSAGE_ID = "message_id";
 
     @Inject
-    ApiManager mApiManager;
+    protected ApiManager mApiManager;
 
     public DeleteMessageIntentService() {
         super("DeleteMessageIntentService");

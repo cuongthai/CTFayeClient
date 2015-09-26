@@ -13,12 +13,13 @@ import javax.inject.Inject;
 /**
  * Created by steve on 15/05/2014.
  */
-public class DownloadUserDetailIntentService extends ExtendBaseIntentService {
+public class DownloadUserDetailIntentService extends BaseIntentService {
+
+    @Inject
+    protected ApiManager mApiManager;
+
     private static boolean sIsInProgress;
     private static final Object sLock = new Object();
-    @Inject
-    ApiManager mApiManager;
-
 
     public DownloadUserDetailIntentService() {
         super("DownloadUserDetailIntentService");

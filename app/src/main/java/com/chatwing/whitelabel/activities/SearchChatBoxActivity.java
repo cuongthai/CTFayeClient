@@ -27,7 +27,6 @@ import com.chatwing.whitelabel.contentproviders.SearchChatBoxSuggestionsProvider
 import com.chatwing.whitelabel.events.TaskFinishedEvent;
 import com.chatwing.whitelabel.listeners.EndlessOnScrollListener;
 import com.chatwing.whitelabel.managers.UserManager;
-import com.chatwing.whitelabel.modules.ExtendChatWingModule;
 import com.chatwing.whitelabel.modules.SearchChatBoxActivityModule;
 import com.chatwing.whitelabel.pojos.LightWeightChatBox;
 import com.chatwing.whitelabel.pojos.responses.CreateChatBoxResponse;
@@ -54,19 +53,19 @@ public class SearchChatBoxActivity extends AppCompatActivity implements View.OnC
 
     private ObjectGraph mObjectGraph;
     @Inject
-    Provider<SearchChatBoxTask> mSearchChatBoxTaskProvider;
+    protected Provider<SearchChatBoxTask> mSearchChatBoxTaskProvider;
     @Inject
-    Provider<CreateChatBoxTask> mCreateChatBoxTaskProvider;
+    protected Provider<CreateChatBoxTask> mCreateChatBoxTaskProvider;
     @Inject
-    SearchManager mSearchManager;
+    protected SearchManager mSearchManager;
     @Inject
-    UserManager mUserManager;
+    protected UserManager mUserManager;
     @Inject
-    Bus mBus;
+    protected Bus mBus;
     @Inject
-    SearchChatBoxResultsAdapter mAdapter;
+    protected SearchChatBoxResultsAdapter mAdapter;
     @Inject
-    ErrorMessageView mErrorMessageView;
+    protected ErrorMessageView mErrorMessageView;
 
     private MenuItem mSearchMenuItem;
     private TextView mProgressTextView;
@@ -82,8 +81,8 @@ public class SearchChatBoxActivity extends AppCompatActivity implements View.OnC
         super.onCreate(savedInstanceState);
 
         ChatWingApplication application = (ChatWingApplication) getApplication();
-        mObjectGraph = application.getApplicationGraph().plus(new ExtendChatWingModule(this),
-                new SearchChatBoxActivityModule(this));
+        mObjectGraph = application.getApplicationGraph()
+                .plus(new SearchChatBoxActivityModule(this));
         mObjectGraph.inject(this);
 
         setContentView(R.layout.activity_search_chat_box);
@@ -344,17 +343,15 @@ public class SearchChatBoxActivity extends AppCompatActivity implements View.OnC
     }
 
     private void doSearch(String query) {
-        if (!TextUtils.isEmpty(query)) {
-            setCurrentQuery(query);
-            mSearchMenuItem.collapseActionView();
-            startSearchChatBoxTask(0);
-            // Save the query as recent
-            SearchRecentSuggestions suggestions = new SearchRecentSuggestions(
-                    this,
-                    SearchChatBoxSuggestionsProvider.AUTHORITY,
-                    SearchChatBoxSuggestionsProvider.MODE);
-            suggestions.saveRecentQuery(query, null);
-        }
+        setCurrentQuery(query);
+        mSearchMenuItem.collapseActionView();
+        startSearchChatBoxTask(0);
+        // Save the query as recent
+        SearchRecentSuggestions suggestions = new SearchRecentSuggestions(
+                this,
+                SearchChatBoxSuggestionsProvider.AUTHORITY,
+                SearchChatBoxSuggestionsProvider.MODE);
+        suggestions.saveRecentQuery(query, null);
     }
 
     private void startSearchChatBoxTask(int offset) {

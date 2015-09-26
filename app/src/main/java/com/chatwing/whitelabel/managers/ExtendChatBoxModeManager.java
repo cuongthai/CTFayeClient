@@ -467,11 +467,6 @@ public class ExtendChatBoxModeManager extends ChatboxModeManager {
 
         try {
             mActivityDelegate.getActivity().getContentResolver().applyBatch(ChatWingContentProvider.AUTHORITY, batch);
-
-            if (!event.isUpgrading())
-                Toast.makeText(mActivityDelegate.getActivity(), R.string.message_current_chat_box_bookmarked,
-                        Toast.LENGTH_SHORT)
-                        .show();
         } catch (RemoteException e) {
             mActivityDelegate.handle(e, R.string.error_failed_to_save_bookmark);
         } catch (OperationApplicationException e) {

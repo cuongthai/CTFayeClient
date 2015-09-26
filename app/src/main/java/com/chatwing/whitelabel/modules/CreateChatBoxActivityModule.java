@@ -19,7 +19,7 @@ import dagger.Provides;
         injects = {
                 CreateChatBoxActivity.class
         },
-        addsTo = ExtendChatWingModule.class
+        addsTo = ChatWingModule.class
 )
 public class CreateChatBoxActivityModule {
     private Activity mActivity;
@@ -27,7 +27,6 @@ public class CreateChatBoxActivityModule {
     public CreateChatBoxActivityModule(Activity activity) {
         this.mActivity = activity;
     }
-
 
     @Provides
     @Singleton

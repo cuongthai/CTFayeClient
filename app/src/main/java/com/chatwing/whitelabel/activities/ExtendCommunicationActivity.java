@@ -44,7 +44,6 @@ import com.chatwing.whitelabel.fragments.PhotoPickerDialogFragment;
 import com.chatwing.whitelabel.fragments.SettingsFragment;
 import com.chatwing.whitelabel.interfaces.MediaControlInterface;
 import com.chatwing.whitelabel.managers.ApiManager;
-import com.chatwing.whitelabel.managers.BuildManager;
 import com.chatwing.whitelabel.managers.ChatboxUnreadDownloadManager;
 import com.chatwing.whitelabel.managers.ExtendChatBoxModeManager;
 import com.chatwing.whitelabel.managers.ExtendCommunicationModeManager;
@@ -95,11 +94,11 @@ public class ExtendCommunicationActivity
     public static final String ACTION_STOP_MEDIA = "ACTION_STOP_MEDIA";
 
     @Inject
-    ApiManager mApiManager;
+    protected ApiManager mApiManager;
     @Inject
-    UserManager mUserManager;
+    protected UserManager mUserManager;
     @Inject
-    ChatboxUnreadDownloadManager chatboxUnreadDownloadManager;
+    protected ChatboxUnreadDownloadManager chatboxUnreadDownloadManager;
     @Inject
     protected FeedModeManager mFeedModeManager;
     @Inject
@@ -119,7 +118,7 @@ public class ExtendCommunicationActivity
         }
 
         if (!mBuildManager.isOfficialChatWingApp() && userManager.getCurrentUser() == null) {
-            startActivity(new Intent(this, StartActivity.class));
+            startActivity(new Intent(this, WhiteLabelCoverActivity.class));
             finish();
             return;
         }
@@ -185,7 +184,7 @@ public class ExtendCommunicationActivity
 
     @Override
     protected Class<? extends BaseABFragmentActivity> getEntranceActivityClass() {
-        return mBuildManager.isOfficialChatWingApp() ? ExtendCommunicationActivity.class : StartActivity.class;
+        return mBuildManager.isOfficialChatWingApp() ? ExtendCommunicationActivity.class : WhiteLabelCoverActivity.class;
     }
 
     @Override
@@ -731,7 +730,7 @@ public class ExtendCommunicationActivity
     private boolean handleDeleteBookmarkEvent(DeleteBookmarkEvent event) {
         if (event.getException() == null)
             return false;
-        mErrorMessageView.show(event.getException());
+        handle(event.getException(), R.string.error_while_deleting_bookmark);
         return true;
     }
 

@@ -13,14 +13,14 @@ import javax.inject.Inject;
 /**
  * Created by steve on 30/06/2014.
  */
-public class BlockUserIntentService extends ExtendBaseIntentService {
+public class BlockUserIntentService extends BaseIntentService {
     public static final String EXTRA_MESSAGE = "message";
-    public static final String EXTRA_BLOCK = "block";
+    public static final String EXTRA_BLOCK_TYPE = "block";
     public static final String EXTRA_CLEAR_MESSAGE = "clear_message";
     public static final String EXTRA_REASON = "reason";
     public static final String EXTRA_DURATION = "duration";
     @Inject
-    ApiManager mApiManager;
+    protected ApiManager mApiManager;
 
     public BlockUserIntentService() {
         super("BlockUserIntentService");
@@ -38,20 +38,24 @@ public class BlockUserIntentService extends ExtendBaseIntentService {
      */
     @Override
     protected void onHandleIntent(Intent intent) {
-        Message message = (Message) intent.getSerializableExtra(EXTRA_MESSAGE);
-        boolean clearMessage = intent.getBooleanExtra(EXTRA_CLEAR_MESSAGE, false);
-        String reason = intent.getStringExtra(EXTRA_REASON);
-        long duration = intent.getLongExtra(EXTRA_DURATION, 0);
-        ExtendChatMessagesFragment.BLOCK block = (ExtendChatMessagesFragment.BLOCK)
-                intent.getSerializableExtra(EXTRA_BLOCK);
+        Message blockMessage = (Message) intent.getSerializableExtra(EXTRA_MESSAGE);
+
+        boolean shouldRemoveMessage = intent.getBooleanExtra(EXTRA_CLEAR_MESSAGE, false);
+        String blockReason = intent.getStringExtra(EXTRA_REASON);
+        long blockDuration = intent.getLongExtra(EXTRA_DURATION, 0);
+
+        ExtendChatMessagesFragment.BLOCK blockType = (ExtendChatMessagesFragment.BLOCK)
+                intent.getSerializableExtra(EXTRA_BLOCK_TYPE);
+
         BlockedEvent event;
         try {
-            BlackListResponse blackListResponse = mApiManager.blockUser(mUserManager.getCurrentUser(),
-                    block,
-                    message,
-                    clearMessage,
-                    reason,
-                    duration);
+            BlackListResponse blackListResponse = mApiManager.blockUser(
+                    mUserManager.getCurrentUser(),
+                    blockType,
+                    blockMessage,
+                    shouldRemoveMessage,
+                    blockReason,
+                    blockDuration);
             event = new BlockedEvent(blackListResponse);
         } catch (Exception e) {
             event = new BlockedEvent(e);

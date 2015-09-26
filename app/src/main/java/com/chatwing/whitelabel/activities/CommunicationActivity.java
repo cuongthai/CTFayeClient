@@ -56,6 +56,7 @@ import com.chatwing.whitelabel.events.faye.FayePublishEvent;
 import com.chatwing.whitelabel.events.faye.MessageReceivedEvent;
 import com.chatwing.whitelabel.events.faye.ServerConnectionChangedEvent;
 import com.chatwing.whitelabel.fragments.AdminListFragment;
+import com.chatwing.whitelabel.fragments.AuthenticateFragment;
 import com.chatwing.whitelabel.fragments.CategoriesFragment;
 import com.chatwing.whitelabel.fragments.ChatMessagesFragment;
 import com.chatwing.whitelabel.fragments.ColorPickerDialogFragment;
@@ -152,21 +153,21 @@ public class CommunicationActivity
     @Inject
     protected GcmManager mGcmManager;
     @Inject
-    ChatWingJSInterface mFayeJsInterface;
+    protected ChatWingJSInterface mFayeJsInterface;
     @Inject
     protected ChatboxModeManager mChatboxModeManager;
     @Inject
-    BuildManager mBuildManager;
+    protected BuildManager mBuildManager;
     @Inject
-    ConversationModeManager mConversationModeManager;
+    protected ConversationModeManager mConversationModeManager;
     @Inject
-    Bus mBus;
+    protected Bus mBus;
     @Inject
-    UserManager mUserManager;
+    protected UserManager mUserManager;
     @Inject
-    ApiManager mApiManager;
+    protected ApiManager mApiManager;
     @Inject
-    EventParser mEventParser;
+    protected EventParser mEventParser;
     @Inject
     protected SyncManager mSyncManager;
     @Inject
@@ -174,7 +175,7 @@ public class CommunicationActivity
     @Inject
     protected CurrentChatBoxManager mCurrentChatboxManager;
     @Inject
-    CommunicationActivityManager mCommunicationActivityManager;
+    protected CommunicationActivityManager mCommunicationActivityManager;
 
     protected CommunicationModeManager mCurrentCommunicationMode;
 
@@ -486,19 +487,24 @@ public class CommunicationActivity
     }
 
     @Override
-    public void handle(Exception exception, int errorMessageResId) {
-        LogUtils.v("Handle error " + exception);
+    public void handle(Exception exception, int generalErrorMessageResId) {
         if (exception instanceof ApiManager.UserUnauthenticatedException) {
             onUserUnauthenticated();
         } else if (exception instanceof ApiManager.InvalidAccessTokenException) {
             onAccessTokenExpired();
         } else if (exception instanceof ApiManager.NotVerifiedEmailException) {
-            mErrorMessageView.show(errorMessageResId);
+            mErrorMessageView.show(R.string.error_email_not_verified);
         } else if (exception instanceof ApiManager.OtherApplicationException) {
             mErrorMessageView.show(((ApiManager.OtherApplicationException) exception).getError().getMessage());
             logout();
-        } else {
-            mErrorMessageView.show(exception, getString(R.string.error_unknown));
+        } if (exception instanceof ApiManager.RequiredPermissionException) {
+            mErrorMessageView.show(R.string.error_no_permission);
+        } else { // General Error
+            if (generalErrorMessageResId != 0){
+                mErrorMessageView.show(exception, getString(generalErrorMessageResId));
+            } else {
+                mErrorMessageView.show(exception, getString(R.string.error_unknown));
+            }
         }
     }
 
@@ -1046,7 +1052,7 @@ public class CommunicationActivity
         GooglePlusDialogFragment fragment = GooglePlusDialogFragment.newInstance(
                 errorCode, requestCode);
         if (fragment != null) {
-            fragment.show(getSupportFragmentManager(), "google_plus_dialog");
+            fragment.show(getSupportFragmentManager(), GooglePlusDialogFragment.DIALOG_TAG);
         }
     }
 

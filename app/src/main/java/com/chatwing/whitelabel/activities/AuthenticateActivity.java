@@ -53,15 +53,20 @@ public abstract class AuthenticateActivity extends BaseABFragmentActivity {
     public static final String INTENT_USER = "IntentUser";
 
     private AsyncTask<?, ?, ?> mCurrentTask;
+
     @Inject
-    Provider<StartSessionTask> mStartSessionTaskProvider;
+    protected Provider<StartSessionTask> mStartSessionTaskProvider;
     @Inject
-    Bus mBus;
+    protected Bus mBus;
     @Inject
-    NetworkUtils mNetworkUtils;
+    protected NetworkUtils mNetworkUtils;
     @Inject
     protected ProgressViewsManager mProgressViewsManager;
 
+    @Override
+    protected List<Object> getModules() {
+        return Arrays.<Object>asList(new AuthenticateActivityModule(this));
+    }
 
     /////////////////////////////////////////////////////////////
     // Activity life cycle
@@ -90,9 +95,7 @@ public abstract class AuthenticateActivity extends BaseABFragmentActivity {
             // since it can be confusing.
             mErrorMessageView.show(R.string.error_network_connection);
         }
-
     }
-
 
     protected abstract int getAuthenticationLayout();
 
@@ -175,18 +178,23 @@ public abstract class AuthenticateActivity extends BaseABFragmentActivity {
         }
     }
 
-
     protected void startSession(AuthenticationParams params) {
         mProgressViewsManager.showProgress(true, R.string.progress_starting_session);
         StartSessionTask task = mStartSessionTaskProvider.get();
         startTask(task.execute(params));
     }
 
+    /**
+     * Handle general task exception if exist, otherwise handle Authentication Success Flow
+     *
+     * @param event
+     * @param task
+     */
     protected void onTaskFinished(TaskFinishedEvent event,
                                   StartSessionTask task) {
 
         if (event.getStatus() == TaskFinishedEvent.Status.FAILED) {
-            if(event.getException() instanceof ApiManager.OtherApplicationException){
+            if (event.getException() instanceof ApiManager.OtherApplicationException) {
                 mErrorMessageView.show(event.getException().getMessage());
                 return;
             }
@@ -196,7 +204,7 @@ public abstract class AuthenticateActivity extends BaseABFragmentActivity {
         }
         LogUtils.v("Google Authenticate: onTaskFinished No Error");
 
-        //Ok, no error
+        //Ok, no error! Handle Success Flow
         AuthenticationResponse result = (AuthenticationResponse) event.getResult();
         if (result.getUser() != null) {
             Intent intent = new Intent();
@@ -207,9 +215,18 @@ public abstract class AuthenticateActivity extends BaseABFragmentActivity {
         }
     }
 
+    /**
+     * Utility method for sub class to start a task
+     *
+     * @param task
+     */
     protected void startTask(AsyncTask<?, ?, ?> task) {
         stopCurrentTask();
         mCurrentTask = task;
+    }
+
+    protected int getFragmentContainerId() {
+        return R.id.fragment_container;
     }
 
     private void stopCurrentTask() {
@@ -220,32 +237,4 @@ public abstract class AuthenticateActivity extends BaseABFragmentActivity {
             mCurrentTask = null;
         }
     }
-
-    protected int getFragmentContainerId() {
-        return R.id.fragment_container;
-    }
-
-    @Override
-    protected List<Object> getModules() {
-        return Arrays.<Object>asList(new AuthenticateActivityModule(this));
-    }
-
-    protected void addAuthenticationFragment(String backStackName,
-                                             String fragmentTag,
-                                             Fragment fragment) {
-        if (!mNetworkUtils.hasInternetConnection()) {
-            mErrorMessageView.show(R.string.error_network_connection);
-            return;
-        }
-
-        if (fragment != null) {
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(getFragmentContainerId(), fragment, fragmentTag)
-                    .addToBackStack(backStackName)
-                    .commit();
-        }
-    }
-
-
 }

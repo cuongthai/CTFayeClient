@@ -37,7 +37,6 @@ public class ChatWingError {
     public static final int ERROR_CODE_VERIFY_EMAIL_ERR = 40304;
     public static final int ERROR_CODE_OTHER_ERR = 40009;
 
-
     protected int code;
     protected String message;
     protected JsonElement params;
@@ -60,14 +59,9 @@ public class ChatWingError {
         return params;
     }
 
-    public static boolean hasExternalInvalidAcessToken(ChatWingError error) {
+    public static boolean hasExternalInvalidAccessToken(ChatWingError error) {
         if (error == null) return false;
         return error.getCode() == ERROR_CODE_EXTERNAL_ACCESS_TOKEN;
-    }
-
-    public static boolean hasValidationError(ChatWingError error) {
-        if (error == null) return false;
-        return error.getCode() == ERROR_CODE_VALIDATION_ERR;
     }
 
     public static boolean hasPermissionError(ChatWingError error) {

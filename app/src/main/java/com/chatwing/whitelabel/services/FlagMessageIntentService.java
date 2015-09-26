@@ -12,11 +12,11 @@ import javax.inject.Inject;
 /**
  * Created by steve on 30/06/2014.
  */
-public class FlagMessageIntentService extends ExtendBaseIntentService {
+public class FlagMessageIntentService extends BaseIntentService {
     public static final String EXTRA_MESSAGE_ID = "EXTRA_MESSAGE_ID";
 
     @Inject
-    ApiManager mApiManager;
+    protected ApiManager mApiManager;
 
     public FlagMessageIntentService() {
         super("FlagMessageIntentService");

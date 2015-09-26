@@ -50,18 +50,18 @@ import javax.inject.Inject;
  */
 public class ExtendChatMessagesFragment extends ChatMessagesFragment {
     @Inject
-    CurrentChatBoxManager mCurrentChatBoxManager;
+    protected CurrentChatBoxManager mCurrentChatBoxManager;
     @Inject
-    UserManager mUserManager;
+    protected UserManager mUserManager;
     @Inject
-    ErrorMessageView mErrorMessageView;
+    protected ErrorMessageView mErrorMessageView;
     @Inject
-    QuickMessageView mMessageView;
+    protected QuickMessageView mMessageView;
     private Delegate mDelegate;
 
     public enum BLOCK {
         IP,
-        TYPE
+        ACCOUNT_TYPE
     }
 
     public static CommunicationMessagesFragment newInstance() {
@@ -182,7 +182,7 @@ public class ExtendChatMessagesFragment extends ChatMessagesFragment {
         Intent intent = new Intent(getActivity(), IgnoreUserIntentService.class);
         intent.putExtra(IgnoreUserIntentService.EXTRA_USER_ID, message.getUserId());
         intent.putExtra(IgnoreUserIntentService.EXTRA_USER_TYPE, message.getUserType());
-        intent.putExtra(IgnoreUserIntentService.EXTRA_IGNORED, mUserManager.hasIgnored(message.getUserId(), message.getUserType()));
+        intent.putExtra(IgnoreUserIntentService.EXTRA_REQUEST_IGNORE, !mUserManager.hasIgnored(message.getUserId(), message.getUserType()));
         getActivity().startService(intent);
     }
 
@@ -260,7 +260,7 @@ public class ExtendChatMessagesFragment extends ChatMessagesFragment {
 
     @Subscribe
     public void onBlockTypeEvent(RequestBlockTypeEvent event) {
-        doBlockUser(BLOCK.TYPE, event);
+        doBlockUser(BLOCK.ACCOUNT_TYPE, event);
     }
 
     @com.squareup.otto.Subscribe
@@ -293,7 +293,7 @@ public class ExtendChatMessagesFragment extends ChatMessagesFragment {
                              RequestBlockEvent event) {
         Intent intent = new Intent(getActivity(), BlockUserIntentService.class);
         intent.putExtra(BlockUserIntentService.EXTRA_MESSAGE, event.getMessage());
-        intent.putExtra(BlockUserIntentService.EXTRA_BLOCK, block);
+        intent.putExtra(BlockUserIntentService.EXTRA_BLOCK_TYPE, block);
         intent.putExtra(BlockUserIntentService.EXTRA_CLEAR_MESSAGE, event.isClearMessage());
         intent.putExtra(BlockUserIntentService.EXTRA_REASON, event.getReason());
         intent.putExtra(BlockUserIntentService.EXTRA_DURATION, event.getDuration());

@@ -12,13 +12,13 @@ import javax.inject.Inject;
 /**
  * Created by steve on 30/06/2014.
  */
-public class IgnoreUserIntentService extends ExtendBaseIntentService {
+public class IgnoreUserIntentService extends BaseIntentService {
     public static final String EXTRA_USER_ID = "EXTRA_USER_ID";
     public static final String EXTRA_USER_TYPE = "EXTRA_USER_TYPE";
-    public static final String EXTRA_IGNORED = "EXTRA_MESSAGE_ID";
+    public static final String EXTRA_REQUEST_IGNORE = "EXTRA_REQUEST_IGNORE";
 
     @Inject
-    ApiManager mApiManager;
+    protected ApiManager mApiManager;
 
     public IgnoreUserIntentService() {
         super("IgnoreUserIntentService");
@@ -34,15 +34,16 @@ public class IgnoreUserIntentService extends ExtendBaseIntentService {
         try {
             String userId = intent.getStringExtra(EXTRA_USER_ID);
             String userType = intent.getStringExtra(EXTRA_USER_TYPE);
-            boolean ignored = intent.getBooleanExtra(EXTRA_IGNORED, false);
+            boolean requestIgnore = intent.getBooleanExtra(EXTRA_REQUEST_IGNORE, true);
+
             IgnoreUserResponse ignoreUserResponse = mApiManager.ignoreUser(currentUser,
                     userId,
                     userType,
-                    ignored);
-            if (ignored) {
-                currentUser.unignoreUser(ignoreUserResponse.getIgnoreUser());
-            } else {
+                    requestIgnore);
+            if (requestIgnore) {
                 currentUser.ignoreUser(ignoreUserResponse.getIgnoreUser());
+            } else {
+                currentUser.unignoreUser(ignoreUserResponse.getIgnoreUser());
             }
             mUserManager.saveCurrentUser();
 

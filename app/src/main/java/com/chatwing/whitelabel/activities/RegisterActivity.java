@@ -11,7 +11,6 @@ import com.chatwing.whitelabel.fragments.RegisterFragment;
 import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.managers.BuildManager;
 import com.chatwing.whitelabel.modules.RegisterActivityModule;
-import com.chatwing.whitelabel.pojos.errors.ChatWingError;
 import com.chatwing.whitelabel.pojos.oauth.AppOAuthParams;
 import com.chatwing.whitelabel.pojos.oauth.ChatwingOAuthParams;
 import com.chatwing.whitelabel.pojos.params.oauth.AuthenticationParams;
@@ -26,39 +25,41 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-public class RegisterActivity extends AuthenticateActivity
-        implements RegisterFragment.Delegate {
-    protected static final String TAG_FRAGMENT_MAIN_AUTHENTICATE = "main_authenticate_fragment";
+public class RegisterActivity extends AuthenticateActivity implements RegisterFragment.Delegate {
+
+    private static final String TAG_FRAGMENT_REGISTER = "register_fragment";
 
     @Inject
-    RegisterFragment mRegisterFragment;
+    protected RegisterFragment mRegisterFragment;
     @Inject
-    Provider<RegisterTask> mRegisterTaskProvider;
+    protected Provider<RegisterTask> mRegisterTaskProvider;
     @Inject
-    BuildManager mBuildManager;
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(
-                        R.id.main_auth_fragment_container,
-                        mRegisterFragment,
-                        TAG_FRAGMENT_MAIN_AUTHENTICATE)
-                .commit();
-    }
+    protected BuildManager mBuildManager;
 
     @Override
     protected List<Object> getModules() {
-        List<Object> modules = new ArrayList<Object>(super.getModules());
+        List modules = new ArrayList(super.getModules());
         modules.add(new RegisterActivityModule(this));
         return modules;
     }
 
+    @Override
+    protected int getAuthenticationLayout() {
+        return R.layout.activity_register;
+    }
+
+    ////////////////////////////////
+    ///    RegisterFragment Delegate
+    ////////////////////////////////
+    @Override
+    public void inject(Fragment fragment) {
+        super.inject(fragment);
+    }
 
     @Override
-    public void register(String email, String password, boolean agreeConditions,
+    public void register(String email,
+                         String password,
+                         boolean agreeConditions,
                          boolean autoCreateChatbox) {
         mProgressViewsManager.showProgress(true, R.string.progress_registering);
         RegisterTask task = mRegisterTaskProvider.get();
@@ -67,8 +68,17 @@ public class RegisterActivity extends AuthenticateActivity
     }
 
     @Override
-    protected int getAuthenticationLayout() {
-         return R.layout.activity_register;
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getRegisterFragment() == null) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(
+                            R.id.register_fragment_container,
+                            mRegisterFragment,
+                            TAG_FRAGMENT_REGISTER)
+                    .commit();
+        }
     }
 
     @Override
@@ -82,33 +92,32 @@ public class RegisterActivity extends AuthenticateActivity
     public void onTaskFinished(TaskFinishedEvent event) {
         AsyncTask<?, ?, ?> task = event.getTask();
         if (task instanceof RegisterTask) {
-            onTaskFinished(event, (RegisterTask) task);
+            handleRegisterTaskFinished(event, (RegisterTask) task);
         } else {
             super.onTaskFinished(event);
         }
     }
 
-    private void onTaskFinished(TaskFinishedEvent event, RegisterTask task) {
+    private void handleRegisterTaskFinished(TaskFinishedEvent event, RegisterTask task) {
         if (event.getStatus() == TaskFinishedEvent.Status.FAILED) {
             mProgressViewsManager.showProgress(false);
 
             Exception exception = event.getException();
             if (exception instanceof EmailValidator.InvalidEmailException) {
-                mRegisterFragment.setEmailError(getString(R.string.error_invalid_email));
+                showEmailError(getString(R.string.error_invalid_email));
                 return;
             }
             if (exception instanceof PasswordValidator.InvalidPasswordException) {
-                mRegisterFragment.setEmailError(getString(R.string.error_invalid_password));
+                showPasswordError(getString(R.string.error_invalid_password));
                 return;
             }
-            if (exception instanceof ApiManager.ValidationException
-                    && ChatWingError.hasValidationError(((ApiManager.ValidationException) exception).getError())) {
+            if (exception instanceof ApiManager.ValidationException) {
                 //Throws by server error code, we can have more detail error from server but let's me it confusing here
-                mRegisterFragment.setEmailError(getString(R.string.error_invalid_username_password));
+                showEmailError(getString(R.string.error_invalid_username_password));
                 return;
             }
 
-            if(exception instanceof ApiManager.OtherApplicationException){
+            if (exception instanceof ApiManager.OtherApplicationException) {
                 mErrorMessageView.show(((ApiManager.OtherApplicationException) exception).getError().getMessage());
                 return;
             }
@@ -126,8 +135,22 @@ public class RegisterActivity extends AuthenticateActivity
         startSession(params);
     }
 
-    @Override
-    public void inject(Fragment fragment) {
-        super.inject(fragment);
+    private void showPasswordError(String message) {
+        RegisterFragment fragment = getRegisterFragment();
+        if (fragment != null) {
+            fragment.setPasswordError(message);
+        }
+    }
+
+    private void showEmailError(String message) {
+        RegisterFragment fragment = getRegisterFragment();
+        if (fragment != null) {
+            fragment.setEmailError(message);
+        }
+    }
+
+    private RegisterFragment getRegisterFragment() {
+        return (RegisterFragment) getSupportFragmentManager()
+                .findFragmentByTag(TAG_FRAGMENT_REGISTER);
     }
 }

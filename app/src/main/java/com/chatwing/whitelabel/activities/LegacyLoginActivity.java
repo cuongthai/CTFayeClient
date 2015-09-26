@@ -41,7 +41,6 @@ import com.chatwing.whitelabel.fragments.LoginTwitterFragment;
 import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.managers.BuildManager;
 import com.chatwing.whitelabel.managers.UserManager;
-import com.chatwing.whitelabel.modules.ExtendChatWingModule;
 import com.chatwing.whitelabel.modules.LegacyActivityModule;
 import com.chatwing.whitelabel.pojos.User;
 import com.chatwing.whitelabel.pojos.errors.AuthenticationParamsError;
@@ -83,64 +82,63 @@ public class LegacyLoginActivity extends AuthenticateActivity
         LoginFragment.Delegate,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        GuestLoginFragment.Delegate,
         ForgotPasswordFragment.Delegate {
-    private static final String TAG_FRAGMENT_LOGIN_TWITTER =
-            "login_twitter_fragment";
-    private static final String TAG_FRAGMENT_LOGIN_GUEST =
-            "login_guest_fragment";
-    protected static final String TAG_FRAGMENT_MAIN_AUTHENTICATE = "main_authenticate_fragment";
-    protected static final String TAG_FRAGMENT_GOOGLE_PLUS =
-            "google_plus_dialog";
-    private static final String TAG_FRAGMENT_LOGIN_YAHOO =
-            "login_yahoo_fragment";
-    private static final String TAG_FRAGMENT_LOGIN_TUMBLR =
-            "login_tumblr_fragment";
+    private static final String TAG_FRAGMENT_MAIN_AUTHENTICATE = "main_authenticate_fragment";
+    private static final String TAG_FRAGMENT_SOCIAL_AUTHENTICATE = "social_authenticate_fragment";
+    private static final String TAG_FRAGMENT_LOGIN_TWITTER = "login_twitter_fragment";
+    private static final String TAG_FRAGMENT_LOGIN_GUEST = "login_guest_fragment";
+    private static final String TAG_FRAGMENT_LOGIN_YAHOO = "login_yahoo_fragment";
+    private static final String TAG_FRAGMENT_LOGIN_TUMBLR = "login_tumblr_fragment";
+    private static final String TAG_FRAGMENT_FORGOT_PASSWORD = "forgot_password_fragment";
+    private static final String BACK_STACK_FORGOT_PASSWORD = "forgot_password_back_stack_name";
+    private static final String BACK_STACK_NAME_LOGIN_YAHOO = "login_yahoo_back_stack_name";
+    private static final String BACK_STACK_NAME_LOGIN_TUMBLR = "login_tumblr_back_stack_name";
+    private static final String BACK_STACK_NAME_LOGIN_TWITTER = "login_twitter_back_stack_name";
+    private static final String BACK_STACK_NAME_LOGIN_GUEST = "login_guest_back_stack_name";
 
-    protected static final String TAG_FRAGMENT_FORGOT_PASSWORD =
-            "forgot_password_fragment";
+    private static final int REQUEST_CODE_SIGN_IN_GOOGLE_PLUS = 9000;
+    private static final int REQUEST_CODE_GET_GOOGLE_PLAY_SERVICES = 10000;
+    private static final int REQUEST_CODE_USER_RECOVERABLE_AUTH = 11000;
+    private static final int REQUEST_CODE_AUTHENTICATE = 1000;
 
-    protected static final String BACK_TACK_FORGOT_PASSWORD =
-            "forgot_password_back_stack_name";
-    private static final String BACK_STACK_NAME_LOGIN_YAHOO =
-            "login_yahoo_back_stack_name";
-    private static final String BACK_STACK_NAME_LOGIN_TUMBLR =
-            "login_tumblr_back_stack_name";
     @Inject
-    LoginFragment mLoginFragment;
+    protected LoginFragment mMainAuthenticationFragment;
     @Inject
-    AuthenticateFragment mSecondAuthenticationFragment;
+    protected AuthenticateFragment mSocialAuthenticationFragment;
     @Inject
-    NetworkUtils mNetworkUtils;
+    protected NetworkUtils mNetworkUtils;
     @Inject
-    GoogleApiClient mGoogleApiClient;
+    protected GoogleApiClient mGoogleApiClient;
     @Inject
-    Bus mBus;
+    protected Bus mBus;
     @Inject
-    GuestLoginFragment guestLoginFragment;
+    protected GuestLoginFragment guestLoginFragment;
     @Inject
-    ForgotPasswordFragment mForgotPasswordFragment;
+    protected ForgotPasswordFragment mForgotPasswordFragment;
     @Inject
     protected QuickMessageView mConfirmMessageView;
     @Inject
-    UserManager mUserManager;
+    protected UserManager mUserManager;
     @Inject
-    Provider<ResetPasswordTask> mResetPasswordTaskProvider;
+    protected Provider<ResetPasswordTask> mResetPasswordTaskProvider;
     @Inject
-    EmailValidator mEmailValidator;
+    protected EmailValidator mEmailValidator;
     @Inject
-    BuildManager mBuildManager;
+    protected BuildManager mBuildManager;
 
     private ConnectionResult mConnectionResult;
-    protected static final int REQUEST_CODE_SIGN_IN_GOOGLE_PLUS = 9000;
-    protected static final int REQUEST_CODE_GET_GOOGLE_PLAY_SERVICES = 10000;
-    protected static final int REQUEST_CODE_USER_RECOVERABLE_AUTH = 11000;
-    private static final String BACK_STACK_NAME_LOGIN_TWITTER =
-            "login_twitter_back_stack_name";
-    private static final String BACK_STACK_NAME_LOGIN_GUEST =
-            "login_guest_back_stack_name";
-    protected static final int REQUEST_CODE_AUTHENTICATE = 1000;
 
+    @Override
+    protected List<Object> getModules() {
+        List modules = new ArrayList(super.getModules());
+        modules.add(new LegacyActivityModule(this));
+        return modules;
+    }
+
+    @Override
+    protected int getAuthenticationLayout() {
+        return R.layout.activity_login;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -150,73 +148,29 @@ public class LegacyLoginActivity extends AuthenticateActivity
             getSupportFragmentManager()
                     .beginTransaction()
                     .add(R.id.main_auth_fragment_container,
-                            mLoginFragment,
+                            mMainAuthenticationFragment,
                             TAG_FRAGMENT_MAIN_AUTHENTICATE)
                     .commit();
         }
 
-        renderAppropriateUIForAppType();
-    }
-
-    private void renderAppropriateUIForAppType() {
-        if (mBuildManager.isOfficialChatWingApp()) {
+        if (mBuildManager.isOfficialChatWingApp()
+                && getSupportFragmentManager().
+                findFragmentByTag(TAG_FRAGMENT_SOCIAL_AUTHENTICATE) == null) {
             getSupportFragmentManager()
                     .beginTransaction()
                     .add(
-                            R.id.second_auth_fragment_container,
-                            mSecondAuthenticationFragment,
-                            getString(R.string.fragment_tag_authenticate))
+                            R.id.social_auth_fragment_container,
+                            mSocialAuthenticationFragment,
+                            TAG_FRAGMENT_SOCIAL_AUTHENTICATE)
                     .commit();
         }
-    }
-
-    @Override
-    @Subscribe
-    public void onUserInfoChanged(UserAuthenticationEvent event) {
-        super.onUserInfoChanged(event);
-    }
-
-    @Override
-    @Subscribe
-    public void onTaskFinished(TaskFinishedEvent event) {
-        super.onTaskFinished(event);
-        AsyncTask<?, ?, ?> task = event.getTask();
-        if (task instanceof ResetPasswordTask) {
-            onTaskFinished(event, (ResetPasswordTask) task);
-        } else if (task instanceof GetGooglePlusAccessTokenTask) {
-            onTaskFinished(event, (GetGooglePlusAccessTokenTask) task);
-        }
-    }
-
-    @Override
-    protected List<Object> getModules() {
-        List<Object> modules = new ArrayList<Object>(super.getModules());
-        modules.add(new ExtendChatWingModule(this));
-        modules.add(new LegacyActivityModule(this));
-        return modules;
     }
 
     @Override
     protected void startSession(AuthenticationParams params) {
         super.startSession(params);
+        //We have been authenticated by 3rd party, logout of current authenticating client
         logoutOfServices();
-    }
-
-    private void logoutOfServices() {
-        Session session = Session.getActiveSession();
-        if (session != null) {
-            session.closeAndClearTokenInformation();
-        }
-
-        if (mGoogleApiClient.isConnected()) {
-            Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
-            mGoogleApiClient.disconnect();
-        }
-    }
-
-    @Override
-    protected int getAuthenticationLayout() {
-        return R.layout.activity_login;
     }
 
     @Override
@@ -312,8 +266,6 @@ public class LegacyLoginActivity extends AuthenticateActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        LogUtils.v("Google Authenticate: onActivityResult");
-
         if (requestCode == REQUEST_CODE_SIGN_IN_GOOGLE_PLUS
                 || requestCode == REQUEST_CODE_GET_GOOGLE_PLAY_SERVICES) {
             // Google+ resolve error
@@ -358,10 +310,172 @@ public class LegacyLoginActivity extends AuthenticateActivity
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(getFragmentContainerId(),
-                        new ForgotPasswordFragment(),
+                        mForgotPasswordFragment,
                         TAG_FRAGMENT_FORGOT_PASSWORD)
-                .addToBackStack(BACK_TACK_FORGOT_PASSWORD)
+                .addToBackStack(BACK_STACK_FORGOT_PASSWORD)
                 .commit();
+    }
+
+    @Override
+    public void resetPassword(String email) throws EmailValidator.InvalidEmailException {
+        mEmailValidator.validate(email);
+        ResetPasswordTask task = mResetPasswordTaskProvider.get();
+        startTask(task.execute(email));
+        mProgressViewsManager.showProgress(true, R.string.progress_sending);
+    }
+
+    /**
+     * A chatwing login task is completed. Concrete class ONLY handle concrete exception.
+     * Super class will handle post success task behaviour
+     *
+     * @param event
+     * @param task
+     */
+    @Override
+    protected void onTaskFinished(TaskFinishedEvent event, StartSessionTask task) {
+        AuthenticationParams params = task.getParams();
+        LogUtils.v("Google Authenticate: onTaskFinished");
+
+        if (event.getStatus() == TaskFinishedEvent.Status.FAILED) {
+            LogUtils.v("Google Authenticate: onTaskFinished FAILED");
+            // Handle error when login using ChatWing account
+            if (Constants.TYPE_CHATWING.equals(params.getType())
+                    && event.getException() instanceof ApiManager.ValidationException) {
+                showEmailAuthenticationError(getString(R.string.error_invalid_username_password));
+                return;
+            }
+
+            if (Constants.TYPE_APP.equals(params.getType())
+                    && event.getException() instanceof ApiManager.ValidationException) {
+                showEmailAuthenticationError(getString(R.string.error_app_invalid_username_password));
+                return;
+            }
+
+            //Error Google
+            if (params.getType().equals(Constants.TYPE_GOOGLE)
+                    && event.getException() instanceof ApiManager.InvalidExternalAccessTokenException) {
+
+                ChatWingError error = ((ApiManager.ChatWingException) event.getException()).getError();
+
+                AuthenticationParamsError errorDetail = new Gson().fromJson(
+                        error.getParams(),
+                        AuthenticationParamsError.class);
+
+                if (AuthenticationParamsError.NAME_INTERNAL_OAUTH_ERROR.equals(errorDetail.getName())) {
+                    // In case of Google Plus authentication, if server indicates token
+                    // is invalid, invalidate the token that we found is bad so that
+                    // GoogleAuthUtil won't return it next time (it
+                    // may have cached it).
+                    // Also, retry getting access token once more.
+                    GoogleAuthUtil.invalidateToken(this, ((OAuth2Params) params).getToken());
+                    loadGooglePlusAccessToken();
+                }
+                return;
+            }
+        }
+
+        super.onTaskFinished(event, task);
+    }
+
+    ////////////////////////////////////////////////////////////
+    // Google Plus Connection Callbacks
+    ////////////////////////////////////////////////////////////
+    @Override
+    public void onConnected(Bundle bundle) {
+        LogUtils.v("Google Authenticate: onConnected");
+
+        // We've resolved any connection errors.
+        mProgressViewsManager.showProgress(false);
+        loadGooglePlusAccessToken();
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult result) {
+        LogUtils.v("Google Authenticate: onConnectionFailed");
+
+        // The user clicked the sign-in button already. Start to resolve
+        // connection errors. Wait until onConnected() to dismiss the
+        // connection dialog.
+        mProgressViewsManager.showProgress(false);
+        if (result.hasResolution()) {
+            try {
+                result.startResolutionForResult(
+                        this,
+                        REQUEST_CODE_SIGN_IN_GOOGLE_PLUS);
+            } catch (IntentSender.SendIntentException e) {
+                connectPlusClient();
+            }
+        }
+
+        // Save the intent so that we can start an activity when the user clicks
+        // the sign-in button.
+        mConnectionResult = result;
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+    }
+
+    ////////////////////////////////////////////
+    //// Event bus
+    ////////////////////////////////////////////
+
+    @Override
+    @Subscribe
+    public void onUserInfoChanged(UserAuthenticationEvent event) {
+        super.onUserInfoChanged(event);
+    }
+
+    @Override
+    @Subscribe
+    public void onTaskFinished(TaskFinishedEvent event) {
+        super.onTaskFinished(event);
+        AsyncTask<?, ?, ?> task = event.getTask();
+        if (task instanceof ResetPasswordTask) {
+            onTaskFinished(event, (ResetPasswordTask) task);
+        } else if (task instanceof GetGooglePlusAccessTokenTask) {
+            onTaskFinished(event, (GetGooglePlusAccessTokenTask) task);
+        }
+    }
+
+    ///////////////////////////////////////
+    ////    private methods
+    ///////////////////////////////////////
+
+    private void logoutOfServices() {
+        //Logout of Facebook
+        Session session = Session.getActiveSession();
+        if (session != null) {
+            session.closeAndClearTokenInformation();
+        }
+
+        //Logout of Google Plus
+        if (mGoogleApiClient.isConnected()) {
+            Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
+            mGoogleApiClient.disconnect();
+        }
+    }
+
+    /**
+     * Check the device to make sure it has the Google Play Services APK. If
+     * it doesn't, display a dialog that allows users to download the APK from
+     * the Google Play Store or enable it in the device's system settings.
+     */
+    private boolean isPlayServicesAvailable() {
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            showGooglePlusDialogFragment(resultCode, REQUEST_CODE_GET_GOOGLE_PLAY_SERVICES);
+            return false;
+        }
+        return true;
+    }
+
+    private void showGooglePlusDialogFragment(int errorCode, int requestCode) {
+        GooglePlusDialogFragment fragment = GooglePlusDialogFragment.newInstance(
+                errorCode, requestCode);
+        if (fragment != null) {
+            fragment.show(getSupportFragmentManager(), GooglePlusDialogFragment.DIALOG_TAG);
+        }
     }
 
     private void connectPlusClient() {
@@ -370,8 +484,6 @@ public class LegacyLoginActivity extends AuthenticateActivity
     }
 
     private void loadGooglePlusAccessToken() {
-        LogUtils.v("Google Authenticate: loadGooglePlusAccessToken");
-
         mProgressViewsManager.showProgress(true, R.string.progress_getting_access_token);
         GetGooglePlusAccessTokenTask task = new GetGooglePlusAccessTokenTask(
                 mBus,
@@ -404,7 +516,12 @@ public class LegacyLoginActivity extends AuthenticateActivity
         }
     }
 
-
+    /**
+     * After Reset Password Task
+     *
+     * @param event
+     * @param task
+     */
     private void onTaskFinished(TaskFinishedEvent event,
                                 @SuppressWarnings("UnusedParameters") ResetPasswordTask task) {
         ResetPasswordResponse response = (ResetPasswordResponse) event.getResult();
@@ -414,13 +531,12 @@ public class LegacyLoginActivity extends AuthenticateActivity
             mConfirmMessageView.show(response.getData());
 
             getSupportFragmentManager().popBackStack(
-                    BACK_TACK_FORGOT_PASSWORD,
+                    BACK_STACK_FORGOT_PASSWORD,
                     FragmentManager.POP_BACK_STACK_INCLUSIVE);
         } else {
             if ((event.getException() instanceof ApiManager.ValidationException ||
-                    event.getException() instanceof EmailValidator.InvalidEmailException)
-                    && mForgotPasswordFragment.isAdded()) {
-                mForgotPasswordFragment.setEmailError(getString(R.string.error_invalid_email));
+                    event.getException() instanceof EmailValidator.InvalidEmailException)) {
+                showEmailForgotError(getString(R.string.error_invalid_email));
                 return;
             }
             //Other errors (Unknown or general errors) we let other to handle it
@@ -428,137 +544,12 @@ public class LegacyLoginActivity extends AuthenticateActivity
         }
     }
 
-    @Override
-    protected void onTaskFinished(TaskFinishedEvent event, StartSessionTask task) {
-        AuthenticationParams params = task.getParams();
-        LogUtils.v("Google Authenticate: onTaskFinished");
-
-        if (event.getStatus() == TaskFinishedEvent.Status.FAILED) {
-            LogUtils.v("Google Authenticate: onTaskFinished FAILED");
-            // Handle error when login using ChatWing account
-            if (Constants.TYPE_CHATWING.equals(params.getType())
-                    && event.getException() instanceof ApiManager.ValidationException
-                    && ChatWingError.hasValidationError(((ApiManager.ValidationException) event.getException()).getError())
-                    && mLoginFragment.isAdded()) {
-                mLoginFragment.setEmailError(getString(R.string.error_invalid_username_password));
-                return;
-            }
-
-            if(Constants.TYPE_APP.equals(params.getType())
-                    && event.getException() instanceof ApiManager.ValidationException
-                    && ChatWingError.hasValidationError(((ApiManager.ValidationException) event.getException()).getError())
-                    && mLoginFragment.isAdded()) {
-                mLoginFragment.setEmailError(getString(R.string.error_app_invalid_username_password));
-                return;
-            }
-
-            //Error Google
-            if (params.getType().equals(Constants.TYPE_GOOGLE)
-                    && event.getException() instanceof ApiManager.InvalidExternalAccessTokenException) {
-                ChatWingError error = ((ApiManager.InvalidExternalAccessTokenException) event.getException()).getError();
-                AuthenticationParamsError errorDetail = new Gson().fromJson(
-                        error.getParams(),
-                        AuthenticationParamsError.class);
-
-                if (AuthenticationParamsError.NAME_INTERNAL_OAUTH_ERROR.equals(errorDetail.getName())) {
-                    // In case of Google Plus authentication, if server indicates token
-                    // is invalid, invalidate the token that we found is bad so that
-                    // GoogleAuthUtil won't return it next time (it
-                    // may have cached it).
-                    // Also, retry getting access token once more.
-                    GoogleAuthUtil.invalidateToken(this, ((OAuth2Params) params).getToken());
-                    loadGooglePlusAccessToken();
-                }
-                return;
-            }
-        }
-
-        super.onTaskFinished(event, task);
-    }
-
     /**
-     * Check the device to make sure it has the Google Play Services APK. If
-     * it doesn't, display a dialog that allows users to download the APK from
-     * the Google Play Store or enable it in the device's system settings.
+     * After Obtaining Google Access Token
+     *
+     * @param event
+     * @param task
      */
-    private boolean isPlayServicesAvailable() {
-        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-        if (resultCode != ConnectionResult.SUCCESS) {
-            showGooglePlusDialogFragment(resultCode, REQUEST_CODE_GET_GOOGLE_PLAY_SERVICES);
-            return false;
-        }
-        return true;
-    }
-
-    private void showGooglePlusDialogFragment(int errorCode, int requestCode) {
-        LogUtils.v("Google Authenticate: showGooglePlusDialogFragment");
-
-        GooglePlusDialogFragment fragment = GooglePlusDialogFragment.newInstance(
-                errorCode, requestCode);
-        if (fragment != null) {
-            fragment.show(getSupportFragmentManager(), TAG_FRAGMENT_GOOGLE_PLUS);
-        }
-    }
-
-    ////////////////////////////////////////////////////////////
-    // Google Plus Connection Callbacks
-    ////////////////////////////////////////////////////////////
-    @Override
-    public void onConnected(Bundle bundle) {
-        LogUtils.v("Google Authenticate: onConnected");
-
-        // We've resolved any connection errors.
-        mProgressViewsManager.showProgress(false);
-        loadGooglePlusAccessToken();
-    }
-
-    /////////////////////////////////////////////////////////////
-    // Google Plus Connection Failed Listener
-    /////////////////////////////////////////////////////////////
-    @Override
-    public void onConnectionFailed(ConnectionResult result) {
-        LogUtils.v("Google Authenticate: onConnectionFailed");
-
-        // The user clicked the sign-in button already. Start to resolve
-        // connection errors. Wait until onConnected() to dismiss the
-        // connection dialog.
-        mProgressViewsManager.showProgress(false);
-        if (result.hasResolution()) {
-            try {
-                result.startResolutionForResult(
-                        this,
-                        REQUEST_CODE_SIGN_IN_GOOGLE_PLUS);
-            } catch (IntentSender.SendIntentException e) {
-                connectPlusClient();
-            }
-        }
-
-        // Save the intent so that we can start an activity when the user clicks
-        // the sign-in button.
-        mConnectionResult = result;
-    }
-
-    @Override
-    public void loginGuest(String guestName, String selectedAvatarUrl) {
-
-    }
-
-    @Override
-    public void resetPassword(String email) throws EmailValidator.InvalidEmailException {
-        mEmailValidator.validate(email);
-        ResetPasswordTask task = mResetPasswordTaskProvider.get();
-        startTask(task.execute(email));
-        mProgressViewsManager.showProgress(true, R.string.progress_sending);
-    }
-
-    ////////////////////////////////////////////////////////////
-    // Google Api Clients Callbacks
-    ////////////////////////////////////////////////////////////
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
     private void onTaskFinished(TaskFinishedEvent event,
                                 @SuppressWarnings("UnusedParameters") GetGooglePlusAccessTokenTask task) {
         if (event.getStatus() == TaskFinishedEvent.Status.SUCCEED) {
@@ -603,5 +594,25 @@ public class LegacyLoginActivity extends AuthenticateActivity
             mErrorMessageView.show(R.string.error_unknown);
             LogUtils.e(exception);
         }
+    }
+
+    private void showEmailForgotError(String message) {
+        ForgotPasswordFragment fragment = (ForgotPasswordFragment) getSupportFragmentManager()
+                .findFragmentByTag(TAG_FRAGMENT_FORGOT_PASSWORD);
+        if (fragment != null) {
+            fragment.setEmailError(message);
+        }
+    }
+
+    private void showEmailAuthenticationError(String message) {
+        LoginFragment fragment = getMainAuthenticationFragment();
+        if (fragment != null) {
+            fragment.setEmailError(message);
+        }
+    }
+
+    private LoginFragment getMainAuthenticationFragment() {
+        return (LoginFragment) getSupportFragmentManager()
+                .findFragmentByTag(TAG_FRAGMENT_MAIN_AUTHENTICATE);
     }
 }

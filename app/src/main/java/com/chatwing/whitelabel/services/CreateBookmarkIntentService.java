@@ -24,12 +24,14 @@ import javax.inject.Inject;
 /**
  * Created by steve on 21/06/2014.
  */
-public class CreateBookmarkIntentService extends ExtendBaseIntentService {
-    private static final String ACTION_CREATE_BOOKMARK = "ACTION_CREATE_BOOKMARK";
+public class CreateBookmarkIntentService extends BaseIntentService {
     public static final String CHATBOX_KEY = "chatbox";
-    private CreateBookmarkEvent mCreateBookmarkEvent;
+    private static final String ACTION_CREATE_BOOKMARK = "ACTION_CREATE_BOOKMARK";
+
     @Inject
-    ApiManager mApiManager;
+    protected ApiManager mApiManager;
+
+    private CreateBookmarkEvent mCreateBookmarkEvent;
 
     public CreateBookmarkIntentService() {
         super("CreateBookmarkIntentService");
@@ -44,12 +46,14 @@ public class CreateBookmarkIntentService extends ExtendBaseIntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        if(mUserManager.getCurrentUser() == null){
+        if (mUserManager.getCurrentUser() == null) {
             return;
         }
         String action = intent.getAction();
         if (ACTION_CREATE_BOOKMARK.equals(action)) {
-            LightWeightChatBox lightWeighChatBox = (LightWeightChatBox) intent.getSerializableExtra(CHATBOX_KEY);
+            LightWeightChatBox lightWeighChatBox =
+                    (LightWeightChatBox) intent.getSerializableExtra(CHATBOX_KEY);
+
             ChatBox chatbox = new ChatBox(
                     lightWeighChatBox.getId(),
                     lightWeighChatBox.getKey(),
@@ -73,7 +77,7 @@ public class CreateBookmarkIntentService extends ExtendBaseIntentService {
                     .withValues(chatBoxContentValues)
                     .build());
             try {
-                //Create local bookmark
+                //Create local bookmark with unsync flag
                 SyncedBookmark bookmark = SyncedBookmark.createLocalBookmark(lightWeighChatBox);
                 ContentValues bookmarkContentValue = SyncedBookmarkTable.getContentValues(bookmark);
                 batch.add(ContentProviderOperation
@@ -83,11 +87,13 @@ public class CreateBookmarkIntentService extends ExtendBaseIntentService {
 
                 getContentResolver().applyBatch(ChatWingContentProvider.AUTHORITY, batch);
 
-                CreateBookmarkResponse bookmarkResponse = mApiManager.createBookmark(mUserManager.getCurrentUser(), lightWeighChatBox.getId());
-                mCreateBookmarkEvent = new CreateBookmarkEvent(bookmarkResponse, intent.getBooleanExtra("is_upgrading", false));
-
-            } catch(ApiManager.InvalidIdentityException iie){
-                //Ignore
+                //Create remote bookmark, will update sync flag
+                CreateBookmarkResponse bookmarkResponse = mApiManager.createBookmark(
+                        mUserManager.getCurrentUser(),
+                        lightWeighChatBox.getId());
+                mCreateBookmarkEvent = new CreateBookmarkEvent(bookmarkResponse);
+            } catch (ApiManager.InvalidIdentityException iie) {
+                //Ignore log
                 mCreateBookmarkEvent = new CreateBookmarkEvent(iie);
             } catch (Exception e) {
                 LogUtils.e(e);
@@ -95,7 +101,6 @@ public class CreateBookmarkIntentService extends ExtendBaseIntentService {
             }
             post(mCreateBookmarkEvent);
         }
-
     }
 
     private void post(final CreateBookmarkEvent event) {
@@ -106,5 +111,4 @@ public class CreateBookmarkIntentService extends ExtendBaseIntentService {
             }
         });
     }
-
 }

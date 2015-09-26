@@ -50,7 +50,6 @@ public abstract class BaseABFragmentActivity extends AppCompatActivity {
     protected Bus mBus;
 
     private ObjectGraph mObjectGraph;
-
     private boolean mIsActive = false;
     private boolean isVisible;
 

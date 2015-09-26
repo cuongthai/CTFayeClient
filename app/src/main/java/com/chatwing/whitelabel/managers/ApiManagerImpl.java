@@ -244,7 +244,7 @@ public class ApiManagerImpl implements ApiManager {
                 //Or token is expired.
                 //Currently it happens only for guest account
                 //The account should be re obtain the access_token. In guest case, it should recreate guest
-                throw new InvalidAccessTokenException();
+                throw new InvalidAccessTokenException(error);
             case ChatWingError.ERROR_CODE_INVALID_IDENTITY:
                 //This is when you are trying to access a resource that requires another login type
                 //E.g create message in chatbox that requires facebook account only
@@ -293,7 +293,7 @@ public class ApiManagerImpl implements ApiManager {
             AuthenticationResponse response = gson.fromJson(
                     responseString,
                     AuthenticationResponse.class);
-            if (ChatWingError.hasExternalInvalidAcessToken(response.getError())) {
+            if (ChatWingError.hasExternalInvalidAccessToken(response.getError())) {
                 throw new InvalidExternalAccessTokenException(response.getError());
             }
             return response;
@@ -535,7 +535,7 @@ public class ApiManagerImpl implements ApiManager {
                         userMessage.setStatus(status);
                         userMessage.setCreatedDate(message.getCreatedDate());
                     }
-                    throw new CreateMessageException(createMessageParamsError, message);
+                    throw new CreateMessageException(error, createMessageParamsError, message);
                 } else {
                     //Out of our scope, server says something strange, report to developer and tell nicely to user
                     throw ApiException.createException(new Exception("Cant handle this error code while sending message"));
@@ -1008,19 +1008,6 @@ public class ApiManagerImpl implements ApiManager {
         return getAvatarUrl(userType, userID);
     }
 
-    @Override
-    public String getConversationUrl(User user, String url) throws UserUnauthenticatedException {
-        if (user == null) {
-            throw new UserUnauthenticatedException();
-        }
-        return url + appendParams(new ConversationMessageViewParams(user.getAccessToken()));
-    }
-
-    @Override
-    public String getChatboxUrl(User user, String url) {
-        return url + appendParams(new ChatboxMessageViewParams(user != null ? user.getAccessToken() : null));
-    }
-
     protected String getAvatarUrl(String loginType, String loginId) {
         if (TextUtils.isEmpty(loginType) || TextUtils.isEmpty(loginId)) {
             return DEFAULT_AVATAR_URL;
@@ -1185,7 +1172,8 @@ public class ApiManagerImpl implements ApiManager {
             EmailValidator.InvalidEmailException,
             PasswordValidator.InvalidPasswordException,
             ValidationException,
-            OtherApplicationException {
+            OtherApplicationException,
+            InvalidAgreeConditionsException {
         mEmailValidator.validate(email);
         mPasswordValidator.validate(password);
         if (!agreeConditions) {
@@ -1393,7 +1381,7 @@ public class ApiManagerImpl implements ApiManager {
     public IgnoreUserResponse ignoreUser(User user,
                                          String userId,
                                          String userType,
-                                         boolean ignored)
+                                         boolean requestIgnore)
             throws UserUnauthenticatedException,
             HttpRequest.HttpRequestException,
             ApiException,
@@ -1408,10 +1396,10 @@ public class ApiManagerImpl implements ApiManager {
         String paramsString = gson.toJson(params);
 
         HttpRequest request;
-        if (ignored) {
-            request = HttpRequest.post(USER_UNIGNORE);
-        } else {
+        if (requestIgnore) {
             request = HttpRequest.post(USER_IGNORE);
+        } else {
+            request = HttpRequest.post(USER_UNIGNORE);
         }
         setUpRequest(request, user);
         request.send(paramsString);
@@ -1467,13 +1455,31 @@ public class ApiManagerImpl implements ApiManager {
         }
     }
 
+    /***
+     *
+     * @param user
+     * @param blockType by account type or user ip
+     * @param messageToBlock
+     * @param shouldRemoveMessage true when client wants server to broadcast remove events
+     * @param blockReason
+     * @param blockDuration
+     * @return
+     * @throws ApiException
+     * @throws HttpRequest.HttpRequestException
+     * @throws UserUnauthenticatedException
+     * @throws ValidationException
+     * @throws InvalidAccessTokenException
+     * @throws RequiredPermissionException
+     * @throws NotVerifiedEmailException
+     * @throws OtherApplicationException
+     */
     @Override
     public BlackListResponse blockUser(User user,
-                                       ExtendChatMessagesFragment.BLOCK block,
-                                       Message message,
-                                       boolean clearMessage,
-                                       String reason,
-                                       long duration)
+                                       ExtendChatMessagesFragment.BLOCK blockType,
+                                       Message messageToBlock,
+                                       boolean shouldRemoveMessage,
+                                       String blockReason,
+                                       long blockDuration)
             throws ApiException,
             HttpRequest.HttpRequestException,
             UserUnauthenticatedException,
@@ -1488,29 +1494,30 @@ public class ApiManagerImpl implements ApiManager {
         HttpRequest request = HttpRequest.post(BLACKLIST_CREATE_URL);
         setUpRequest(request, user);
         BlockUserParams params;
-        if (block == ExtendChatMessagesFragment.BLOCK.TYPE) {
+        if (blockType == ExtendChatMessagesFragment.BLOCK.ACCOUNT_TYPE) {
             params = new BlockUserParams(
-                    message.getUserId(),
-                    message.getUserType(),
+                    messageToBlock.getUserId(),
+                    messageToBlock.getUserType(),
                     BlockUserParams.METHOD_SOCIAL,
-                    clearMessage,
-                    String.valueOf(message.getChatBoxId()),
-                    duration,
-                    reason);
+                    shouldRemoveMessage,
+                    String.valueOf(messageToBlock.getChatBoxId()),
+                    blockDuration,
+                    blockReason);
         } else {
             params = new BlockUserParams(
-                    message.getId(),
+                    messageToBlock.getId(),
                     BlockUserParams.METHOD_IP,
-                    clearMessage,
-                    String.valueOf(message.getChatBoxId()),
-                    duration,
-                    reason);
+                    shouldRemoveMessage,
+                    String.valueOf(messageToBlock.getChatBoxId()),
+                    blockDuration,
+                    blockReason);
         }
         request.send(gson.toJson(params));
         String responseString = null;
         try {
             responseString = validate(request);
             BlackListResponse blackListResponse = gson.fromJson(responseString, BlackListResponse.class);
+            //You don't have permission to block
             if (ChatWingError.hasPermissionError(blackListResponse.getError())) {
                 throw new RequiredPermissionException();
             }
@@ -1566,7 +1573,7 @@ public class ApiManagerImpl implements ApiManager {
         if (TextUtils.isEmpty(query)) {
             throw new ValidationException(
                     new ChatWingError(ChatWingError.ERROR_CODE_VALIDATION_ERR,
-                            mContext.getString(R.string.error_required_chat_wing_login_to_create_chat_boxes),
+                            mContext.getString(R.string.error_blank_chatbox),
                             null));
         }
 

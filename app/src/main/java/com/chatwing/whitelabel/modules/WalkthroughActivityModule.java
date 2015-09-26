@@ -17,7 +17,7 @@ import dagger.Provides;
  */
 @Module(
         injects = WalkthroughActivity.class,
-        addsTo = ExtendChatWingModule.class
+        addsTo = ChatWingModule.class
 )
 public class WalkthroughActivityModule {
     private WalkthroughActivity mActivity;

@@ -1,8 +1,7 @@
 package com.chatwing.whitelabel.fragments;
 
-import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,7 +10,6 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
-
 
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.adapters.EmailsAdapterFactory;
@@ -23,33 +21,27 @@ import javax.inject.Inject;
  * Author: Huy Nguyen
  * Date: Oct 1st, 2013
  */
-public class ForgotPasswordFragment extends Fragment {
-    @Inject
-    EmailValidator mEmailValidator;
-    @Inject
-    InputMethodManager mInputMethodManager;
-    @Inject
-    EmailsAdapterFactory mEmailsAdapterFactory;
-    private Delegate mDelegate;
-    private AutoCompleteTextView mEmailEditText;
-
-    public void setEmailError(String message) {
-        if (mEmailEditText != null) {
-            mEmailEditText.setError(message);
-        }
-    }
+public class ForgotPasswordFragment extends BaseFragment {
 
     public interface Delegate extends InjectableFragmentDelegate {
         void resetPassword(String email) throws EmailValidator.InvalidEmailException;
     }
 
-    public ForgotPasswordFragment() {
-    }
+    @Inject
+    protected EmailValidator mEmailValidator;
+    @Inject
+    protected InputMethodManager mInputMethodManager;
+    @Inject
+    protected EmailsAdapterFactory mEmailsAdapterFactory;
+
+    private Delegate mDelegate;
+    private AutoCompleteTextView mEmailEditText;
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        mDelegate = (Delegate) activity;
+    protected void onAttachToContext(Context context) {
+        if (context instanceof Delegate) {
+            mDelegate = (Delegate) context;
+        }
     }
 
     @Override
@@ -103,6 +95,12 @@ public class ForgotPasswordFragment extends Fragment {
             mDelegate.resetPassword(email);
         } catch (EmailValidator.InvalidEmailException ex) {
             mEmailEditText.setError(getString(R.string.error_invalid_email));
+        }
+    }
+
+    public void setEmailError(String message) {
+        if (mEmailEditText != null) {
+            mEmailEditText.setError(message);
         }
     }
 }

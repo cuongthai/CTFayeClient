@@ -14,7 +14,6 @@ import com.chatwing.whitelabel.events.TaskFinishedEvent;
 import com.chatwing.whitelabel.managers.ProgressViewsManager;
 import com.chatwing.whitelabel.managers.UserManager;
 import com.chatwing.whitelabel.modules.CreateChatBoxActivityModule;
-import com.chatwing.whitelabel.modules.ExtendChatWingModule;
 import com.chatwing.whitelabel.pojos.LightWeightChatBox;
 import com.chatwing.whitelabel.pojos.responses.CreateChatBoxResponse;
 import com.chatwing.whitelabel.tasks.CreateChatBoxTask;
@@ -36,18 +35,24 @@ public class CreateChatBoxActivity extends BaseABFragmentActivity {
     public static final String EXTRA_RESULT_EXCEPTION = "exception";
 
     @Inject
-    Bus mBus;
+    protected Bus mBus;
     @Inject
-    UserManager mUserManager;
+    protected UserManager mUserManager;
     @Inject
-    Provider<CreateChatBoxTask> mCreateChatBoxProvider;
+    protected Provider<CreateChatBoxTask> mCreateChatBoxProvider;
     @Inject
-    ProgressViewsManager mProgressViewsManager;
+    protected ProgressViewsManager mProgressViewsManager;
     @Inject
-    ErrorMessageView mErrorMessageView;
+    protected ErrorMessageView mErrorMessageView;
+
     private CreateChatBoxTask mCurrentTask = null;
     // UI references.
     private EditText mNameTextView;
+
+    @Override
+    protected List<Object> getModules() {
+        return Arrays.<Object>asList(new CreateChatBoxActivityModule(this));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,19 +106,7 @@ public class CreateChatBoxActivity extends BaseABFragmentActivity {
         stopCurrentTask();
     }
 
-    @Override
-    protected List<Object> getModules() {
-        return Arrays.<Object>asList(new ExtendChatWingModule(this), new CreateChatBoxActivityModule(this));
-    }
 
-    private void stopCurrentTask() {
-        if (mCurrentTask != null) {
-            if (mCurrentTask.getStatus() != AsyncTask.Status.FINISHED) {
-                mCurrentTask.cancel(true);
-            }
-            mCurrentTask = null;
-        }
-    }
 
     public void attemptCreate() {
         if (mCurrentTask != null) {
@@ -162,6 +155,15 @@ public class CreateChatBoxActivity extends BaseABFragmentActivity {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void stopCurrentTask() {
+        if (mCurrentTask != null) {
+            if (mCurrentTask.getStatus() != AsyncTask.Status.FINISHED) {
+                mCurrentTask.cancel(true);
+            }
+            mCurrentTask = null;
         }
     }
 }

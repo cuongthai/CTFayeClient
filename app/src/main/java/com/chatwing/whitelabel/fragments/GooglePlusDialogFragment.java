@@ -15,6 +15,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
  * Time: 11:14 AM
  */
 public class GooglePlusDialogFragment extends DialogFragment {
+    public static final String DIALOG_TAG = "google_plus_dialog";
     private static final String EXTRA_ERROR_CODE = "error_code";
     private static final String EXTRA_REQUEST_CODE = "request_code";
 

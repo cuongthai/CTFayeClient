@@ -1,8 +1,7 @@
 package com.chatwing.whitelabel.fragments;
 
-import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,26 +21,22 @@ import javax.inject.Inject;
 /**
  * Created by steve on 02/07/2014.
  */
-public class GuestLoginFragment extends Fragment {
+public class GuestLoginFragment extends BaseFragment {
     @Inject
-    GuestAvatarAdapter adapter;
+    protected GuestAvatarAdapter adapter;
     @Inject
-    Bus mBus;
+    protected Bus mBus;
 
-    private Delegate mDelegate;
-
-    public interface Delegate extends InjectableFragmentDelegate {
-        void loginGuest(String guestName, String selectedAvatarUrl);
-    }
-
+    private InjectableFragmentDelegate mDelegate;
 
     public GuestLoginFragment() {
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        mDelegate = (Delegate) activity;
+    protected void onAttachToContext(Context context) {
+        if (context instanceof InjectableFragmentDelegate) {
+            mDelegate = (InjectableFragmentDelegate) context;
+        }
     }
 
     @Override

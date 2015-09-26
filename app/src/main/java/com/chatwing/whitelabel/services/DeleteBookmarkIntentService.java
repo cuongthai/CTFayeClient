@@ -15,11 +15,11 @@ import javax.inject.Inject;
 /**
  * Created by steve on 23/06/2014.
  */
-public class DeleteBookmarkIntentService extends ExtendBaseIntentService {
-    public static final String BOOKMARK_IDS_KEY = "bookmark_ids";
+public class DeleteBookmarkIntentService extends BaseIntentService {
+    public static final String BOOKMARK_IDS = "bookmark_ids";
     private DeleteBookmarkEvent mDeleteBookmarkEvent;
     @Inject
-    ApiManager mApiManager;
+    protected ApiManager mApiManager;
 
     public DeleteBookmarkIntentService() {
         super("DeleteBookmarkIntentService");
@@ -27,7 +27,7 @@ public class DeleteBookmarkIntentService extends ExtendBaseIntentService {
 
     public static void start(Context context, ArrayList<Integer> bookmarkIds) {
         Intent intent = new Intent(context, DeleteBookmarkIntentService.class);
-        intent.putIntegerArrayListExtra(BOOKMARK_IDS_KEY, bookmarkIds);
+        intent.putIntegerArrayListExtra(BOOKMARK_IDS, bookmarkIds);
         context.startService(intent);
     }
 
@@ -35,10 +35,11 @@ public class DeleteBookmarkIntentService extends ExtendBaseIntentService {
     protected void onHandleIntent(Intent intent) {
         User user = mUserManager.getCurrentUser();
         if (user == null || !mUserManager.userCanBookmark()) {
-            post(new DeleteBookmarkEvent(new Exception()));
+            post(new DeleteBookmarkEvent(new ApiManager.RequiredPermissionException()));
             return;
         }
-        ArrayList<Integer> bookmarkIds = intent.getIntegerArrayListExtra(BOOKMARK_IDS_KEY);
+
+        ArrayList<Integer> bookmarkIds = intent.getIntegerArrayListExtra(BOOKMARK_IDS);
         for (Integer bookmarkId : bookmarkIds) {
             try {
                 DeleteBookmarkResponse deleteBookmarkResponse = mApiManager.deleteBookmark(
@@ -60,5 +61,4 @@ public class DeleteBookmarkIntentService extends ExtendBaseIntentService {
             }
         });
     }
-
 }

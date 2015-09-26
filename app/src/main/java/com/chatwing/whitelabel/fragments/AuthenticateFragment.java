@@ -1,6 +1,7 @@
 package com.chatwing.whitelabel.fragments;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -25,12 +26,12 @@ import javax.inject.Inject;
 /**
  * Created by nguyenthanhhuy on 4/14/14.
  */
-public class AuthenticateFragment extends Fragment implements View.OnClickListener {
+public class AuthenticateFragment extends BaseFragment implements View.OnClickListener {
 
     public interface Delegate extends InjectableFragmentDelegate {
-        public void login(String loginType);
+        void login(String loginType);
 
-        public Info getInfo();
+        Info getInfo();
     }
 
     public static class Info {
@@ -53,7 +54,7 @@ public class AuthenticateFragment extends Fragment implements View.OnClickListen
     }
 
     @Inject
-    Bus mBus;
+    protected Bus mBus;
     private Delegate mDelegate;
     private Session.StatusCallback mSessionStatusCallback = new Session.StatusCallback() {
         @Override
@@ -77,13 +78,11 @@ public class AuthenticateFragment extends Fragment implements View.OnClickListen
         }
     };
 
-    public AuthenticateFragment() {
-    }
-
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        mDelegate = (Delegate) activity;
+    protected void onAttachToContext(Context context) {
+        if (context instanceof Delegate) {
+            mDelegate = (Delegate) context;
+        }
     }
 
     @Override
@@ -120,7 +119,6 @@ public class AuthenticateFragment extends Fragment implements View.OnClickListen
 
         guestLoginBtn.setOnClickListener(this);
         guestLoginBtn.setText(info.mGuestAuthText);
-
     }
 
     @Override

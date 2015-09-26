@@ -28,11 +28,13 @@ import javax.inject.Inject;
 /**
  * Created by steve on 21/06/2014.
  */
-public class SyncBookmarkIntentService extends ExtendBaseIntentService {
+public class SyncBookmarkIntentService extends BaseIntentService {
+
+    @Inject
+    protected ApiManager mApiManager;
+
     private static boolean sIsInProgress;
     private static final Object sLock = new Object();
-    @Inject
-    com.chatwing.whitelabel.managers.ApiManager mApiManager;
 
     public SyncBookmarkIntentService() {
         super("SyncBookmarkIntentService");
@@ -45,6 +47,7 @@ public class SyncBookmarkIntentService extends ExtendBaseIntentService {
         post(SyncBookmarkEvent.startedEvent());
         SyncBookmarkEvent result;
         try {
+            ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
 
             //Load bookmarks from server
             BookmarkResponse bookmarkResponse = mApiManager.loadBookmarks(mUserManager.getCurrentUser());
@@ -58,16 +61,17 @@ public class SyncBookmarkIntentService extends ExtendBaseIntentService {
              * 4. Submit out of sync bookmark to server
              */
             Map<Integer, Integer> chatboxLastReads = getChatboxUnreadCount();
-            ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
 
             List<LightWeightChatBox> unSyncedBookmarks = getUnSyncedBookmarks();
             refillUnreadCount(bookmarks, chatboxLastReads);
-            fillAddOperationsMissingChatBoxes(batch, bookmarks);
+            fillAddOrUpdateOperationsChatBoxes(batch, bookmarks);
             fillRemoveOperationsSyncedBookmarks(batch);
             fillAddOperationsRemoteBookmarks(batch, bookmarks);
 
             getContentResolver().applyBatch(ChatWingContentProvider.AUTHORITY, batch);
-            getContentResolver().notifyChange(ChatWingContentProvider.getSyncedBookmarksUri(), null);
+            getContentResolver().notifyChange(
+                    ChatWingContentProvider.getSyncedBookmarksUri(),
+                    null);
 
             /**
              * Kick off services to create unsync bookmarks.
@@ -91,7 +95,8 @@ public class SyncBookmarkIntentService extends ExtendBaseIntentService {
         post(result);
     }
 
-    private void refillUnreadCount(SyncedBookmark[] bookmarks, Map<Integer, Integer> chatboxUnreadCounts) {
+    private void refillUnreadCount(SyncedBookmark[] bookmarks,
+                                   Map<Integer, Integer> chatboxUnreadCounts) {
         for (SyncedBookmark syncedBookmark : bookmarks) {
             ChatBox chatBox = syncedBookmark.getChatBox();
             if (chatboxUnreadCounts.containsKey(chatBox.getId())) {
@@ -136,22 +141,26 @@ public class SyncBookmarkIntentService extends ExtendBaseIntentService {
         });
     }
 
-    private void fillAddOperationsMissingChatBoxes(ArrayList<ContentProviderOperation> batch, SyncedBookmark[] bookmarks) {
+    private void fillAddOrUpdateOperationsChatBoxes(ArrayList<ContentProviderOperation> batch,
+                                                    SyncedBookmark[] bookmarks) {
         for (SyncedBookmark bookmark : bookmarks) {
+            ChatBox chatBox = bookmark.getChatBox();
+
             if (ChatWingContentProvider.hasChatBoxInDB(
                     getContentResolver(),
-                    bookmark.getChatBox().getId())) {
-                //We update local chatbox because not all local chatbox has enough information for rendering Bookmarks
+                    chatBox.getId())) {
+                //We update local chatbox
+                //because not all local chatbox has enough information for rendering Bookmarks
                 ContentValues chatBoxContentValues = new ContentValues();
-                chatBoxContentValues.put(ChatBoxTable.ALIAS, bookmark.getChatBox().getAlias());
+                chatBoxContentValues.put(ChatBoxTable.ALIAS, chatBox.getAlias());
                 batch.add(ContentProviderOperation
-                        .newUpdate(ChatWingContentProvider.getChatBoxWithIdUri(bookmark.getChatBox().getId()))
+                        .newUpdate(ChatWingContentProvider.getChatBoxWithIdUri(chatBox.getId()))
                         .withValues(chatBoxContentValues)
                         .build());
             } else {
                 //FIXME: The same issue with {@link com.chatwing.services.CreateBookmarkIntentService}
                 ContentValues chatBoxContentValues = ChatBoxTable.getContentValues(
-                        bookmark.getChatBox(), " ");
+                        chatBox, " ");
                 batch.add(ContentProviderOperation
                         .newInsert(ChatWingContentProvider.getChatBoxesUri())
                         .withValues(chatBoxContentValues)
@@ -160,7 +169,8 @@ public class SyncBookmarkIntentService extends ExtendBaseIntentService {
         }
     }
 
-    private void fillAddOperationsRemoteBookmarks(ArrayList<ContentProviderOperation> batch, SyncedBookmark[] bookmarks) {
+    private void fillAddOperationsRemoteBookmarks(ArrayList<ContentProviderOperation> batch,
+                                                  SyncedBookmark[] bookmarks) {
         for (SyncedBookmark bookmark : bookmarks) {
             bookmark.setIsSynced(true);
             Uri syncedBookmarksUri = ChatWingContentProvider.getSyncedBookmarksUri();
@@ -178,7 +188,7 @@ public class SyncBookmarkIntentService extends ExtendBaseIntentService {
                 .build());
     }
 
-    public List<LightWeightChatBox> getUnSyncedBookmarks() {
+    private List<LightWeightChatBox> getUnSyncedBookmarks() {
         Cursor cursor = getContentResolver().query(
                 ChatWingContentProvider.getSyncedBookmarksUri(),
                 new String[]{
