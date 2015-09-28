@@ -36,7 +36,6 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ToggleButton;
 
-import com.chatwing.whitelabel.ChatWingApplication;
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.adapters.CommunicationMessagesAdapter;
 import com.chatwing.whitelabel.adapters.EmoticonPackagesAdapter;
@@ -48,7 +47,6 @@ import com.chatwing.whitelabel.events.InvalidIdentityEvent;
 import com.chatwing.whitelabel.events.MessageEvent;
 import com.chatwing.whitelabel.events.UserUnauthenticatedEvent;
 import com.chatwing.whitelabel.generators.MessageRandomKeyGenerator;
-import com.chatwing.whitelabel.interfaces.ChatWingJSInterface;
 import com.chatwing.whitelabel.loaders.CommunicationBoxMessagesLoader;
 import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.managers.UserManager;
@@ -60,6 +58,7 @@ import com.chatwing.whitelabel.pojos.Emoticon;
 import com.chatwing.whitelabel.pojos.Message;
 import com.chatwing.whitelabel.pojos.User;
 import com.chatwing.whitelabel.pojos.errors.CreateMessageParamsError;
+import com.chatwing.whitelabel.pojos.params.CreateConversationParams;
 import com.chatwing.whitelabel.services.CreateMessageIntentService;
 import com.chatwing.whitelabel.services.GetMessagesIntentService;
 import com.chatwing.whitelabel.utils.LogUtils;
@@ -97,8 +96,6 @@ public abstract class CommunicationMessagesFragment extends Fragment {
     ErrorMessageView mErrorMessageView;
     @Inject
     UserManager mUserManager;
-    @Inject
-    ChatWingJSInterface mFayeJsInterface;
     @Inject
     CommunicationMessagesAdapter mAdapter;
     @Inject
@@ -151,6 +148,10 @@ public abstract class CommunicationMessagesFragment extends Fragment {
         void showNewContentFragment();
 
         void showPasswordDialogFragment();
+
+        void showBlockUserDialogFragment(Message message);
+
+        void showConversation(CreateConversationParams.SimpleUser simpleUser);
 
         void inject(BBCodeEditText mCommunicationBoxEditText);
     }

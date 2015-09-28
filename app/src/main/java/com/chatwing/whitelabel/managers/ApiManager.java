@@ -2,7 +2,7 @@ package com.chatwing.whitelabel.managers;
 
 import com.chatwing.whitelabel.ChatWing;
 import com.chatwing.whitelabel.Constants;
-import com.chatwing.whitelabel.fragments.ExtendChatMessagesFragment;
+import com.chatwing.whitelabel.fragments.ChatMessagesFragment;
 import com.chatwing.whitelabel.pojos.Message;
 import com.chatwing.whitelabel.pojos.OnlineUser;
 import com.chatwing.whitelabel.pojos.User;
@@ -125,7 +125,7 @@ public interface ApiManager {
             NotVerifiedEmailException, OtherApplicationException;
 
     BlackListResponse blockUser(User user,
-                                ExtendChatMessagesFragment.BLOCK block,
+                                ChatMessagesFragment.BLOCK block,
                                 Message message,
                                 boolean clearMessage,
                                 String reason,

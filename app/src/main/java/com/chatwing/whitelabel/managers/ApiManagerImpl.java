@@ -23,7 +23,7 @@ import android.text.TextUtils;
 import com.chatwing.whitelabel.ChatWing;
 import com.chatwing.whitelabel.Constants;
 import com.chatwing.whitelabel.R;
-import com.chatwing.whitelabel.fragments.ExtendChatMessagesFragment;
+import com.chatwing.whitelabel.fragments.ChatMessagesFragment;
 import com.chatwing.whitelabel.modules.ForApplication;
 import com.chatwing.whitelabel.pojos.Message;
 import com.chatwing.whitelabel.pojos.OnlineUser;
@@ -34,12 +34,10 @@ import com.chatwing.whitelabel.pojos.jspojos.JSUserResponse;
 import com.chatwing.whitelabel.pojos.params.BlockUserParams;
 import com.chatwing.whitelabel.pojos.params.ChatBoxMessagesParams;
 import com.chatwing.whitelabel.pojos.params.ChatboxAckParams;
-import com.chatwing.whitelabel.pojos.params.ChatboxMessageViewParams;
 import com.chatwing.whitelabel.pojos.params.ChatboxNotificationStatus;
 import com.chatwing.whitelabel.pojos.params.ConcreteParams;
 import com.chatwing.whitelabel.pojos.params.ConversationAckParams;
 import com.chatwing.whitelabel.pojos.params.ConversationMessageParams;
-import com.chatwing.whitelabel.pojos.params.ConversationMessageViewParams;
 import com.chatwing.whitelabel.pojos.params.ConversationNotificationStatus;
 import com.chatwing.whitelabel.pojos.params.CreateBookmarkParams;
 import com.chatwing.whitelabel.pojos.params.CreateChatBoxParams;
@@ -1475,7 +1473,7 @@ public class ApiManagerImpl implements ApiManager {
      */
     @Override
     public BlackListResponse blockUser(User user,
-                                       ExtendChatMessagesFragment.BLOCK blockType,
+                                       ChatMessagesFragment.BLOCK blockType,
                                        Message messageToBlock,
                                        boolean shouldRemoveMessage,
                                        String blockReason,
@@ -1494,7 +1492,7 @@ public class ApiManagerImpl implements ApiManager {
         HttpRequest request = HttpRequest.post(BLACKLIST_CREATE_URL);
         setUpRequest(request, user);
         BlockUserParams params;
-        if (blockType == ExtendChatMessagesFragment.BLOCK.ACCOUNT_TYPE) {
+        if (blockType == ChatMessagesFragment.BLOCK.ACCOUNT_TYPE) {
             params = new BlockUserParams(
                     messageToBlock.getUserId(),
                     messageToBlock.getUserType(),

@@ -18,6 +18,7 @@ package com.chatwing.whitelabel.fragments;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -26,6 +27,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +40,7 @@ import com.chatwing.whitelabel.ChatWing;
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.activities.CommunicationActivity;
 import com.chatwing.whitelabel.contentproviders.ChatWingContentProvider;
+import com.chatwing.whitelabel.events.AccountSwitchEvent;
 import com.chatwing.whitelabel.events.SyncUnreadEvent;
 import com.chatwing.whitelabel.events.UpdateUserEvent;
 import com.chatwing.whitelabel.managers.ApiManager;
@@ -57,15 +61,49 @@ import javax.inject.Inject;
 /**
  * Created by nguyenthanhhuy on 10/30/13.
  */
-public class CommunicationDrawerFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class CommunicationDrawerFragment extends BaseFragment
+        implements LoaderManager.LoaderCallbacks<Cursor> {
+    private static final int LOADER_ID_SYNCED_BOOKMARKS = 5000;
+    private static final int LOADER_ID_COUNT_CONVERSATIONS_MESSAGES_UNREAD = 5002;
+    private static final int LOADER_ID_CHATBOXES = 5003;
 
+    private static final String COLUMN_NAME_SUM_UNREAD_COUNT = "sum_unread_count";
 
-    protected static final int LOADER_ID_COUNT_CONVERSATIONS_MESSAGES_UNREAD = 5002;
-    protected static final int LOADER_ID_CHATBOXES = 5003;
+    @Inject
+    protected BuildManager mBuildManager;
+    @Inject
+    protected UserManager mUserManager;
+    @Inject
+    protected ApiManager mApiManager;
+    @Inject
+    protected VolleyManager mVolleyManager;
+    @Inject
+    protected Bus mBus;
+    @Inject
+    protected ErrorMessageView mErrorView;
+    @Inject
+    protected ProgressDialog mProgressDialog;
 
-    protected static final String COLUMN_NAME_SUM_UNREAD_COUNT = "sum_unread_count";
+    private View mNextView;
+    private TextView mWebsiteTv;
+    private View feedView;
+    private View musicView;
+    private View mSearchChatBoxView;
+    private View mCreateChatBoxView;
+    private TextView mBookmarksUnreadCountView;
+    private View bookmarkView;
     private View mLogoutButton;
-
+    private Listener mListener;
+    private ImageView mUserAvatarView;
+    private TextView mUsernameView;
+    private TextView mAccountTypeView;
+    private View mUserInfoContainer;
+    private View mLoginButton;
+    private View mCategoriesView;
+    private TextView mCategoriesUnreadCountView;
+    private View mConversationsView;
+    private View mAdminContactsView;
+    private TextView mConversationsUnreadCountView;
 
     public interface Listener extends InjectableFragmentDelegate {
         void showCategories();
@@ -76,43 +114,35 @@ public class CommunicationDrawerFragment extends Fragment implements LoaderManag
 
         public WebView getWebView();
 
+        void showSettings();
+
+        void updateAvatar();
+
+        void searchChatBox();
+
+        void createChatBox();
+
+        void showBookmarks();
+
+        void openAccountPicker();
+
+        void showFeedsSources();
+
+        void showMusicBox();
+
         void logout();
     }
 
-    @Inject
-    UserManager mUserManager;
-    @Inject
-    ApiManager mApiManager;
-    @Inject
-    VolleyManager mVolleyManager;
-    @Inject
-    Bus mBus;
-    @Inject
-    ErrorMessageView mErrorView;
-    @Inject
-    ProgressDialog mProgressDialog;
-    @Inject
-    BuildManager mBuildManager;
-
-    private Listener mListener;
-    protected ImageView mUserAvatarView;
-    private TextView mUsernameView;
-    protected TextView mAccountTypeView;
-    private View mUserInfoContainer;
-    private View mLoginButton;
-    private View mCategoriesView;
-    private TextView mCategoriesUnreadCountView;
-    private View mConversationsView;
-    private View mAdminContactsView;
-    private TextView mConversationsUnreadCountView;
 
     public CommunicationDrawerFragment() {
     }
 
+
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        mListener = (Listener) activity;
+    protected void onAttachToContext(Context context) {
+        if (context instanceof Listener) {
+            mListener = (Listener) context;
+        }
     }
 
     @Override
@@ -171,6 +201,68 @@ public class CommunicationDrawerFragment extends Fragment implements LoaderManag
                 mListener.logout();
             }
         });
+
+
+        mUserInfoContainer = view.findViewById(R.id.user_info_layout);
+        mNextView = view.findViewById(R.id.next);
+        mWebsiteTv = (TextView) view.findViewById(R.id.websiteTv);
+
+        view.findViewById(R.id.settings).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.showSettings();
+            }
+        });
+
+
+        mSearchChatBoxView = view.findViewById(R.id.search_chat_box);
+        mSearchChatBoxView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.searchChatBox();
+            }
+        });
+
+        mCreateChatBoxView = view.findViewById(R.id.create_chat_box);
+        mCreateChatBoxView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.createChatBox();
+            }
+        });
+
+        bookmarkView = view.findViewById(R.id.bookmarks);
+        bookmarkView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.showBookmarks();
+            }
+        });
+
+        feedView = view.findViewById(R.id.feeds);
+        feedView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.showFeedsSources();
+            }
+        });
+
+        musicView = view.findViewById(R.id.music_box);
+        musicView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mListener.showMusicBox();
+            }
+        });
+        mUserInfoContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mListener.openAccountPicker();
+            }
+        });
+
+
+        mBookmarksUnreadCountView = (TextView) view.findViewById(R.id.bookmarks_unread_count);
     }
 
     @Override
@@ -182,6 +274,26 @@ public class CommunicationDrawerFragment extends Fragment implements LoaderManag
         LoaderManager loaderManager = getLoaderManager();
         loaderManager.initLoader(LOADER_ID_CHATBOXES, null, this);
         loaderManager.initLoader(LOADER_ID_COUNT_CONVERSATIONS_MESSAGES_UNREAD, null, this);
+        loaderManager.initLoader(LOADER_ID_SYNCED_BOOKMARKS, null, this);
+
+        if (!mBuildManager.isOfficialChatWingApp()) {
+            mCreateChatBoxView.setVisibility(View.GONE);
+            mSearchChatBoxView.setVisibility(View.GONE);
+            bookmarkView.setVisibility(View.GONE);
+            mNextView.setVisibility(View.GONE);
+
+            //TODO FIXME only apply for Destiny!
+            mWebsiteTv.setText(Html.fromHtml("<a href='http://www.DestinyTeamFinder.com/'>http://www.DestinyTeamFinder.com/</a>"));
+            mWebsiteTv.setMovementMethod(LinkMovementMethod.getInstance());
+        }
+
+        if (!mBuildManager.isSupportedRss()) {
+            feedView.setVisibility(View.GONE);
+        }
+
+        if (!mBuildManager.isSupportedMusicBox()) {
+            musicView.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -214,8 +326,15 @@ public class CommunicationDrawerFragment extends Fragment implements LoaderManag
 
 
     @Subscribe
+    public void onAccountSwitch(AccountSwitchEvent event) {
+        updateUserViews();
+    }
+
+    @Subscribe
     public void onSyncChatboxUnreadComplete(SyncUnreadEvent event) {
         getLoaderManager().restartLoader(LOADER_ID_COUNT_CONVERSATIONS_MESSAGES_UNREAD, null, this);
+        getLoaderManager().restartLoader(LOADER_ID_SYNCED_BOOKMARKS, null, this);
+        getLoaderManager().restartLoader(LOADER_ID_CHATBOXES, null, this);
     }
 
     @Subscribe
@@ -239,7 +358,7 @@ public class CommunicationDrawerFragment extends Fragment implements LoaderManag
     }
 
 
-    protected void updateUserViews() {
+    private void updateUserViews() {
         LogUtils.v("Updating User Views");
         User user = mUserManager.getCurrentUser();
         if (user == null) {
@@ -254,13 +373,29 @@ public class CommunicationDrawerFragment extends Fragment implements LoaderManag
         showLoginButton(false);
 
         String avatarUrl = mApiManager.getAvatarUrl(user);
-        LogUtils.v("Avatar drawer "+avatarUrl);
+        LogUtils.v("Avatar drawer " + avatarUrl);
         ImageLoader.getInstance().displayImage(avatarUrl, mUserAvatarView);
         mUsernameView.setText(user.getName());
         mAccountTypeView.setText(mApiManager.getDisplayUserLoginType(user.getLoginType()));
 
-        if(!mBuildManager.canShowAdminList()){
+        if (!mBuildManager.canShowAdminList()) {
             mAdminContactsView.setVisibility(View.GONE);
+        }
+
+        //Only allow chatwing to update avatar
+        User currentUser = mUserManager.getCurrentUser();
+        if (currentUser != null && (currentUser.isChatWing() || currentUser.isAppUser())) {
+            mUserAvatarView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mListener.updateAvatar();
+                }
+            });
+        } else {
+            mUserAvatarView.setOnClickListener(null);
+        }
+        if (currentUser != null) {
+            mAccountTypeView.setText(mApiManager.getDisplayUserLoginType(currentUser.getLoginType()));
         }
     }
 
@@ -274,7 +409,7 @@ public class CommunicationDrawerFragment extends Fragment implements LoaderManag
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        LogUtils.v("Loader running "+id);
+        LogUtils.v("Loader running " + id);
 
         switch (id) {
             case LOADER_ID_COUNT_CONVERSATIONS_MESSAGES_UNREAD:
@@ -295,6 +430,17 @@ public class CommunicationDrawerFragment extends Fragment implements LoaderManag
                         uri,
                         new String[]{
                                 "sum(" + ChatBoxTable.UNREAD_COUNT + ") as " + COLUMN_NAME_SUM_UNREAD_COUNT,
+                        },
+                        null,
+                        null,
+                        null);
+            case LOADER_ID_SYNCED_BOOKMARKS:
+                uri = ChatWingContentProvider.getSyncedBookmarksUri();
+                return new CursorLoader(
+                        getActivity(),
+                        uri,
+                        new String[]{
+                                "sum(" + ChatBoxTable.TABLE_CHAT_BOX + "." + ChatBoxTable.UNREAD_COUNT + ") as " + COLUMN_NAME_SUM_UNREAD_COUNT,
                         },
                         null,
                         null,
@@ -331,6 +477,8 @@ public class CommunicationDrawerFragment extends Fragment implements LoaderManag
                 return mConversationsUnreadCountView;
             case LOADER_ID_CHATBOXES:
                 return mCategoriesUnreadCountView;
+            case LOADER_ID_SYNCED_BOOKMARKS:
+                return mBookmarksUnreadCountView;
             default:
                 return null;
         }
@@ -359,6 +507,8 @@ public class CommunicationDrawerFragment extends Fragment implements LoaderManag
             case LOADER_ID_CHATBOXES:
                 mCategoriesUnreadCountView.setVisibility(View.GONE);
                 break;
+            case LOADER_ID_SYNCED_BOOKMARKS:
+                mBookmarksUnreadCountView.setVisibility(View.GONE);
         }
     }
 

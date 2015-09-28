@@ -21,7 +21,11 @@ import android.content.Context;
 import android.view.LayoutInflater;
 
 import com.chatwing.whitelabel.activities.CommunicationActivity;
+import com.chatwing.whitelabel.activities.ExtendCommunicationActivity;
+import com.chatwing.whitelabel.fragments.AccountDialogFragment;
 import com.chatwing.whitelabel.fragments.AdminListFragment;
+import com.chatwing.whitelabel.fragments.BlockUserDialogFragment;
+import com.chatwing.whitelabel.fragments.BookmarkedChatBoxesDrawerFragment;
 import com.chatwing.whitelabel.fragments.CategoriesFragment;
 import com.chatwing.whitelabel.fragments.ChatMessagesFragment;
 import com.chatwing.whitelabel.fragments.ChatboxesFragment;
@@ -29,29 +33,40 @@ import com.chatwing.whitelabel.fragments.CommunicationDrawerFragment;
 import com.chatwing.whitelabel.fragments.ConversationMessagesFragment;
 import com.chatwing.whitelabel.fragments.ConversationsFragment;
 import com.chatwing.whitelabel.fragments.EmoticonsFragment;
+import com.chatwing.whitelabel.fragments.FeedDrawerFragment;
+import com.chatwing.whitelabel.fragments.FeedFragment;
+import com.chatwing.whitelabel.fragments.MusicDrawerFragment;
+import com.chatwing.whitelabel.fragments.MusicFragment;
 import com.chatwing.whitelabel.fragments.NotificationFragment;
+import com.chatwing.whitelabel.fragments.OnlineUsersFragment;
 import com.chatwing.whitelabel.fragments.PasswordDialogFragment;
+import com.chatwing.whitelabel.fragments.PhotoPickerDialogFragment;
 import com.chatwing.whitelabel.fragments.ProfileFragment;
-import com.chatwing.whitelabel.interfaces.ChatWingJSInterface;
 import com.chatwing.whitelabel.interfaces.ChatWingJavaDelegate;
 import com.chatwing.whitelabel.interfaces.JSInterfaceImpl;
 import com.chatwing.whitelabel.managers.ApiManager;
+import com.chatwing.whitelabel.managers.BuildManager;
 import com.chatwing.whitelabel.managers.ChatboxModeManager;
 import com.chatwing.whitelabel.managers.CommunicationActivityManager;
 import com.chatwing.whitelabel.managers.ConversationModeManager;
 import com.chatwing.whitelabel.managers.CurrentChatBoxManager;
 import com.chatwing.whitelabel.managers.CurrentConversationManager;
+import com.chatwing.whitelabel.managers.ExtendCurrentChatboxManager;
+import com.chatwing.whitelabel.managers.FeedModeManager;
+import com.chatwing.whitelabel.managers.MusicModeManager;
 import com.chatwing.whitelabel.managers.PasswordManager;
 import com.chatwing.whitelabel.managers.UserManager;
 import com.chatwing.whitelabel.parsers.BBCodeParser;
 import com.chatwing.whitelabel.parsers.BBCodeParserImpl;
 import com.chatwing.whitelabel.parsers.EventParser;
 import com.chatwing.whitelabel.parsers.EventParserImpl;
+import com.chatwing.whitelabel.tasks.LoadOnlineUsersTask;
 import com.chatwing.whitelabel.validators.ChatBoxIdValidator;
 import com.chatwing.whitelabel.validators.ConversationIdValidator;
 import com.chatwing.whitelabel.views.BBCodeEditText;
 import com.squareup.otto.Bus;
 
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -75,7 +90,20 @@ import dagger.Provides;
                 CategoriesFragment.class,
                 NotificationFragment.class,
                 EmoticonsFragment.class,
-                JSInterfaceImpl.class
+                JSInterfaceImpl.class,
+
+                ChatMessagesFragment.class,
+                ExtendCommunicationActivity.class,
+                CommunicationDrawerFragment.class,
+                BookmarkedChatBoxesDrawerFragment.class,
+                AccountDialogFragment.class,
+                OnlineUsersFragment.class,
+                PhotoPickerDialogFragment.class,
+                BlockUserDialogFragment.class,
+                FeedDrawerFragment.class,
+                FeedFragment.class,
+                MusicFragment.class,
+                MusicDrawerFragment.class,
         },
         addsTo = ChatWingModule.class
 
@@ -126,48 +154,8 @@ public class CommunicationActivityModule {
 
     @Provides
     @Singleton
-    ChatboxModeManager provideChatboxModeManager(Bus bus,
-                                                 UserManager userManager,
-                                                 ApiManager apiManager,
-                                                 CurrentChatBoxManager currentChatBoxManager,
-                                                 ChatBoxIdValidator chatBoxIdValidator,
-                                                 CommunicationActivityManager communicationActivityManager) {
-        return new ChatboxModeManager(
-                bus,
-                mActivity,
-                userManager,
-                apiManager,
-                currentChatBoxManager,
-                chatBoxIdValidator,
-                communicationActivityManager);
-    }
-
-    @Provides
-    @Singleton
     ChatWingJavaDelegate provideChatWingJavaDelegate(JSInterfaceImpl jsInterface){
         return jsInterface;
-    }
-
-    @Provides
-    @Singleton
-    ChatWingJSInterface provideChatWingJSInterface(ChatWingJavaDelegate delegate) {
-        return new ChatWingJSInterface(delegate);
-    }
-
-    @Provides
-    @Singleton
-    ConversationModeManager provideConversationModeManager(Bus bus,
-                                                           UserManager userManager,
-                                                           CurrentConversationManager currentConversationManager,
-                                                           ConversationIdValidator conversationIdValidator,
-                                                           CommunicationActivityManager communicationActivityManager) {
-        return new ConversationModeManager(
-                bus,
-                mActivity,
-                userManager,
-                currentConversationManager,
-                conversationIdValidator,
-                communicationActivityManager);
     }
 
     @Provides
@@ -208,6 +196,81 @@ public class CommunicationActivityModule {
     @Singleton
     PasswordManager providePasswordManager() {
         return new PasswordManager(mActivity);
+    }
+
+    @Provides
+    @Singleton
+    ChatboxModeManager provideChatboxModeManager(Bus bus,
+                                                 UserManager userManager,
+                                                 ApiManager apiManager,
+                                                 CurrentChatBoxManager currentChatBoxManager,
+                                                 BuildManager buildManager,
+                                                 ChatBoxIdValidator chatBoxIdValidator,
+                                                 CommunicationActivityManager communicationActivityManager) {
+        return new ChatboxModeManager(
+                bus,
+                mActivity,
+                mActivity,
+                userManager,
+                apiManager,
+                currentChatBoxManager,
+                communicationActivityManager,
+                buildManager,
+                chatBoxIdValidator);
+    }
+
+    @Provides
+    @Singleton
+    ConversationModeManager provideConversationModeManager(Bus bus,
+                                                           UserManager userManager,
+                                                           CurrentConversationManager currentConversationManager,
+                                                           ConversationIdValidator conversationIdValidator,
+                                                           CommunicationActivityManager communicationActivityManager) {
+        return new ConversationModeManager(
+                bus,
+                mActivity,
+                userManager,
+                currentConversationManager,
+                conversationIdValidator,
+                communicationActivityManager);
+    }
+
+    @Provides
+    @Singleton
+    FeedModeManager provideFeedModeManager(Bus bus,
+                                           UserManager userManager,
+                                           CommunicationActivityManager communicationActivityManager) {
+        return new FeedModeManager(
+                bus,
+                mActivity,
+                userManager,
+                communicationActivityManager);
+    }
+
+    @Provides
+    @Singleton
+    MusicModeManager provideMusicModeManager(Bus bus,
+                                             UserManager userManager,
+                                             CommunicationActivityManager communicationActivityManager) {
+        return new MusicModeManager(
+                bus,
+                mActivity,
+                userManager,
+                communicationActivityManager);
+    }
+
+
+    @Provides
+    @Singleton
+    CurrentChatBoxManager provideCurrentChatboxManager(Bus bus,
+                                                       ChatBoxIdValidator chatBoxIdValidator,
+                                                       Provider<LoadOnlineUsersTask> taskProvider,
+                                                       PasswordManager passwordManager) {
+        return new ExtendCurrentChatboxManager(mActivity,
+                bus,
+                chatBoxIdValidator,
+                taskProvider,
+                passwordManager);
     }
 }
 

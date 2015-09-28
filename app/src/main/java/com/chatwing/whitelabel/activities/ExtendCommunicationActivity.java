@@ -32,9 +32,9 @@ import com.chatwing.whitelabel.events.faye.ServerConnectionChangedEvent;
 import com.chatwing.whitelabel.fragments.AccountDialogFragment;
 import com.chatwing.whitelabel.fragments.BlockUserDialogFragment;
 import com.chatwing.whitelabel.fragments.BookmarkedChatBoxesDrawerFragment;
+import com.chatwing.whitelabel.fragments.ChatMessagesFragment;
+import com.chatwing.whitelabel.fragments.CommunicationDrawerFragment;
 import com.chatwing.whitelabel.fragments.CommunicationMessagesFragment;
-import com.chatwing.whitelabel.fragments.ExtendChatMessagesFragment;
-import com.chatwing.whitelabel.fragments.ExtendCommunicationDrawerFragment;
 import com.chatwing.whitelabel.fragments.FeedDrawerFragment;
 import com.chatwing.whitelabel.fragments.FeedFragment;
 import com.chatwing.whitelabel.fragments.MusicDrawerFragment;
@@ -42,18 +42,15 @@ import com.chatwing.whitelabel.fragments.MusicFragment;
 import com.chatwing.whitelabel.fragments.OnlineUsersFragment;
 import com.chatwing.whitelabel.fragments.PhotoPickerDialogFragment;
 import com.chatwing.whitelabel.fragments.SettingsFragment;
-import com.chatwing.whitelabel.interfaces.MediaControlInterface;
 import com.chatwing.whitelabel.managers.ApiManager;
+import com.chatwing.whitelabel.managers.ChatboxModeManager;
 import com.chatwing.whitelabel.managers.ChatboxUnreadDownloadManager;
-import com.chatwing.whitelabel.managers.ExtendChatBoxModeManager;
-import com.chatwing.whitelabel.managers.ExtendCommunicationModeManager;
+import com.chatwing.whitelabel.managers.CommunicationModeManager;
 import com.chatwing.whitelabel.managers.FeedModeManager;
 import com.chatwing.whitelabel.managers.MusicModeManager;
 import com.chatwing.whitelabel.managers.UserManager;
 import com.chatwing.whitelabel.modules.CommunicationActivityModule;
-import com.chatwing.whitelabel.modules.ExtendCommunicationActivityModule;
 import com.chatwing.whitelabel.pojos.Message;
-import com.chatwing.whitelabel.pojos.Song;
 import com.chatwing.whitelabel.pojos.errors.ChatWingError;
 import com.chatwing.whitelabel.pojos.params.CreateConversationParams;
 import com.chatwing.whitelabel.pojos.responses.ChatBoxDetailsResponse;
@@ -82,31 +79,14 @@ import javax.inject.Inject;
  */
 public class ExtendCommunicationActivity
         extends CommunicationActivity
-        implements ExtendCommunicationDrawerFragment.Listener,
-        OnlineUsersFragment.OnlineUsersFragmentDelegate,
-        ExtendChatMessagesFragment.Delegate,
-        ExtendCommunicationModeManager.Delegate,
-        MediaControlInterface {
+        implements
+         {
 
-    public static final String AVATAR_PICKER_DIALOG_FRAGMENT_TAG = "AvatarPickerDialogFragment";
-    public static final String BLOCK_USER_DIALOG_FRAGMENT_TAG = "BlockUserDialogFragment";
-    public static final String ACCOUNT_DIALOG_FRAGMENT_TAG = "AccountDialogFragmentTag";
-    public static final String ACTION_STOP_MEDIA = "ACTION_STOP_MEDIA";
 
-    @Inject
-    protected ApiManager mApiManager;
-    @Inject
-    protected UserManager mUserManager;
-    @Inject
-    protected ChatboxUnreadDownloadManager chatboxUnreadDownloadManager;
-    @Inject
-    protected FeedModeManager mFeedModeManager;
-    @Inject
-    protected MusicModeManager mMusicModeManager;
 
-    private MusicService musicService;
-    private Intent playIntent;
-    private boolean musicBound = false;
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,47 +120,9 @@ public class ExtendCommunicationActivity
         }
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        startAndBindMusicService();
 
-        FlurryAgent.onStartSession(this, getString(R.string.flurry_api_key));
-    }
 
-    private void startAndBindMusicService() {
-        if(mBuildManager.isSupportedMusicBox()) {
-            if (playIntent == null) {
-                playIntent = new Intent(this, MusicService.class);
-                startService(playIntent);
-            }
-            bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
-        }
-    }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        FlurryAgent.onEndSession(this);
-        if (isBindMediaService()) {
-            unbindService(musicConnection);
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        chatboxUnreadDownloadManager.downloadUnread();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        super.onActivityResult(requestCode, resultCode, intent);
-        if (requestCode == Crop.REQUEST_CROP && resultCode == RESULT_OK) {
-            Uri output = Crop.getOutput(intent);
-            startUpdateAvatar(output.getPath());
-        }
-    }
 
     @Override
     protected Class<? extends BaseABFragmentActivity> getEntranceActivityClass() {
@@ -195,8 +137,7 @@ public class ExtendCommunicationActivity
 
     @Override
     protected List<Object> getModules() {
-        return Arrays.<Object>asList(new CommunicationActivityModule(this),
-                new ExtendCommunicationActivityModule(this));
+        return Arrays.<Object>asList(new CommunicationActivityModule(this));
     }
 
     @Subscribe
@@ -223,13 +164,7 @@ public class ExtendCommunicationActivity
         }
     }
 
-    @com.squareup.otto.Subscribe
-    public void onServerConnectionChangedEvent
-            (ServerConnectionChangedEvent event) {
-        super.onServerConnectionChangedEvent(event);
-    }
-
-    @com.squareup.otto.Subscribe
+    @Subscribe
     public void onSyncCommunicationBoxEvent
             (SyncCommunicationBoxEvent event) {
         super.onSyncCommunicationBoxEvent(event);
@@ -243,22 +178,60 @@ public class ExtendCommunicationActivity
         }
     }
 
+             @Subscribe
+             @Override
+             public void onAccountSwitch(AccountSwitchEvent accountSwitchEvent) {
+                 getDrawerLayout().closeDrawers();
+                 if (isInConversationMode()) {
+                     mCurrentConversationManager.removeCurrentConversation();
+                 }
+                 mCurrentCommunicationMode.unsubscribeToChannels(mWebView);
+                 mWebView = null;
+                 mNotSubscribeToChannels = true;
+                 //clean up irrelevant data
+                 try {
+                     mGcmManager.clearRegistrationId();
 
-    @Subscribe
-    public void onChannelSubscriptionChanged
-            (ChannelSubscriptionChangedEvent event) {
-        super.onChannelSubscriptionChanged(event);
-    }
+                     getContentResolver().applyBatch(ChatWingContentProvider.AUTHORITY,
+                             ChatWingContentProvider.getClearAllDataBatch());
+                     startSyncingCommunications(true);
 
-    @Subscribe
-    public void onFayePublished(FayePublishEvent event) {
-        super.onFayePublished(event);
-    }
+                     deployGCM();
+                     invalidateOptionsMenu();
+                 } catch (Exception e) {
+                     LogUtils.e(e);
+                 }
+             }
 
-    @Subscribe
-    public void onMessageReceived(MessageReceivedEvent event) {
-        super.onMessageReceived(event);
-    }
+             /**
+              * After deleting bookmark on server, we delete on client
+              *
+              * @param event
+              */
+             @Subscribe
+             public void onDeletedBookmarkEvent(DeleteBookmarkEvent event) {
+                 if (handleDeleteBookmarkEvent(event)) {
+                     return;
+                 }
+
+                 DeleteBookmarkResponse.DeletedBookmark deletedBookmark = event.getResponse().getData();
+                 if (deletedBookmark == null) {
+                     LogUtils.e("Hmm... No data again.." + event.getResponse());
+                     return;
+                 }
+                 Uri syncedBookmarkWithChatBoxIdUri = ChatWingContentProvider
+                         .getSyncedBookmarkWithChatBoxIdUri(deletedBookmark.getChatBoxId());
+
+                 int delete = getContentResolver()
+                         .delete(syncedBookmarkWithChatBoxIdUri,
+                                 null,
+                                 null);
+                 if (delete != 1) {
+                     //Weird thing happen
+                     LogUtils.e("After deleting on server, bookmark removal on client side has broken chatbox_id" +
+                             deletedBookmark.getChatBoxId());
+                 }
+             }
 
     @Subscribe
     public void onBlockedUser(BlockedEvent event) {
@@ -306,7 +279,7 @@ public class ExtendCommunicationActivity
     @Override
     public void onBackPressed() {
         if (mCurrentCommunicationMode.isSecondaryDrawerOpening()) {
-            ((ExtendChatBoxModeManager) mCurrentCommunicationMode).closeSecondaryDrawer();
+            ((ChatboxModeManager) mCurrentCommunicationMode).closeSecondaryDrawer();
         } else if (!mCurrentCommunicationMode.isCommunicationBoxDrawerOpening()) {
             // Both online users and chat boxes/conversation lists are closed.
             // Open chat boxes/conversation list now.
@@ -403,7 +376,7 @@ public class ExtendCommunicationActivity
 
     @Override
     protected void setupChatboxMode() {
-        setupMode(mChatboxModeManager, ExtendChatMessagesFragment.newInstance());
+        setupMode(mChatboxModeManager, ChatMessagesFragment.newInstance());
     }
 
     @Override
@@ -411,60 +384,7 @@ public class ExtendCommunicationActivity
         showConversation(simpleUser);
     }
 
-    private synchronized void showAccountPicker(String message) {
-        Fragment oldFragment = getSupportFragmentManager().findFragmentByTag(
-                ACCOUNT_DIALOG_FRAGMENT_TAG);
-        if (oldFragment == null
-                && isActive()) { // To prevent showdialog when activity is paused.
-            // Better Workaround http://stackoverflow.com/questions/8040280/how-to-handle-handler-messages-when-activity-fragment-is-paused
-            AccountDialogFragment accountDialogFragment = AccountDialogFragment.newInstance(message);
-            accountDialogFragment.show(getSupportFragmentManager(),
-                    ACCOUNT_DIALOG_FRAGMENT_TAG);
-            //This to prevent duplication dialog. This should be used together with findFragmentByTag
-            getSupportFragmentManager().executePendingTransactions();
-        }
-    }
 
-    private void showAvatarPicker() {
-        Fragment oldFragment = getSupportFragmentManager().findFragmentByTag(
-                AVATAR_PICKER_DIALOG_FRAGMENT_TAG);
-        if (oldFragment == null) {
-            PhotoPickerDialogFragment accountDialogFragment = PhotoPickerDialogFragment.newInstance();
-            accountDialogFragment.show(getSupportFragmentManager(),
-                    AVATAR_PICKER_DIALOG_FRAGMENT_TAG);
-            //This to prevent duplication dialog. This should be used together with findFragmentByTag
-            getSupportFragmentManager().executePendingTransactions();
-        }
-    }
-
-    private boolean isInFeedMode() {
-        return mCurrentCommunicationMode == null || mCurrentCommunicationMode instanceof FeedModeManager;
-    }
-
-
-    private boolean isInMusicBoxMode() {
-        return mCurrentCommunicationMode == null || mCurrentCommunicationMode instanceof MusicModeManager;
-    }
-
-    private void setupFeedMode() {
-        setupMode(mFeedModeManager, FeedFragment.newInstance());
-        setContentShown(true);
-    }
-
-    private void setupMusicBoxMode() {
-        setupMode(mMusicModeManager, MusicFragment.newInstance());
-        setContentShown(true);
-    }
-
-    private void startUpdateAvatar(String filePath) {
-        if (UpdateAvatarIntentService.isInProgress()) {
-            return;
-        }
-
-        Intent startIntent = new Intent(this, UpdateAvatarIntentService.class);
-        startIntent.putExtra(UpdateAvatarIntentService.EXTRA_AVATAR_PATH, filePath);
-        startService(startIntent);
-    }
 
     @Override
     public void showBlockUserDialogFragment(Message message) {
@@ -484,73 +404,9 @@ public class ExtendCommunicationActivity
             ((DialogFragment) authenticationDialog).dismiss();
     }
 
-    @Subscribe
-    @Override
-    public void onAccountSwitch(AccountSwitchEvent accountSwitchEvent) {
-        getDrawerLayout().closeDrawers();
-        if (isInConversationMode()) {
-            mCurrentConversationManager.removeCurrentConversation();
-        }
-        mCurrentCommunicationMode.unsubscribeToChannels(mWebView);
-        mWebView = null;
-        mNotSubscribeToChannels = true;
-        //clean up irrelevant data
-        try {
-            mGcmManager.clearRegistrationId();
-
-            getContentResolver().applyBatch(ChatWingContentProvider.AUTHORITY,
-                    ChatWingContentProvider.getClearAllDataBatch());
-            startSyncingCommunications(true);
-
-            deployGCM();
-            invalidateOptionsMenu();
-        } catch (Exception e) {
-            LogUtils.e(e);
-        }
-    }
-
-    @Override
-    public MusicService.STATUS getMediaStatus() {
-        if (musicBound) {
-            return musicService.getStatus();
-        }
-        return null;
-    }
-
-    @Override
-    public MusicService getMediaService() {
-        return musicService;
-    }
-
-    @Override
-    public void playLastMediaIfStopping() {
-        Intent service = new Intent(MusicService.ACTION_PLAY_LAST_MEDIA_IF_STOPPING);
-        startService(service);
-    }
 
 
-    @Override
-    public boolean isBindMediaService() {
-        return musicBound;
-    }
 
-    @Override
-    public void enqueue(Song song) {
-        Intent i = new Intent(MusicService.ACTION_URL);
-        i.putExtra(MusicService.SONG_EXTRA, song);
-        startService(i);
-    }
-
-
-    @Override
-    public void updateUIForPlayerPreparing(boolean preparing) {
-        if (preparing) {
-            startRefreshAnimation();
-        } else {
-            stopRefreshAnimation();
-            syncRefreshAnimationState(); // Make sure if sync is in progress, continue show
-        }
-    }
 
     /**
      * This class makes the ad request and loads the ad.
@@ -622,18 +478,7 @@ public class ExtendCommunicationActivity
         }
     }
 
-    private void startSyncingBookmarks() {
-        if (!mBuildManager.isOfficialChatWingApp()) return;
 
-        if (mUserManager.getCurrentUser() == null
-                || SyncBookmarkIntentService.isInProgress()) {
-            // A sync operation is running. Just wait for it.
-            return;
-        }
-        super.mSyncManager.addToQueue(SyncBookmarkIntentService.class);
-
-        getActivity().startService(new Intent(getActivity(), SyncBookmarkIntentService.class));
-    }
 
     @Override
     protected boolean syncingInProcess() {
@@ -649,105 +494,9 @@ public class ExtendCommunicationActivity
         return result;
     }
 
-    private boolean onInvalidAuthentication(ApiManager.InvalidIdentityException invalidIdentityException) {
-        ChatWingError error = invalidIdentityException.getError();
-        ChatBoxDetailsResponse.ChatBoxDetailErrorParams chatBoxDetailErrorParams =
-                new Gson().fromJson(error.getParams(), ChatBoxDetailsResponse.ChatBoxDetailErrorParams.class);
 
-        if (chatBoxDetailErrorParams == null) {
-            return true;
-        }
-        if (chatBoxDetailErrorParams.isForceLogin()
-                && mUserManager.getCurrentUser() == null) {
-            denyAccessCurrentManager();
-            showAccountPicker(getString(R.string.message_need_login));
-            return true;
-        }
 
-        if (!mUserManager.acceptAccessChatbox(mUserManager.getCurrentUser(),
-                chatBoxDetailErrorParams)) {
-            denyAccessCurrentManager();
-            showAccountPicker(getString(R.string.message_need_switch_account, chatBoxDetailErrorParams.getAuthenticationMethodString()));
-            return true;
-        }
 
-        //No one can access this chatbox except admin, etc...
-        return false;
-    }
 
-    /**
-     * User has been denied to access chatbox, they should be kicked out
-     */
-    private void denyAccessCurrentManager() {
-        if (isInChatBoxMode()) {
-            mCurrentChatboxManager.removeCurrentChatBox();
-        } else {
-            mCurrentConversationManager.removeCurrentConversation();
-        }
-    }
 
-    private void startSyncingCurrentUser() {
-        if (mUserManager.getCurrentUser() == null
-                || DownloadUserDetailIntentService.isInProgress()) {
-            // A sync operation is running. Just wait for it.
-            return;
-        }
-
-        getActivity().startService(new Intent(getActivity(), DownloadUserDetailIntentService.class));
-
-    }
-
-    /**
-     * After deleting bookmark on server, we delete on client
-     *
-     * @param event
-     */
-    @Subscribe
-    public void onDeletedBookmarkEvent(DeleteBookmarkEvent event) {
-        if (handleDeleteBookmarkEvent(event)) {
-            return;
-        }
-
-        DeleteBookmarkResponse.DeletedBookmark deletedBookmark = event.getResponse().getData();
-        if (deletedBookmark == null) {
-            LogUtils.e("Hmm... No data again.." + event.getResponse());
-            return;
-        }
-        Uri syncedBookmarkWithChatBoxIdUri = ChatWingContentProvider
-                .getSyncedBookmarkWithChatBoxIdUri(deletedBookmark.getChatBoxId());
-
-        int delete = getContentResolver()
-                .delete(syncedBookmarkWithChatBoxIdUri,
-                        null,
-                        null);
-        if (delete != 1) {
-            //Weird thing happen
-            LogUtils.e("After deleting on server, bookmark removal on client side has broken chatbox_id" +
-                    deletedBookmark.getChatBoxId());
-        }
-    }
-
-    private boolean handleDeleteBookmarkEvent(DeleteBookmarkEvent event) {
-        if (event.getException() == null)
-            return false;
-        handle(event.getException(), R.string.error_while_deleting_bookmark);
-        return true;
-    }
-
-    //connect to the service
-    private ServiceConnection musicConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            MusicService.MusicBinder binder = (MusicService.MusicBinder) service;
-            //get service
-            musicService = binder.getService();
-            musicBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            musicBound = false;
-        }
-    };
 }

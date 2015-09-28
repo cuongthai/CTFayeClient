@@ -36,6 +36,7 @@ import com.chatwing.whitelabel.Constants;
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.activities.BaseABFragmentActivity;
 import com.chatwing.whitelabel.contentproviders.ChatWingContentProvider;
+import com.chatwing.whitelabel.events.AccountSwitchEvent;
 import com.chatwing.whitelabel.events.ChatBoxUnreadCountChangedEvent;
 import com.chatwing.whitelabel.events.CurrentCommunicationEvent;
 import com.chatwing.whitelabel.fragments.CommunicationMessagesFragment;
@@ -240,6 +241,10 @@ public abstract class CommunicationModeManager {
     public abstract void processMessageInCurrentCommunicationBox(Message message);
 
     public static interface Delegate {
+        void dismissAuthenticationDialog();
+
+        void onAccountSwitch(AccountSwitchEvent accountSwitchEvent);
+
         public static final String EXTRA_CHAT_BOX_ID = "chat_box_id";
 
         public static final int REQUEST_SEARCH_CHAT_BOX = 2;

@@ -37,10 +37,6 @@ import javax.inject.Inject;
  * Created by steve on 06/12/2014.
  */
 public class JSInterfaceImpl implements ChatWingJavaDelegate {
-    protected static final String LONG_CLICK_MESSAGE_EVENT = "press:message";
-    protected static final String TOUCH_NAME_EVENT = "tap:name";
-    protected static final String TOUCH_AVATAR_EVENT = "tap:avatar";
-
     protected static final String FAYE_CONNECTED_TO_SERVER = "faye:up";
     protected static final String FAYE_DISCONNECTED_TO_SERVER = "faye:down";
     protected static final String FAYE_SUBSCRIBE_TO_CHANNEL = "channel:subscribed";

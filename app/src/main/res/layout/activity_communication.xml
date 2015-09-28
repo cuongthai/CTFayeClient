@@ -82,7 +82,7 @@
         android:layout_gravity="start">
 
         <fragment
-            android:name="com.chatwing.whitelabel.fragments.ExtendCommunicationDrawerFragment"
+            android:name="com.chatwing.whitelabel.fragments.CommunicationDrawerFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:tag="@string/fragment_tag_left_drawer" />

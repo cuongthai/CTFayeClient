@@ -3,7 +3,7 @@ package com.chatwing.whitelabel.services;
 import android.content.Intent;
 
 import com.chatwing.whitelabel.events.BlockedEvent;
-import com.chatwing.whitelabel.fragments.ExtendChatMessagesFragment;
+import com.chatwing.whitelabel.fragments.ChatMessagesFragment;
 import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.pojos.Message;
 import com.chatwing.whitelabel.pojos.responses.BlackListResponse;
@@ -44,7 +44,7 @@ public class BlockUserIntentService extends BaseIntentService {
         String blockReason = intent.getStringExtra(EXTRA_REASON);
         long blockDuration = intent.getLongExtra(EXTRA_DURATION, 0);
 
-        ExtendChatMessagesFragment.BLOCK blockType = (ExtendChatMessagesFragment.BLOCK)
+        ChatMessagesFragment.BLOCK blockType = (ChatMessagesFragment.BLOCK)
                 intent.getSerializableExtra(EXTRA_BLOCK_TYPE);
 
         BlockedEvent event;

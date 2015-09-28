@@ -19,12 +19,16 @@ package com.chatwing.whitelabel.activities;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.ComponentName;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -49,14 +53,15 @@ import com.chatwing.whitelabel.Constants;
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.contentproviders.ChatWingContentProvider;
 import com.chatwing.whitelabel.events.AllSyncsCompletedEvent;
+import com.chatwing.whitelabel.events.DeleteBookmarkEvent;
 import com.chatwing.whitelabel.events.SyncCommunicationBoxEvent;
 import com.chatwing.whitelabel.events.UserUnauthenticatedEvent;
 import com.chatwing.whitelabel.events.faye.ChannelSubscriptionChangedEvent;
 import com.chatwing.whitelabel.events.faye.FayePublishEvent;
 import com.chatwing.whitelabel.events.faye.MessageReceivedEvent;
 import com.chatwing.whitelabel.events.faye.ServerConnectionChangedEvent;
+import com.chatwing.whitelabel.fragments.AccountDialogFragment;
 import com.chatwing.whitelabel.fragments.AdminListFragment;
-import com.chatwing.whitelabel.fragments.AuthenticateFragment;
 import com.chatwing.whitelabel.fragments.CategoriesFragment;
 import com.chatwing.whitelabel.fragments.ChatMessagesFragment;
 import com.chatwing.whitelabel.fragments.ColorPickerDialogFragment;
@@ -64,22 +69,30 @@ import com.chatwing.whitelabel.fragments.CommunicationDrawerFragment;
 import com.chatwing.whitelabel.fragments.CommunicationMessagesFragment;
 import com.chatwing.whitelabel.fragments.ConversationMessagesFragment;
 import com.chatwing.whitelabel.fragments.ConversationsFragment;
+import com.chatwing.whitelabel.fragments.FeedFragment;
 import com.chatwing.whitelabel.fragments.GooglePlusDialogFragment;
 import com.chatwing.whitelabel.fragments.InjectableFragmentDelegate;
+import com.chatwing.whitelabel.fragments.MusicFragment;
 import com.chatwing.whitelabel.fragments.NavigatableFragmentListener;
 import com.chatwing.whitelabel.fragments.NewContentFragment;
+import com.chatwing.whitelabel.fragments.OnlineUsersFragment;
 import com.chatwing.whitelabel.fragments.PasswordDialogFragment;
+import com.chatwing.whitelabel.fragments.PhotoPickerDialogFragment;
 import com.chatwing.whitelabel.fragments.ProfileFragment;
-import com.chatwing.whitelabel.interfaces.ChatWingJSInterface;
+import com.chatwing.whitelabel.interfaces.ChatWingJavaDelegate;
+import com.chatwing.whitelabel.interfaces.MediaControlInterface;
 import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.managers.BuildManager;
 import com.chatwing.whitelabel.managers.ChatboxModeManager;
+import com.chatwing.whitelabel.managers.ChatboxUnreadDownloadManager;
 import com.chatwing.whitelabel.managers.CommunicationActivityManager;
 import com.chatwing.whitelabel.managers.CommunicationModeManager;
 import com.chatwing.whitelabel.managers.ConversationModeManager;
 import com.chatwing.whitelabel.managers.CurrentChatBoxManager;
 import com.chatwing.whitelabel.managers.CurrentConversationManager;
+import com.chatwing.whitelabel.managers.FeedModeManager;
 import com.chatwing.whitelabel.managers.GcmManager;
+import com.chatwing.whitelabel.managers.MusicModeManager;
 import com.chatwing.whitelabel.managers.SyncManager;
 import com.chatwing.whitelabel.managers.UserManager;
 import com.chatwing.whitelabel.modules.CommunicationActivityModule;
@@ -90,19 +103,29 @@ import com.chatwing.whitelabel.pojos.ChatBox;
 import com.chatwing.whitelabel.pojos.Conversation;
 import com.chatwing.whitelabel.pojos.Event;
 import com.chatwing.whitelabel.pojos.Message;
+import com.chatwing.whitelabel.pojos.Song;
 import com.chatwing.whitelabel.pojos.User;
+import com.chatwing.whitelabel.pojos.errors.ChatWingError;
 import com.chatwing.whitelabel.pojos.params.CreateConversationParams;
+import com.chatwing.whitelabel.pojos.responses.ChatBoxDetailsResponse;
 import com.chatwing.whitelabel.services.AckChatboxIntentService;
 import com.chatwing.whitelabel.services.AckConversationIntentService;
 import com.chatwing.whitelabel.services.CreateConversationIntentService;
+import com.chatwing.whitelabel.services.DownloadUserDetailIntentService;
+import com.chatwing.whitelabel.services.MusicService;
 import com.chatwing.whitelabel.services.OfflineIntentService;
+import com.chatwing.whitelabel.services.SyncBookmarkIntentService;
 import com.chatwing.whitelabel.services.SyncCommunicationBoxesIntentService;
+import com.chatwing.whitelabel.services.UpdateAvatarIntentService;
 import com.chatwing.whitelabel.services.UpdateGcmIntentService;
 import com.chatwing.whitelabel.tables.MessageTable;
 import com.chatwing.whitelabel.utils.LogUtils;
 import com.chatwing.whitelabel.views.BBCodeEditText;
+import com.flurry.android.FlurryAgent;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.gson.Gson;
+import com.soundcloud.android.crop.Crop;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -133,27 +156,36 @@ public class CommunicationActivity
         CommunicationModeManager.Delegate,
         InjectableFragmentDelegate,
         CommunicationDrawerFragment.Listener,
+        OnlineUsersFragment.OnlineUsersFragmentDelegate,
+        ChatMessagesFragment.Delegate,
         NavigatableFragmentListener,
-        ProfileFragment.Listener {
+        ProfileFragment.Listener,
+        MediaControlInterface, {
+    public static final String AVATAR_PICKER_DIALOG_FRAGMENT_TAG = "AvatarPickerDialogFragment";
+    public static final String BLOCK_USER_DIALOG_FRAGMENT_TAG = "BlockUserDialogFragment";
+    public static final String ACCOUNT_DIALOG_FRAGMENT_TAG = "AccountDialogFragmentTag";
+    public static final String ACTION_STOP_MEDIA = "ACTION_STOP_MEDIA";
     public static final String PASSWORD_DIALOG_FRAGMENT_TAG = "PasswordDialogFragmentTAG";
+    public static final int REQUEST_CODE_AUTHENTICATION = 10000;
+    public static final String CHATBOX_ID = "CHATBOX_ID";
+    public static final String ACTION_OPEN_CHATBOX = "ACTION_OPEN_CHATBOX";
+    public static final String ACTION_OPEN_CONVERSATION = "ACTION_OPEN_CONVERSATION";
+    public static final String CONVERSATION_ID = "CONVERSATION_ID";
+
     private static final String EXTRA_CURRENT_MODE = "current_mode";
     private static final String ATTACHMENT_CONTENT_FRAGMENT_TAG = "NewContentFragment";
     private static final int MODE_CHAT_BOX = 0;
     private static final int MODE_NONE = -1;
     private static final int MODE_CONVERSATION = 1;
-    public static final int REQUEST_CODE_AUTHENTICATION = 10000;
     private static final int REQUEST_CODE_GET_GOOGLE_PLAY_SERVICES = 9000;
-    public static final String CHATBOX_ID = "CHATBOX_ID";
-    public static final String ACTION_OPEN_CHATBOX = "ACTION_OPEN_CHATBOX";
-    public static final String ACTION_OPEN_CONVERSATION = "ACTION_OPEN_CONVERSATION";
-    public static final String CONVERSATION_ID = "CONVERSATION_ID";
+
 
     protected WebView mWebView;
     protected boolean mNotSubscribeToChannels;
     @Inject
     protected GcmManager mGcmManager;
     @Inject
-    protected ChatWingJSInterface mFayeJsInterface;
+    protected ChatWingJavaDelegate mFayeJsInterface;
     @Inject
     protected ChatboxModeManager mChatboxModeManager;
     @Inject
@@ -162,10 +194,6 @@ public class CommunicationActivity
     protected ConversationModeManager mConversationModeManager;
     @Inject
     protected Bus mBus;
-    @Inject
-    protected UserManager mUserManager;
-    @Inject
-    protected ApiManager mApiManager;
     @Inject
     protected EventParser mEventParser;
     @Inject
@@ -176,6 +204,16 @@ public class CommunicationActivity
     protected CurrentChatBoxManager mCurrentChatboxManager;
     @Inject
     protected CommunicationActivityManager mCommunicationActivityManager;
+    @Inject
+    protected ApiManager mApiManager;
+    @Inject
+    protected UserManager mUserManager;
+    @Inject
+    protected ChatboxUnreadDownloadManager chatboxUnreadDownloadManager;
+    @Inject
+    protected FeedModeManager mFeedModeManager;
+    @Inject
+    protected MusicModeManager mMusicModeManager;
 
     protected CommunicationModeManager mCurrentCommunicationMode;
 
@@ -190,6 +228,9 @@ public class CommunicationActivity
     // after that.
     private boolean mIsCreated;
     private ProgressBar mLoadingView;
+    private MusicService musicService;
+    private Intent playIntent;
+    private boolean musicBound = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -252,6 +293,8 @@ public class CommunicationActivity
         }
 
         mIsCreated = true;
+
+
     }
 
     @Override
@@ -275,6 +318,19 @@ public class CommunicationActivity
         if (mIsCreated) {
             startSyncingCommunications(false);
             mIsCreated = false;
+        }
+
+        startAndBindMusicService();
+
+        FlurryAgent.onStartSession(this, getString(R.string.flurry_api_key));
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        FlurryAgent.onEndSession(this);
+        if (isBindMediaService()) {
+            unbindService(musicConnection);
         }
     }
 
@@ -317,6 +373,11 @@ public class CommunicationActivity
         if (requestCode == REQUEST_CODE_AUTHENTICATION && resultCode == RESULT_OK) {
             startSyncingCommunications(true);
         }
+
+        if (requestCode == Crop.REQUEST_CROP && resultCode == RESULT_OK) {
+            Uri output = Crop.getOutput(intent);
+            startUpdateAvatar(output.getPath());
+        }
     }
 
     @Override
@@ -356,6 +417,7 @@ public class CommunicationActivity
         mChatboxModeManager.onResume();
         mConversationModeManager.onResume();
         invalidateOptionsMenu();
+        chatboxUnreadDownloadManager.downloadUnread();
     }
 
     @Override
@@ -651,7 +713,7 @@ public class CommunicationActivity
 
             mWebView.addJavascriptInterface(
                     mFayeJsInterface,
-                    ChatWingJSInterface.CHATWING_JS_NAME);
+                    ChatWingJavaDelegate.CHATWING_JS_NAME);
 
             mWebView.setWebChromeClient(new WebChromeClient() {
                 @Override
@@ -1099,4 +1161,199 @@ public class CommunicationActivity
         logout();
     }
 
+    /////////////////////////////////////////////////////////
+    //              MediaControlInterface
+    /////////////////////////////////////////////////////////
+
+    @Override
+    public MusicService.STATUS getMediaStatus() {
+        if (musicBound) {
+            return musicService.getStatus();
+        }
+        return null;
+    }
+
+    @Override
+    public MusicService getMediaService() {
+        return musicService;
+    }
+
+    @Override
+    public void playLastMediaIfStopping() {
+        Intent service = new Intent(MusicService.ACTION_PLAY_LAST_MEDIA_IF_STOPPING);
+        startService(service);
+    }
+
+    @Override
+    public boolean isBindMediaService() {
+        return musicBound;
+    }
+
+    @Override
+    public void enqueue(Song song) {
+        Intent i = new Intent(MusicService.ACTION_URL);
+        i.putExtra(MusicService.SONG_EXTRA, song);
+        startService(i);
+    }
+
+    @Override
+    public void updateUIForPlayerPreparing(boolean preparing) {
+        if (preparing) {
+            startRefreshAnimation();
+        } else {
+            stopRefreshAnimation();
+            syncRefreshAnimationState(); // Make sure if sync is in progress, continue show
+        }
+    }
+
+
+    private void startAndBindMusicService() {
+        if(mBuildManager.isSupportedMusicBox()) {
+            if (playIntent == null) {
+                playIntent = new Intent(this, MusicService.class);
+                startService(playIntent);
+            }
+            bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
+        }
+    }
+
+    private synchronized void showAccountPicker(String message) {
+        Fragment oldFragment = getSupportFragmentManager().findFragmentByTag(
+                ACCOUNT_DIALOG_FRAGMENT_TAG);
+        if (oldFragment == null
+                && isActive()) { // To prevent showdialog when activity is paused.
+            // Better Workaround http://stackoverflow.com/questions/8040280/how-to-handle-handler-messages-when-activity-fragment-is-paused
+            AccountDialogFragment accountDialogFragment = AccountDialogFragment.newInstance(message);
+            accountDialogFragment.show(getSupportFragmentManager(),
+                    ACCOUNT_DIALOG_FRAGMENT_TAG);
+            //This to prevent duplication dialog. This should be used together with findFragmentByTag
+            getSupportFragmentManager().executePendingTransactions();
+        }
+    }
+
+    private void showAvatarPicker() {
+        Fragment oldFragment = getSupportFragmentManager().findFragmentByTag(
+                AVATAR_PICKER_DIALOG_FRAGMENT_TAG);
+        if (oldFragment == null) {
+            PhotoPickerDialogFragment accountDialogFragment = PhotoPickerDialogFragment.newInstance();
+            accountDialogFragment.show(getSupportFragmentManager(),
+                    AVATAR_PICKER_DIALOG_FRAGMENT_TAG);
+            //This to prevent duplication dialog. This should be used together with findFragmentByTag
+            getSupportFragmentManager().executePendingTransactions();
+        }
+    }
+
+    private boolean isInFeedMode() {
+        return mCurrentCommunicationMode == null || mCurrentCommunicationMode instanceof FeedModeManager;
+    }
+
+
+    private boolean isInMusicBoxMode() {
+        return mCurrentCommunicationMode == null || mCurrentCommunicationMode instanceof MusicModeManager;
+    }
+
+    private void setupFeedMode() {
+        setupMode(mFeedModeManager, FeedFragment.newInstance());
+        setContentShown(true);
+    }
+
+    private void setupMusicBoxMode() {
+        setupMode(mMusicModeManager, MusicFragment.newInstance());
+        setContentShown(true);
+    }
+
+    private void startUpdateAvatar(String filePath) {
+        if (UpdateAvatarIntentService.isInProgress()) {
+            return;
+        }
+
+        Intent startIntent = new Intent(this, UpdateAvatarIntentService.class);
+        startIntent.putExtra(UpdateAvatarIntentService.EXTRA_AVATAR_PATH, filePath);
+        startService(startIntent);
+    }
+
+    private boolean onInvalidAuthentication(ApiManager.InvalidIdentityException invalidIdentityException) {
+        ChatWingError error = invalidIdentityException.getError();
+        ChatBoxDetailsResponse.ChatBoxDetailErrorParams chatBoxDetailErrorParams =
+                new Gson().fromJson(error.getParams(), ChatBoxDetailsResponse.ChatBoxDetailErrorParams.class);
+
+        if (chatBoxDetailErrorParams == null) {
+            return true;
+        }
+        if (chatBoxDetailErrorParams.isForceLogin()
+                && mUserManager.getCurrentUser() == null) {
+            denyAccessCurrentManager();
+            showAccountPicker(getString(R.string.message_need_login));
+            return true;
+        }
+
+        if (!mUserManager.acceptAccessChatbox(mUserManager.getCurrentUser(),
+                chatBoxDetailErrorParams)) {
+            denyAccessCurrentManager();
+            showAccountPicker(getString(R.string.message_need_switch_account, chatBoxDetailErrorParams.getAuthenticationMethodString()));
+            return true;
+        }
+
+        //No one can access this chatbox except admin, etc...
+        return false;
+    }
+
+    /**
+     * User has been denied to access chatbox, they should be kicked out
+     */
+    private void denyAccessCurrentManager() {
+        if (isInChatBoxMode()) {
+            mCurrentChatboxManager.removeCurrentChatBox();
+        } else {
+            mCurrentConversationManager.removeCurrentConversation();
+        }
+    }
+
+    private void startSyncingCurrentUser() {
+        if (mUserManager.getCurrentUser() == null
+                || DownloadUserDetailIntentService.isInProgress()) {
+            // A sync operation is running. Just wait for it.
+            return;
+        }
+
+        getActivity().startService(new Intent(getActivity(), DownloadUserDetailIntentService.class));
+
+    }
+
+    private boolean handleDeleteBookmarkEvent(DeleteBookmarkEvent event) {
+        if (event.getException() == null)
+            return false;
+        handle(event.getException(), R.string.error_while_deleting_bookmark);
+        return true;
+    }
+
+    //connect to the service
+    private ServiceConnection musicConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            MusicService.MusicBinder binder = (MusicService.MusicBinder) service;
+            //get service
+            musicService = binder.getService();
+            musicBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            musicBound = false;
+        }
+    };
+
+    private void startSyncingBookmarks() {
+        if (!mBuildManager.isOfficialChatWingApp()) return;
+
+        if (mUserManager.getCurrentUser() == null
+                || SyncBookmarkIntentService.isInProgress()) {
+            // A sync operation is running. Just wait for it.
+            return;
+        }
+        super.mSyncManager.addToQueue(SyncBookmarkIntentService.class);
+
+        getActivity().startService(new Intent(getActivity(), SyncBookmarkIntentService.class));
+    }
 }

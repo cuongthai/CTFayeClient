@@ -57,12 +57,13 @@ import com.squareup.otto.Subscribe;
  * Created by cuongthai on 18/08/2014.
  */
 public class ConversationModeManager extends CommunicationModeManager {
+    public static final int DRAWER_GRAVITY_UNUSED_SECONDARY = Gravity.RIGHT;
     public static final int DRAWER_GRAVITY_CONVERSATIONS = Gravity.LEFT;
     private static final String EXTRA_CURRENT_CONVERSATION_ID = "current_conversation_id";
 
-    protected final CurrentConversationManager mCurrentConversationManager;
+    private final CurrentConversationManager mCurrentConversationManager;
     private String mRequestedUserHashKey;
-    ConversationIdValidator mConversationIdValidator;
+    private ConversationIdValidator mConversationIdValidator;
     private final String mConversationsTitle;
     private String mRequestedConversationKey;
 
@@ -85,6 +86,9 @@ public class ConversationModeManager extends CommunicationModeManager {
         super.activate();
         mOriginalTitle = mTitle = mActivityDelegate.getActivity().getTitle();
         LogUtils.v("Title: activate " + mOriginalTitle + ":" + mTitle + ":" + mConversationsTitle);
+        setTitle(mTitle.toString());
+        mActivityDelegate.getDrawerLayout().setDrawerLockMode(
+                DrawerLayout.LOCK_MODE_LOCKED_CLOSED, DRAWER_GRAVITY_UNUSED_SECONDARY);
     }
 
     @Override
@@ -116,6 +120,8 @@ public class ConversationModeManager extends CommunicationModeManager {
     public void deactivate() {
         super.deactivate();
         mCurrentConversationManager.removeCurrentConversation();
+        mActivityDelegate.getDrawerLayout().setDrawerLockMode(
+                DrawerLayout.LOCK_MODE_UNLOCKED, DRAWER_GRAVITY_UNUSED_SECONDARY);
     }
 
     @Override
@@ -151,6 +157,8 @@ public class ConversationModeManager extends CommunicationModeManager {
         }
 
     }
+
+
 
     @Override
     public boolean isSecondaryDrawerOpening() {
@@ -190,6 +198,13 @@ public class ConversationModeManager extends CommunicationModeManager {
             LogUtils.v("Debug request open conversation: Set open conversation onNewIntent");
             mRequestedConversationKey = intent.getStringExtra(CommunicationActivity.CONVERSATION_ID);
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        AppCompatActivity activity = mActivityDelegate.getActivity();
+        activity.getMenuInflater().inflate(R.menu.conversation_menu, menu);
+        return true;
     }
 
     @Override
