@@ -1010,7 +1010,7 @@ public class CommunicationActivity
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-                dialog = ProgressDialog.show(CommunicationActivity.this, "",
+                dialog = ProgressDialog.show(getDialogContext(), "",
                         getString(R.string.logging_out), true, false);
             }
 
@@ -1050,6 +1050,12 @@ public class CommunicationActivity
         }.execute();
     }
 
+    private Context getDialogContext() {
+        Context context;
+        if (getParent() != null) context = getParent();
+        else context = this;
+        return context;
+    }
 
     protected Class<? extends BaseABFragmentActivity> getEntranceActivityClass() {
         return CommunicationActivity.class;
