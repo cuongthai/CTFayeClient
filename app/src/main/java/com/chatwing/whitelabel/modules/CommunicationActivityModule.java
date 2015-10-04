@@ -21,7 +21,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 
 import com.chatwing.whitelabel.activities.CommunicationActivity;
-import com.chatwing.whitelabel.activities.ExtendCommunicationActivity;
 import com.chatwing.whitelabel.fragments.AccountDialogFragment;
 import com.chatwing.whitelabel.fragments.AdminListFragment;
 import com.chatwing.whitelabel.fragments.BlockUserDialogFragment;
@@ -51,7 +50,6 @@ import com.chatwing.whitelabel.managers.CommunicationActivityManager;
 import com.chatwing.whitelabel.managers.ConversationModeManager;
 import com.chatwing.whitelabel.managers.CurrentChatBoxManager;
 import com.chatwing.whitelabel.managers.CurrentConversationManager;
-import com.chatwing.whitelabel.managers.ExtendCurrentChatboxManager;
 import com.chatwing.whitelabel.managers.FeedModeManager;
 import com.chatwing.whitelabel.managers.MusicModeManager;
 import com.chatwing.whitelabel.managers.PasswordManager;
@@ -93,7 +91,6 @@ import dagger.Provides;
                 JSInterfaceImpl.class,
 
                 ChatMessagesFragment.class,
-                ExtendCommunicationActivity.class,
                 CommunicationDrawerFragment.class,
                 BookmarkedChatBoxesDrawerFragment.class,
                 AccountDialogFragment.class,
@@ -154,21 +151,13 @@ public class CommunicationActivityModule {
 
     @Provides
     @Singleton
-    ChatWingJavaDelegate provideChatWingJavaDelegate(JSInterfaceImpl jsInterface){
+    ChatWingJavaDelegate provideChatWingJavaDelegate(JSInterfaceImpl jsInterface) {
         return jsInterface;
     }
 
     @Provides
     @Singleton
-    CurrentChatBoxManager provideCurrentChatboxManager(Bus bus,
-                                                       ChatBoxIdValidator chatBoxIdValidator,
-                                                       PasswordManager passwordManager) {
-        return new CurrentChatBoxManager(mActivity, bus, chatBoxIdValidator, passwordManager);
-    }
-
-    @Provides
-    @Singleton
-    CommunicationActivityManager provideCommunicationActivityManager(){
+    CommunicationActivityManager provideCommunicationActivityManager() {
         return new CommunicationActivityManager(mActivity);
     }
 
@@ -185,7 +174,7 @@ public class CommunicationActivityModule {
 
     @Provides
     @Singleton
-    ProgressDialog provideProgressDialog(){
+    ProgressDialog provideProgressDialog() {
         ProgressDialog progressDialog = new ProgressDialog(mActivity);
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.setCancelable(false);
@@ -266,7 +255,7 @@ public class CommunicationActivityModule {
                                                        ChatBoxIdValidator chatBoxIdValidator,
                                                        Provider<LoadOnlineUsersTask> taskProvider,
                                                        PasswordManager passwordManager) {
-        return new ExtendCurrentChatboxManager(mActivity,
+        return new CurrentChatBoxManager(mActivity,
                 bus,
                 chatBoxIdValidator,
                 taskProvider,

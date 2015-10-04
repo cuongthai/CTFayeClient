@@ -1,10 +1,9 @@
 package com.chatwing.whitelabel;
 
 import android.app.Application;
-import android.content.Context;
 import android.view.ViewConfiguration;
 
-import com.chatwing.whitelabel.activities.ExtendCommunicationActivity;
+import com.chatwing.whitelabel.activities.CommunicationActivity;
 import com.chatwing.whitelabel.activities.LegacyLoginActivity;
 import com.chatwing.whitelabel.activities.WalkthroughActivity;
 import com.chatwing.whitelabel.modules.ChatWingModule;
@@ -28,7 +27,13 @@ public class ChatWingApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Fabric.with(this, new Crashlytics.Builder().core(new CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build()).build());
+        Fabric.with(this, new Crashlytics
+                .Builder()
+                .core(new CrashlyticsCore
+                        .Builder()
+                        .disabled(BuildConfig.DEBUG)
+                        .build())
+                .build());
 
         /**
          * App IDS
@@ -38,11 +43,11 @@ public class ChatWingApplication extends Application {
          *
          */
         //Currently support only one chatbox enter from client, it should be loaded from server
-        ChatWing.initialize(this, BuildConfig.APP_ID, "", new String[]{"1873"}, isOfficialChatWingApp()
+        ChatWing.initialize(this, BuildConfig.APP_ID, "", isOfficialChatWingApp()
                 ? WalkthroughActivity.class
                 : LegacyLoginActivity.class);
         ChatWing.setIsDebugging(false);
-        ChatWing.instance(this).setMainActivityClass(ExtendCommunicationActivity.class);
+        ChatWing.instance(this).setMainActivityClass(CommunicationActivity.class);
         ChatWing.instance(this).getChatwingGraph().plus(getModules().toArray());
 
         FlurryAgent.init(this, getString(R.string.flurry_api_key));

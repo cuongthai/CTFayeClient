@@ -17,6 +17,7 @@
 package com.chatwing.whitelabel.fragments;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -84,44 +85,57 @@ import javax.inject.Provider;
 /**
  * Created by cuongthai on 18/07/2014.
  */
-public abstract class CommunicationMessagesFragment extends Fragment {
+public abstract class CommunicationMessagesFragment extends BaseFragment {
     private static final int MESSAGE_LOADER_ID = 87654;
+
     @Inject
-    Bus mBus;
+    protected Bus mBus;
     @Inject
-    InputMethodManager mInputMethodManager;
+    protected InputMethodManager mInputMethodManager;
     @Inject
-    Provider<Typeface> mIconicTypefaceProvider;
+    protected Provider<Typeface> mIconicTypefaceProvider;
     @Inject
-    ErrorMessageView mErrorMessageView;
+    protected ErrorMessageView mErrorMessageView;
     @Inject
-    UserManager mUserManager;
+    protected UserManager mUserManager;
     @Inject
-    CommunicationMessagesAdapter mAdapter;
+    protected CommunicationMessagesAdapter mAdapter;
     @Inject
-    MessageRandomKeyGenerator mRandomKeyGenerator;
+    protected MessageRandomKeyGenerator mRandomKeyGenerator;
 
     private View mBBCodeControlsContainer;
     private View mStickerContainer;
-    private Map<BBCodeParser.BBCode, Button> mBBCodeControls;
-    protected View newContentBtn;
-    protected View newEmoBtn;
-    protected Delegate mDelegate;
-    protected CommunicationBoxMessagesLoaderCallbacks mLoaderCallbacks;
-    private boolean mSyncingBBCodeControls;
-    private BBCodeEditText mCommunicationBoxEditText;
     private View sendBtn;
     private View mComposeContainer;
-    private boolean showingBottomContainer;
-    protected boolean mIsNoMoreMessages;
-
-
+    private Map<BBCodeParser.BBCode, Button> mBBCodeControls;
+    private BBCodeEditText mCommunicationBoxEditText;
     private EmoticonPackagesAdapter adapter;
     private ViewPager emoticonsPager;
     private TabPageIndicator indicator;
     private RecyclerView mRecyclerView;
     private LinearLayoutManager mLayoutManager;
+    private boolean mSyncingBBCodeControls;
+    private boolean showingBottomContainer;
 
+    protected CommunicationBoxMessagesLoaderCallbacks mLoaderCallbacks;
+    protected boolean mIsNoMoreMessages;
+    protected View newContentBtn;
+    protected View newEmoBtn;
+    protected Delegate mDelegate;
+
+    public interface Delegate extends InjectableFragmentDelegate {
+        void showColorPickerDialogFragment(BBCodeParser.BBCode code);
+
+        void showNewContentFragment();
+
+        void showPasswordDialogFragment();
+
+        void showBlockUserDialogFragment(Message message);
+
+        void showConversation(CreateConversationParams.SimpleUser simpleUser);
+
+        void inject(BBCodeEditText mCommunicationBoxEditText);
+    }
 
     public boolean isShowingBBControls() {
         return mBBCodeControlsContainer.getVisibility() == View.VISIBLE;
@@ -140,20 +154,6 @@ public abstract class CommunicationMessagesFragment extends Fragment {
         } else {
             mComposeContainer.setVisibility(View.GONE);
         }
-    }
-
-    public static interface Delegate extends InjectableFragmentDelegate {
-        void showColorPickerDialogFragment(BBCodeParser.BBCode code);
-
-        void showNewContentFragment();
-
-        void showPasswordDialogFragment();
-
-        void showBlockUserDialogFragment(Message message);
-
-        void showConversation(CreateConversationParams.SimpleUser simpleUser);
-
-        void inject(BBCodeEditText mCommunicationBoxEditText);
     }
 
     public CommunicationMessagesFragment() {
@@ -228,7 +228,6 @@ public abstract class CommunicationMessagesFragment extends Fragment {
                 isAdded = true;
             }
         }
-//        updateItemViews();
         return isAdded;
     }
 
@@ -284,7 +283,8 @@ public abstract class CommunicationMessagesFragment extends Fragment {
         Exception exception = event.getException();
         if (exception != null &&
                 exception instanceof ApiManager.CreateMessageException) {
-            ApiManager.CreateMessageException createMessageException = (ApiManager.CreateMessageException) exception;
+            ApiManager.CreateMessageException createMessageException =
+                    (ApiManager.CreateMessageException) exception;
             handle(createMessageException.getCreateMessageParamsError(),
                     createMessageException.getCommunicationMessage());
             return;
@@ -346,7 +346,6 @@ public abstract class CommunicationMessagesFragment extends Fragment {
     protected void handle(CreateMessageParamsError error, Message originalMessage) {
         String type = error.getType();
         String toastMessage;
-        boolean removeOriginalMessage = true;
         if (type.equals(CreateMessageParamsError.TYPE_EMPTY_MESSAGE)) {
             // This shouldn't happen because the message was checked in sendMessage
             // before the request to server is made.
@@ -365,12 +364,10 @@ public abstract class CommunicationMessagesFragment extends Fragment {
             toastMessage = error.getErrorMessage();
             // even if the user is unable to send the message,
             // the message is still appended to the message list (but not stored in the database)
-            removeOriginalMessage = true;
         } else {
             toastMessage = getString(R.string.error_unknown);
             // Unknown error, just leave the message in the list with a
             // "Failed" label.
-            removeOriginalMessage = false;
             LogUtils.e("Unknown error: " + type);
         }
 
@@ -382,7 +379,6 @@ public abstract class CommunicationMessagesFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         mDelegate.inject(this);
 
-//        new BottomSheet.Builder(this).title("title")
         mRecyclerView = (RecyclerView) view.findViewById(R.id.message_list);
         emoticonsPager = (ViewPager) view.findViewById(R.id.pager);
         emoticonsPager.setAdapter(new EmoticonPackagesAdapter(getActivity().getSupportFragmentManager(),
@@ -500,37 +496,10 @@ public abstract class CommunicationMessagesFragment extends Fragment {
                 hasAdminPermission);
     }
 
-
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         configRecyclerView();
-    }
-
-    private void configRecyclerView() {
-        mRecyclerView.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(getActivity());
-        mLayoutManager.setReverseLayout(true);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            int pastVisiblesItems, visibleItemCount, totalItemCount;
-
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-
-                visibleItemCount = mLayoutManager.getChildCount();
-                totalItemCount = mLayoutManager.getItemCount();
-                pastVisiblesItems = mLayoutManager.findFirstVisibleItemPosition();
-
-                if (!GetMessagesIntentService.isRunning()) {
-                    if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
-                        LogUtils.v("Last Item Wow !");
-                        loadMessagesFromServer();
-                    }
-                }
-            }
-        });
     }
 
     @Override
@@ -577,18 +546,10 @@ public abstract class CommunicationMessagesFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        mDelegate = (Delegate) activity;
-
-    }
-
-    private void hideBBCodeControls() {
-        mBBCodeControlsContainer.setVisibility(View.GONE);
-    }
-
-    private void hideStickerContainer() {
-        mStickerContainer.setVisibility(View.GONE);
+    protected void onAttachToContext(Context context) {
+        if (context instanceof Delegate) {
+            mDelegate = (Delegate) context;
+        }
     }
 
     public void showBBCodeControls() {
@@ -607,6 +568,108 @@ public abstract class CommunicationMessagesFragment extends Fragment {
         }
         showingBottomContainer = true;
         mStickerContainer.setVisibility(View.VISIBLE);
+    }
+
+    public void appendBBCode(BBCodePair pair) {
+        if (mCommunicationBoxEditText.append(pair)) {
+            showKeyboard();
+            syncBBCodeControlState(pair.getCode());
+            saveBBCodesIfNeeded();
+        }
+    }
+
+    //////////////////////////////////////////////////////////////
+    // Instance methods
+    //////////////////////////////////////////////////////////////
+    private void sendMessage() {
+        if (!mUserManager.userCanSendMessage()) {
+            mErrorMessageView.show(R.string.error_required_login);
+            return;
+        }
+        User user = mUserManager.getCurrentUser();
+
+        String content = mCommunicationBoxEditText.getFullText();
+        if (TextUtils.isEmpty(content)) {
+            // Nothing to send
+            return;
+        }
+
+        if (!hasCurrentCommunication()) {
+            // No current communication box to send new message to
+            return;
+        }
+
+        long createdDate = System.currentTimeMillis();
+        String randomKey = mRandomKeyGenerator.generate(content, createdDate);
+        Message newMessage = constructMessage(
+                user,
+                content,
+                createdDate,
+                randomKey,
+                Message.Status.SENDING);
+        newMessage.setCreatedDate(System.currentTimeMillis());
+
+        if (addNewMessage(newMessage)) {
+            scrollToLast(true);
+        }
+        mCommunicationBoxEditText.setText("");
+        if (!user.getProfile().shouldRememberPreviousStyle()) {
+            mCommunicationBoxEditText.clearAllBBCodes();
+            syncBBCodeControlsState();
+        }
+
+        // Send task to CreateMessageIntentService to make a async request.
+        Intent i = new Intent(getActivity(), CreateMessageIntentService.class);
+        i.putExtra(CreateMessageIntentService.EXTRA_MESSAGE, newMessage);
+        getActivity().startService(i);
+    }
+
+    protected void loadEmoticons(Emoticon[] emoticons) {
+        //There is a case multiple emoticons code mapped to the same link
+        //It's used in case of rendering emoticons code to image but since we let js side render the view
+        //we dont need to care about it.
+        Set<Emoticon> emoticonSet = new TreeSet<Emoticon>(new Comparator<Emoticon>() {
+            @Override
+            public int compare(Emoticon emoticon, Emoticon emoticon2) {
+                return emoticon.getImage().compareTo(emoticon2.getImage());
+            }
+        });
+        emoticonSet.addAll(Arrays.asList(emoticons));
+        Map<String, Emoticon[]> packages = new HashMap<String, Emoticon[]>();
+        packages.put("Emoticons", emoticonSet.toArray(new Emoticon[emoticonSet.size()]));
+
+        adapter = new EmoticonPackagesAdapter(getActivity().getSupportFragmentManager(), packages);
+        emoticonsPager.setAdapter(adapter);
+        indicator.setViewPager(emoticonsPager);
+        indicator.notifyDataSetChanged();
+
+    }
+
+    public abstract class CommunicationBoxMessagesLoaderCallbacks implements
+            LoaderManager.LoaderCallbacks<CommunicationBoxMessagesLoader.Result> {
+
+        @Override
+        public void onLoadFinished(Loader<CommunicationBoxMessagesLoader.Result> loader,
+                                   CommunicationBoxMessagesLoader.Result data) {
+            List<Message> messagesFromDB = data.getMessages();
+
+            LogUtils.v("CommunicationBoxMessagesLoaderCallbacks finished ");
+            if (data.getException() != null) {
+                mErrorMessageView.show(data.getException());
+            } else if (messagesFromDB != null && messagesFromDB.size() > 0) {
+                mAdapter.setData(messagesFromDB);
+            }
+
+            /**
+             * After adding data to adapter, we start loading more to fill the view
+             * If adapter is empty, load from server
+             */
+            loadMessagesFromServer();
+        }
+
+        @Override
+        public void onLoaderReset(Loader<CommunicationBoxMessagesLoader.Result> loader) {
+        }
     }
 
     private void configBBCodeControls() {
@@ -667,11 +730,17 @@ public abstract class CommunicationMessagesFragment extends Fragment {
         }
     }
 
-    public void appendBBCode(BBCodePair pair) {
-        if (mCommunicationBoxEditText.append(pair)) {
-            showKeyboard();
-            syncBBCodeControlState(pair.getCode());
-            saveBBCodesIfNeeded();
+    private void hideBBCodeControls() {
+        mBBCodeControlsContainer.setVisibility(View.GONE);
+    }
+
+    private void hideStickerContainer() {
+        mStickerContainer.setVisibility(View.GONE);
+    }
+
+    private void syncBBCodeControlsState() {
+        for (BBCodeParser.BBCode code : mBBCodeControls.keySet()) {
+            syncBBCodeControlState(code);
         }
     }
 
@@ -713,104 +782,29 @@ public abstract class CommunicationMessagesFragment extends Fragment {
         }
     }
 
-    //////////////////////////////////////////////////////////////
-    // Instance methods
-    //////////////////////////////////////////////////////////////
-    private void sendMessage() {
-        if (!mUserManager.userCanSendMessage()) {
-            mErrorMessageView.show(R.string.error_required_login);
-            return;
-        }
-        User user = mUserManager.getCurrentUser();
+    private void configRecyclerView() {
+        mRecyclerView.setHasFixedSize(true);
+        mLayoutManager = new LinearLayoutManager(getActivity());
+        mLayoutManager.setReverseLayout(true);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            int pastVisiblesItems, visibleItemCount, totalItemCount;
 
-        String content = mCommunicationBoxEditText.getFullText();
-        if (TextUtils.isEmpty(content)) {
-            // Nothing to send
-            return;
-        }
-
-        if (!hasCurrentCommunication()) {
-            // No current communication box to send new message to
-            return;
-        }
-
-        long createdDate = System.currentTimeMillis();
-        String randomKey = mRandomKeyGenerator.generate(content, createdDate);
-        Message newMessage = constructMessage(
-                user,
-                content,
-                createdDate,
-                randomKey,
-                Message.Status.SENDING);
-        newMessage.setCreatedDate(System.currentTimeMillis());
-
-        if (addNewMessage(newMessage)) {
-            scrollToLast(true);
-        }
-        mCommunicationBoxEditText.setText("");
-        if (!user.getProfile().shouldRememberPreviousStyle()) {
-            mCommunicationBoxEditText.clearAllBBCodes();
-            syncBBCodeControlsState();
-        }
-
-        // Send task to CreateMessageIntentService to make a async request.
-        Intent i = new Intent(getActivity(), CreateMessageIntentService.class);
-        i.putExtra(CreateMessageIntentService.EXTRA_MESSAGE, newMessage);
-        getActivity().startService(i);
-    }
-
-
-    private void syncBBCodeControlsState() {
-        for (BBCodeParser.BBCode code : mBBCodeControls.keySet()) {
-            syncBBCodeControlState(code);
-        }
-    }
-
-    protected void loadEmoticons(Emoticon[] emoticons) {
-        //There is a case multiple emoticons code mapped to the same link
-        //It's used in case of rendering emoticons code to image but since we let js side render the view
-        //we dont need to care about it.
-        Set<Emoticon> emoticonSet = new TreeSet<Emoticon>(new Comparator<Emoticon>() {
             @Override
-            public int compare(Emoticon emoticon, Emoticon emoticon2) {
-                return emoticon.getImage().compareTo(emoticon2.getImage());
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+
+                visibleItemCount = mLayoutManager.getChildCount();
+                totalItemCount = mLayoutManager.getItemCount();
+                pastVisiblesItems = mLayoutManager.findFirstVisibleItemPosition();
+
+                if (!GetMessagesIntentService.isRunning()) {
+                    if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
+                        LogUtils.v("Last Item Wow !");
+                        loadMessagesFromServer();
+                    }
+                }
             }
         });
-        emoticonSet.addAll(Arrays.asList(emoticons));
-        Map<String, Emoticon[]> packages = new HashMap<String, Emoticon[]>();
-        packages.put("Emoticons", emoticonSet.toArray(new Emoticon[emoticonSet.size()]));
-
-        adapter = new EmoticonPackagesAdapter(getActivity().getSupportFragmentManager(), packages);
-        emoticonsPager.setAdapter(adapter);
-        indicator.setViewPager(emoticonsPager);
-        indicator.notifyDataSetChanged();
-
-    }
-
-    public abstract class CommunicationBoxMessagesLoaderCallbacks implements
-            LoaderManager.LoaderCallbacks<CommunicationBoxMessagesLoader.Result> {
-
-        @Override
-        public void onLoadFinished(Loader<CommunicationBoxMessagesLoader.Result> loader,
-                                   CommunicationBoxMessagesLoader.Result data) {
-            List<Message> messagesFromDB = data.getMessages();
-
-            LogUtils.v("CommunicationBoxMessagesLoaderCallbacks finished ");
-            if (data.getException() != null) {
-                mErrorMessageView.show(data.getException());
-            } else if (messagesFromDB != null && messagesFromDB.size() > 0) {
-                mAdapter.setData(messagesFromDB);
-            }
-
-            /**
-             * After adding data to adapter, we start loading more to fill the view
-             * If adapter is empty, load from server
-             */
-            loadMessagesFromServer();
-        }
-
-        @Override
-        public void onLoaderReset(Loader<CommunicationBoxMessagesLoader.Result> loader) {
-        }
     }
 }

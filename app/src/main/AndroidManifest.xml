@@ -7,11 +7,11 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     <!-- GCM permissions -->
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <!-- GCM requires a Google account. -->
-    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <!-- Keeps the processor from sleeping when a message is received. -->
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <!-- Permission to prevent other apps from registering and receiving our messages -->
     <!-- The permission must exactly match the pattern:  applicationPackage + ".permission.C2D_MESSAGE" -->
@@ -32,34 +32,6 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Theme.ChatWing">
-        <activity
-            android:name=".activities.ExtendCommunicationActivity"
-            android:icon="@drawable/ic_launcher"
-            android:label="@string/app_name"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.ChatWing">
-            <intent-filter android:label="@string/app_name">
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-            <intent-filter android:label="@string/app_name">
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="chatwing.com"
-                    android:pathPattern="/chatbox/.*"
-                    android:scheme="http" />
-                <data
-                    android:host="chatwing.com"
-                    android:pathPattern="/chatbox/.*"
-                    android:scheme="https" />
-            </intent-filter>
-        </activity>
 
         <activity
             android:name=".activities.WalkthroughActivity"
@@ -76,8 +48,7 @@
         <activity
             android:name=".activities.WhiteLabelCoverActivity"
             android:icon="@drawable/ic_launcher"
-            android:label="@string/app_name"
-            >
+            android:label="@string/app_name">
 
         </activity>
 
@@ -85,14 +56,14 @@
             android:name=".activities.LegacyLoginActivity"
             android:icon="@drawable/ic_launcher"
             android:label="@string/title_activity_login"
-            android:theme="@style/Theme.ChatWing"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.ChatWing" />
         <activity
             android:name=".activities.RegisterActivity"
             android:icon="@drawable/ic_launcher"
             android:label="@string/title_activity_register"
-            android:theme="@style/Theme.ChatWing"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.ChatWing" />
         <activity
             android:name=".activities.SearchChatBoxActivity"
             android:label="@string/title_activity_search_chat_box"
@@ -114,17 +85,41 @@
             android:name=".activities.MainPreferenceActivity"
             android:icon="@drawable/ic_launcher"
             android:label="@string/title_activity_user_profile_preference"
-            android:theme="@style/Theme.ChatWing"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.ChatWing" />
         <activity
             android:name=".activities.NoMenuWebViewActivity"
             android:icon="@drawable/ic_launcher"
             android:theme="@style/Theme.ChatWing" />
         <activity android:name="com.soundcloud.android.crop.CropImageActivity" />
 
-        <activity android:name=".activities.CommunicationActivity"
-            android:theme="@style/Theme.ChatWing"
-            android:icon="@drawable/ic_chatwing"/>
+        <activity
+            android:name=".activities.CommunicationActivity"
+            android:icon="@drawable/ic_chatwing"
+            android:label="@string/app_name"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.ChatWing">
+            <intent-filter android:label="@string/app_name">
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter android:label="@string/app_name">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="chatwing.com"
+                    android:pathPattern="/chatbox/.*"
+                    android:scheme="http" />
+                <data
+                    android:host="chatwing.com"
+                    android:pathPattern="/chatbox/.*"
+                    android:scheme="https" />
+            </intent-filter>
+        </activity>
 
         <service android:name=".services.CreateConversationIntentService" />
         <service android:name=".services.LoadChatBoxDetailsService" />
@@ -150,7 +145,8 @@
         <service android:name=".services.SyncBookmarkIntentService" />
         <service android:name=".services.CreateBookmarkIntentService" />
         <service android:name=".services.DeleteBookmarkIntentService" />
-        <service android:name=".services.NotificationIntentService"
+        <service
+            android:name=".services.NotificationIntentService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
@@ -160,7 +156,7 @@
             android:name=".services.ChatWingInstanceIDListenerService"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.google.android.gms.iid.InstanceID"/>
+                <action android:name="com.google.android.gms.iid.InstanceID" />
             </intent-filter>
         </service>
         <service android:name=".services.MusicService">
@@ -203,9 +199,10 @@
             android:exported="true"
             android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-                <category android:name="${applicationId}"/>
+
+                <category android:name="${applicationId}" />
             </intent-filter>
         </receiver>
 

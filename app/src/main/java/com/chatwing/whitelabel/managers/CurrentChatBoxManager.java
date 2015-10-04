@@ -16,40 +16,51 @@
 
 package com.chatwing.whitelabel.managers;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 
-import com.chatwing.whitelabel.contentproviders.ChatWingContentProvider;
 import com.chatwing.whitelabel.events.CurrentChatBoxEvent;
 import com.chatwing.whitelabel.events.LoadChatBoxDetailsEvent;
 import com.chatwing.whitelabel.events.LoadCurrentChatBoxFailedEvent;
+import com.chatwing.whitelabel.events.LoadOnlineUsersFailedEvent;
+import com.chatwing.whitelabel.events.LoadOnlineUsersSuccessEvent;
 import com.chatwing.whitelabel.events.RequestOpenChatBoxEvent;
 import com.chatwing.whitelabel.events.ResumeOpenChatBoxEvent;
+import com.chatwing.whitelabel.events.TaskFinishedEvent;
 import com.chatwing.whitelabel.pojos.ChatBox;
 import com.chatwing.whitelabel.pojos.responses.ChatBoxDetailsResponse;
+import com.chatwing.whitelabel.pojos.responses.LoadOnlineUsersResponse;
 import com.chatwing.whitelabel.services.AckChatboxIntentService;
 import com.chatwing.whitelabel.services.LoadChatBoxDetailsService;
-import com.chatwing.whitelabel.tables.ChatBoxTable;
+import com.chatwing.whitelabel.tasks.LoadOnlineUsersTask;
 import com.chatwing.whitelabel.utils.LogUtils;
 import com.chatwing.whitelabel.validators.ChatBoxIdValidator;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
+
+import javax.inject.Provider;
 
 /**
  * Created by cuongthai on 21/07/2014.
  */
 public class CurrentChatBoxManager extends CurrentCommunicationManager {
     private final ChatBoxIdValidator mChatBoxIdValidator;
+
     protected ChatBox mCurrentChatBox;
     protected ChatBox mLastKnownGoodChatBox;
+
     private PasswordManager mPasswordManager;
+    private Provider<LoadOnlineUsersTask> mOnlineUsersTaskProvider;
+    private LoadOnlineUsersTask mCurrentOnlineUsersTask;
 
     public CurrentChatBoxManager(Context context,
                                  Bus bus,
                                  ChatBoxIdValidator chatBoxIdValidator,
+                                 Provider<LoadOnlineUsersTask> onlineUsersTaskProvider,
                                  PasswordManager passwordManager) {
         super(context, bus);
+        mOnlineUsersTaskProvider = onlineUsersTaskProvider;
         mChatBoxIdValidator = chatBoxIdValidator;
         mPasswordManager = passwordManager;
     }
@@ -88,8 +99,49 @@ public class CurrentChatBoxManager extends CurrentCommunicationManager {
         }
     }
 
+    @Subscribe
+    public void onTaskFinishedEvent(TaskFinishedEvent event) {
+        if (event.getTask() != mCurrentOnlineUsersTask) {
+            return;
+        }
+        Exception exception = event.getException();
+        if (exception != null) {
+            mBus.post(new LoadOnlineUsersFailedEvent(exception));
+        } else {
+            LoadOnlineUsersResponse response = (LoadOnlineUsersResponse) event.getResult();
+            LoadOnlineUsersResponse.Data data = response.getData();
+            if (data == null) {
+                //Monitor this
+                LogUtils.e("Hm... Why no data? " + response.getError());
+                return;
+            }
+            mBus.post(new LoadOnlineUsersSuccessEvent(data.getCount(), data.getList()));
+        }
+    }
+
+    public void loadOnlineUsers() {
+        if (mCurrentChatBox == null) {
+            return;
+        }
+        if (mCurrentOnlineUsersTask != null
+                && mCurrentOnlineUsersTask.getStatus() != AsyncTask.Status.FINISHED) {
+            // There is a running task, no need to start a new one.
+            return;
+        }
+        mCurrentOnlineUsersTask = mOnlineUsersTaskProvider.get();
+        mCurrentOnlineUsersTask.execute(mCurrentChatBox.getId());
+    }
+
     public ChatBox getCurrentChatBox() {
         return mCurrentChatBox;
+    }
+
+    public ChatBox getLastKnownGoodChatBox() {
+        return mCurrentChatBox == null ? mLastKnownGoodChatBox : mCurrentChatBox;
+    }
+
+    public void resetLastKnownChatBox() {
+        mLastKnownGoodChatBox = null;
     }
 
     private void setCurrentChatBox(ChatBox newChatBox, boolean confirmedPassword) {
@@ -137,16 +189,12 @@ public class CurrentChatBoxManager extends CurrentCommunicationManager {
         mBus.post(new CurrentChatBoxEvent(CurrentChatBoxEvent.Status.REMOVED, null));
     }
 
-    protected void stopBackgroundTasks() {
-
+    private void stopBackgroundTasks() {
+        if (mCurrentOnlineUsersTask != null) {
+            if (mCurrentOnlineUsersTask.getStatus() != AsyncTask.Status.FINISHED) {
+                mCurrentOnlineUsersTask.cancel(true);
+            }
+            mCurrentOnlineUsersTask = null;
+        }
     }
-
-    public ChatBox getLastKnownGoodChatBox() {
-        return mCurrentChatBox == null ? mLastKnownGoodChatBox : mCurrentChatBox;
-    }
-
-    public void resetLastKnownChatBox() {
-        mLastKnownGoodChatBox = null;
-    }
-
 }

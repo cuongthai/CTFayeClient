@@ -106,17 +106,16 @@ public class ChatboxModeManager extends CommunicationModeManager {
 
     private static final long REFRESH_ONLINE_USERS_INTERVAL = 20 * DateUtils.SECOND_IN_MILLIS;
 
-
     private final MediaControlInterface mMediaControlInterface;
-
     private final CurrentChatBoxManager mCurrentChatBoxManager;
     private final ApiManager mApiManager;
     private final ChatBoxIdValidator mChatBoxIdValidator;
-    private int mRequestedChatboxId;
     private final CharSequence mChatBoxesTitle;
 
-    private BadgeView mOnlineUsersBadgeView;
     private int mNumOfOnlineUser;
+    private int mRequestedChatboxId;
+
+    private BadgeView mOnlineUsersBadgeView;
     private Handler mRefreshOnlineUsersHandler;
     private CommunicationModeManager.Delegate mActivityDelegate;
     private BuildManager mBuildManager;
@@ -142,6 +141,7 @@ public class ChatboxModeManager extends CommunicationModeManager {
                               BuildManager buildManager,
                               ChatBoxIdValidator chatBoxIdValidator) {
         super(bus, delegate, userManager, communicationActivityManager);
+        mActivityDelegate = delegate;
         mApiManager = apiManager;
         mCurrentChatBoxManager = currentChatBoxManager;
         mChatBoxesTitle = getString(R.string.title_chat_boxes);
@@ -208,8 +208,6 @@ public class ChatboxModeManager extends CommunicationModeManager {
                 notificationItem.setVisible(true);
             }
         }
-
-        boolean chatBoxesDrawerOpened = mActivityDelegate.getDrawerLayout().isDrawerOpen(DRAWER_GRAVITY_CHAT_BOXES);
 
         MenuItem shareChatBoxItem = menu.findItem(R.id.share_chat_box);
         MenuItem copyAliasItem = menu.findItem(R.id.copy_alias);
@@ -294,7 +292,8 @@ public class ChatboxModeManager extends CommunicationModeManager {
                     mMediaControlInterface.enqueue(new Song(currentChatBox.getAudioUrl(),
                             currentChatBox.getAudioName(),
                             currentChatBox.getName()));
-                    LogUtils.v("mMediaControlInterface.getMediaStatus() " + mMediaControlInterface.getMediaStatus());
+                    LogUtils.v("mMediaControlInterface.getMediaStatus() " +
+                            mMediaControlInterface.getMediaStatus());
                     mMediaControlInterface.playLastMediaIfStopping();
 
                     invalidateOptionsMenu();
@@ -330,7 +329,7 @@ public class ChatboxModeManager extends CommunicationModeManager {
         }
 
         if (mCurrentChatBoxManager.getCurrentChatBox() != null) {
-            ((ExtendCurrentChatboxManager) mCurrentChatBoxManager).loadOnlineUsers();
+            mCurrentChatBoxManager.loadOnlineUsers();
         }
     }
 
@@ -364,8 +363,6 @@ public class ChatboxModeManager extends CommunicationModeManager {
         if (CommunicationActivity.ACTION_OPEN_CHATBOX.equals(action)) {
             mRequestedChatboxId = intent.getIntExtra(CommunicationActivity.CHATBOX_ID, 0);
         }
-
-
     }
 
     @Override
@@ -551,7 +548,7 @@ public class ChatboxModeManager extends CommunicationModeManager {
     @Override
     public void processDeleteMessagesByIPEvent(Event event) {
         Message message = (Message) event.getParams();
-        int delete = mActivityDelegate.getActivity().getContentResolver().delete(
+        mActivityDelegate.getActivity().getContentResolver().delete(
                 ChatWingContentProvider.getMessagesUri(),
                 MessageTable.CHAT_BOX_ID + "=" + message.getChatBoxId()
                         + " AND " + MessageTable.IP + "='" + message.getIp() + "'",
@@ -565,12 +562,6 @@ public class ChatboxModeManager extends CommunicationModeManager {
         return DRAWER_GRAVITY_CHAT_BOXES;
     }
 
-    public void closeSecondaryDrawer() {
-        mActivityDelegate.getDrawerLayout().closeDrawer(DRAWER_GRAVITY_ONLINE_USER);
-        mActivityDelegate.getActivity().invalidateOptionsMenu();
-    }
-
-
     ///////////////////////////////////////////////////
     //        Event Bus
     ///////////////////////////////////////////////////
@@ -579,7 +570,9 @@ public class ChatboxModeManager extends CommunicationModeManager {
         if (event.getStatus() == UpdateSubscriptionEvent.Status.FAILED) {
             if (event.getException() != null &&
                     event.getException() instanceof ApiManager.NotVerifiedEmailException) {
-                Toast.makeText(mActivityDelegate.getActivity(), getString(R.string.error_email_verify), Toast.LENGTH_LONG).show();
+                Toast.makeText(mActivityDelegate.getActivity(),
+                        getString(R.string.error_email_verify),
+                        Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -626,7 +619,7 @@ public class ChatboxModeManager extends CommunicationModeManager {
                 ChatBox chatbox = event.getChatbox();
                 setTitle(chatbox.getName());
                 if (chatbox.getAlias() != null) setSubTitle(constructAliasLink(chatbox.getAlias()));
-                ((ExtendCurrentChatboxManager) mCurrentChatBoxManager).loadOnlineUsers();
+                mCurrentChatBoxManager.loadOnlineUsers();
 
                 invalidateOptionsMenu();
                 subscribeToCurrentChatBox();
@@ -660,7 +653,7 @@ public class ChatboxModeManager extends CommunicationModeManager {
             mRefreshOnlineUsersHandler = new Handler() {
                 @Override
                 public void handleMessage(android.os.Message msg) {
-                    ((ExtendCurrentChatboxManager) mCurrentChatBoxManager).loadOnlineUsers();
+                    mCurrentChatBoxManager.loadOnlineUsers();
                 }
             };
         }
@@ -693,7 +686,8 @@ public class ChatboxModeManager extends CommunicationModeManager {
                 mActivityDelegate.getActivity().getContentResolver(),
                 chatBoxId)) {
             //Update existing bookmark
-            Uri syncedBookmarkWithChatBoxIdUri = ChatWingContentProvider.getSyncedBookmarkWithChatBoxIdUri(chatBoxId);
+            Uri syncedBookmarkWithChatBoxIdUri = ChatWingContentProvider
+                    .getSyncedBookmarkWithChatBoxIdUri(chatBoxId);
             batch.add(ContentProviderOperation
                     .newUpdate(syncedBookmarkWithChatBoxIdUri)
                     .withValues(SyncedBookmarkTable.getContentValues(syncedBookmark))
@@ -708,7 +702,9 @@ public class ChatboxModeManager extends CommunicationModeManager {
         }
 
         try {
-            mActivityDelegate.getActivity().getContentResolver().applyBatch(ChatWingContentProvider.AUTHORITY, batch);
+            mActivityDelegate.getActivity()
+                    .getContentResolver()
+                    .applyBatch(ChatWingContentProvider.AUTHORITY, batch);
         } catch (RemoteException e) {
             mActivityDelegate.handle(e, R.string.error_failed_to_save_bookmark);
         } catch (OperationApplicationException e) {
@@ -718,7 +714,9 @@ public class ChatboxModeManager extends CommunicationModeManager {
 
     private void cancelNotification() {
         if (mCurrentChatBoxManager.getCurrentChatBox() == null) return;
-        NotificationManager notificationManager = (NotificationManager) mActivityDelegate.getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager notificationManager =
+                (NotificationManager) mActivityDelegate.getActivity()
+                        .getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(mCurrentChatBoxManager.getCurrentChatBox().getId());
     }
 
@@ -733,6 +731,11 @@ public class ChatboxModeManager extends CommunicationModeManager {
         }
     }
 
+    public void closeSecondaryDrawer() {
+        mActivityDelegate.getDrawerLayout().closeDrawer(DRAWER_GRAVITY_ONLINE_USER);
+        mActivityDelegate.getActivity().invalidateOptionsMenu();
+    }
+
     private void subscribeToCurrentChatBox() {
         WebView webView = mActivityDelegate.getFayeWebView();
         if (webView == null) {
@@ -740,7 +743,8 @@ public class ChatboxModeManager extends CommunicationModeManager {
         } else {
             ChatBox currentChatBox = mCurrentChatBoxManager.getCurrentChatBox();
             if (currentChatBox != null) {
-                String js = String.format("javascript:subscribe('%s')", currentChatBox.getFayeChannel());
+                String js = String.format("javascript:subscribe('%s')",
+                        currentChatBox.getFayeChannel());
                 webView.loadUrl(js);
             }
         }
@@ -862,7 +866,7 @@ public class ChatboxModeManager extends CommunicationModeManager {
             mActivityDelegate.handle(exception, R.string.error_failed_to_save_chat_box);
             return true;
         }
-        if (exception instanceof ApiManager.NotVerifiedEmailException){
+        if (exception instanceof ApiManager.NotVerifiedEmailException) {
             mActivityDelegate.handle(exception, R.string.error_email_verify);
             return true;
         }
@@ -878,12 +882,16 @@ public class ChatboxModeManager extends CommunicationModeManager {
         boolean isBindMediaService = mMediaControlInterface.isBindMediaService();
         MusicService.STATUS status = mMediaControlInterface.getMediaStatus();
 
-        LogUtils.v("Audio URL " + audioUrl + " isBindMediaService=" + isBindMediaService + " status " + status);
+        LogUtils.v("Audio URL " + audioUrl +
+                " isBindMediaService=" + isBindMediaService + " status " + status);
 
         if (audioUrl == null
                 || (isBindMediaService && status == MusicService.STATUS.PREPARING)
                 || isBindMediaService && mMediaControlInterface.getMediaService()
-                .containsSong(new Song(chatbox.getAudioUrl(), chatbox.getAudioName(), chatbox.getName()))) {
+                .containsSong(new Song(
+                        chatbox.getAudioUrl(),
+                        chatbox.getAudioName(),
+                        chatbox.getName()))) {
             setMediaControlVisible(false);
         } else {
             setMediaControlVisible(true);

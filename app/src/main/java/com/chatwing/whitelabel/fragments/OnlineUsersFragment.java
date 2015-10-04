@@ -39,21 +39,24 @@ import javax.inject.Inject;
  * Date: 7/25/13
  * Time: 9:29 AM
  */
-public class OnlineUsersFragment extends ListFragment implements AdapterView.OnItemClickListener {
-    public static interface OnlineUsersFragmentDelegate extends InjectableFragmentDelegate {
-        public void createConversation(CreateConversationParams.SimpleUser simpleUser);
+public class OnlineUsersFragment
+        extends ListFragment
+        implements AdapterView.OnItemClickListener {
+
+    public interface OnlineUsersFragmentDelegate extends InjectableFragmentDelegate {
+        void createConversation(CreateConversationParams.SimpleUser simpleUser);
     }
 
-    private OnlineUsersFragmentDelegate mDelegate;
     @Inject
-    OnlineUsersAdapter mListAdapter;
+    protected OnlineUsersAdapter mListAdapter;
     @Inject
-    Bus mBus;
+    protected Bus mBus;
     @Inject
-    UserManager mUserManager;
+    protected UserManager mUserManager;
     @Inject
-    QuickMessageView mQuickMessageView;
+    protected QuickMessageView mQuickMessageView;
 
+    private OnlineUsersFragmentDelegate mDelegate;
     private FrameLayout mRootView;
     private TextView mEmptyTextView;
 

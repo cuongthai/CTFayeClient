@@ -39,55 +39,32 @@ import dagger.ObjectGraph;
  * Created by cuongthai on 19/07/2014.
  */
 public class ChatWing {
-    private static ChatWing chatWing;
+    private static  ChatWing chatWing;
     private static boolean isDebugging = true;
-    private final Context mContext;
 
-    private ObjectGraph mChatwingGraph;
     @Inject
     @ForMainThread
     protected Handler mHandler;
     @Inject
     Bus mBus;
-    @Inject
-    UserManager mUserManager;
 
+    private ObjectGraph mChatwingGraph;
     private static String mAppId;
     private static String mAppSecret;
     private static String mClientId;
 
-    private String[] mChatboxIds;
     private Class<? extends Activity> mAuthenticationEntranceClass;
-    private JSInterfaceImpl mJSDelegate;
     private Class<? extends CommunicationActivity> mainActivityClass;
 
-    public void loadUnreadCount() {
-        if (mUserManager.getCurrentUser() != null) {
-            int count = ChatWingContentProvider.countUnreadMessagesInConversations(mContext.getContentResolver());
-            post(new UnreadMessagesEvent(count));
-            mContext.startService(new Intent(mContext, SyncCommunicationBoxesIntentService.class));
-        }
-    }
-
-    private void post(final UnreadMessagesEvent unreadMessagesEvent) {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mBus.post(unreadMessagesEvent);
-            }
-        });
-    }
 
     public static void initialize(Context context,
                                   String appId,
                                   String appSecret,
-                                  String[] chatboxIds,
                                   Class<? extends Activity> authenticateEntranceActivityClass) {
         ChatWing instance = instance(context);
         instance.mAppId = appId;
         instance.mAppSecret = appSecret;
         instance.mClientId = "android";
-        instance.mChatboxIds = chatboxIds;
         instance.mAuthenticationEntranceClass = authenticateEntranceActivityClass;
     }
 
@@ -103,7 +80,6 @@ public class ChatWing {
     }
 
     private ChatWing(Context context) {
-        mContext = context;
         mChatwingGraph = ObjectGraph.create(new ChatWingModule(context));
         mChatwingGraph.inject(this);
     }

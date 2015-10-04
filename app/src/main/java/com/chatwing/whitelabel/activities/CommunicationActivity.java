@@ -30,6 +30,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -37,9 +38,11 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -52,9 +55,13 @@ import com.chatwing.whitelabel.ChatWing;
 import com.chatwing.whitelabel.Constants;
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.contentproviders.ChatWingContentProvider;
+import com.chatwing.whitelabel.events.AccountSwitchEvent;
 import com.chatwing.whitelabel.events.AllSyncsCompletedEvent;
+import com.chatwing.whitelabel.events.BlockedEvent;
 import com.chatwing.whitelabel.events.DeleteBookmarkEvent;
 import com.chatwing.whitelabel.events.SyncCommunicationBoxEvent;
+import com.chatwing.whitelabel.events.SyncUnreadEvent;
+import com.chatwing.whitelabel.events.UpdateUserEvent;
 import com.chatwing.whitelabel.events.UserUnauthenticatedEvent;
 import com.chatwing.whitelabel.events.faye.ChannelSubscriptionChangedEvent;
 import com.chatwing.whitelabel.events.faye.FayePublishEvent;
@@ -62,6 +69,8 @@ import com.chatwing.whitelabel.events.faye.MessageReceivedEvent;
 import com.chatwing.whitelabel.events.faye.ServerConnectionChangedEvent;
 import com.chatwing.whitelabel.fragments.AccountDialogFragment;
 import com.chatwing.whitelabel.fragments.AdminListFragment;
+import com.chatwing.whitelabel.fragments.BlockUserDialogFragment;
+import com.chatwing.whitelabel.fragments.BookmarkedChatBoxesDrawerFragment;
 import com.chatwing.whitelabel.fragments.CategoriesFragment;
 import com.chatwing.whitelabel.fragments.ChatMessagesFragment;
 import com.chatwing.whitelabel.fragments.ColorPickerDialogFragment;
@@ -69,9 +78,11 @@ import com.chatwing.whitelabel.fragments.CommunicationDrawerFragment;
 import com.chatwing.whitelabel.fragments.CommunicationMessagesFragment;
 import com.chatwing.whitelabel.fragments.ConversationMessagesFragment;
 import com.chatwing.whitelabel.fragments.ConversationsFragment;
+import com.chatwing.whitelabel.fragments.FeedDrawerFragment;
 import com.chatwing.whitelabel.fragments.FeedFragment;
 import com.chatwing.whitelabel.fragments.GooglePlusDialogFragment;
 import com.chatwing.whitelabel.fragments.InjectableFragmentDelegate;
+import com.chatwing.whitelabel.fragments.MusicDrawerFragment;
 import com.chatwing.whitelabel.fragments.MusicFragment;
 import com.chatwing.whitelabel.fragments.NavigatableFragmentListener;
 import com.chatwing.whitelabel.fragments.NewContentFragment;
@@ -79,6 +90,7 @@ import com.chatwing.whitelabel.fragments.OnlineUsersFragment;
 import com.chatwing.whitelabel.fragments.PasswordDialogFragment;
 import com.chatwing.whitelabel.fragments.PhotoPickerDialogFragment;
 import com.chatwing.whitelabel.fragments.ProfileFragment;
+import com.chatwing.whitelabel.fragments.SettingsFragment;
 import com.chatwing.whitelabel.interfaces.ChatWingJavaDelegate;
 import com.chatwing.whitelabel.interfaces.MediaControlInterface;
 import com.chatwing.whitelabel.managers.ApiManager;
@@ -108,6 +120,7 @@ import com.chatwing.whitelabel.pojos.User;
 import com.chatwing.whitelabel.pojos.errors.ChatWingError;
 import com.chatwing.whitelabel.pojos.params.CreateConversationParams;
 import com.chatwing.whitelabel.pojos.responses.ChatBoxDetailsResponse;
+import com.chatwing.whitelabel.pojos.responses.DeleteBookmarkResponse;
 import com.chatwing.whitelabel.services.AckChatboxIntentService;
 import com.chatwing.whitelabel.services.AckConversationIntentService;
 import com.chatwing.whitelabel.services.CreateConversationIntentService;
@@ -122,6 +135,8 @@ import com.chatwing.whitelabel.tables.MessageTable;
 import com.chatwing.whitelabel.utils.LogUtils;
 import com.chatwing.whitelabel.views.BBCodeEditText;
 import com.flurry.android.FlurryAgent;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.gson.Gson;
@@ -157,16 +172,14 @@ public class CommunicationActivity
         InjectableFragmentDelegate,
         CommunicationDrawerFragment.Listener,
         OnlineUsersFragment.OnlineUsersFragmentDelegate,
-        ChatMessagesFragment.Delegate,
         NavigatableFragmentListener,
         ProfileFragment.Listener,
-        MediaControlInterface, {
+        MediaControlInterface {
     public static final String AVATAR_PICKER_DIALOG_FRAGMENT_TAG = "AvatarPickerDialogFragment";
     public static final String BLOCK_USER_DIALOG_FRAGMENT_TAG = "BlockUserDialogFragment";
     public static final String ACCOUNT_DIALOG_FRAGMENT_TAG = "AccountDialogFragmentTag";
     public static final String ACTION_STOP_MEDIA = "ACTION_STOP_MEDIA";
     public static final String PASSWORD_DIALOG_FRAGMENT_TAG = "PasswordDialogFragmentTAG";
-    public static final int REQUEST_CODE_AUTHENTICATION = 10000;
     public static final String CHATBOX_ID = "CHATBOX_ID";
     public static final String ACTION_OPEN_CHATBOX = "ACTION_OPEN_CHATBOX";
     public static final String ACTION_OPEN_CONVERSATION = "ACTION_OPEN_CONVERSATION";
@@ -177,6 +190,7 @@ public class CommunicationActivity
     private static final int MODE_CHAT_BOX = 0;
     private static final int MODE_NONE = -1;
     private static final int MODE_CONVERSATION = 1;
+    public static final int REQUEST_CODE_AUTHENTICATION = 10000;
     private static final int REQUEST_CODE_GET_GOOGLE_PLAY_SERVICES = 9000;
 
 
@@ -231,6 +245,76 @@ public class CommunicationActivity
     private MusicService musicService;
     private Intent playIntent;
     private boolean musicBound = false;
+
+    /**
+     * This class makes the ad request and loads the ad.
+     */
+    public static class AdFragment extends Fragment {
+
+        private AdView mAdView;
+
+        public AdFragment() {
+        }
+
+        @Override
+        public void onActivityCreated(Bundle bundle) {
+            super.onActivityCreated(bundle);
+
+            // Gets the ad view defined in layout/ad_fragment.xml with ad unit ID set in
+            // values/strings.xml.
+            mAdView = (AdView) getView().findViewById(R.id.adView);
+
+            // Create an ad request. Check logcat output for the hashed device ID to
+            // get test ads on a physical device. e.g.
+            // "Use AdRequest.Builder.addTestDevice("ABCDEF012345") to get test ads on this device."
+            AdRequest adRequest = new AdRequest.Builder()
+                    .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                    .addTestDevice("8852195CD9EACCCF36E4DEBF3288370B")
+                    .build();
+
+            // Start loading the ad in the background.
+            mAdView.loadAd(adRequest);
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            return inflater.inflate(R.layout.fragment_ad, container, false);
+        }
+
+        /**
+         * Called when leaving the activity
+         */
+        @Override
+        public void onPause() {
+            if (mAdView != null) {
+                mAdView.pause();
+            }
+            super.onPause();
+        }
+
+        /**
+         * Called when returning to the activity
+         */
+        @Override
+        public void onResume() {
+            super.onResume();
+            if (mAdView != null) {
+                mAdView.resume();
+            }
+        }
+
+        /**
+         * Called before the activity is destroyed
+         */
+        @Override
+        public void onDestroy() {
+            if (mAdView != null) {
+                mAdView.destroy();
+            }
+            super.onDestroy();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -294,7 +378,32 @@ public class CommunicationActivity
 
         mIsCreated = true;
 
+        String action = getIntent().getAction();
+        if (ACTION_STOP_MEDIA.equals(action)) {
+            startService(new Intent(MusicService.ACTION_STOP));
+        }
 
+        if (!mBuildManager.isOfficialChatWingApp() && userManager.getCurrentUser() == null) {
+            startActivity(new Intent(this, WhiteLabelCoverActivity.class));
+            finish();
+            return;
+        }
+
+        String onlineFragmentTag = getString(R.string.fragment_tag_online_user);
+        if (getSupportFragmentManager().findFragmentByTag(onlineFragmentTag) == null) {
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.add(R.id.right_drawer_container, new OnlineUsersFragment(), onlineFragmentTag);
+            fragmentTransaction.commit();
+        }
+
+        String adsFragmentTag = getString(R.string.fragment_tag_ads);
+        if (mBuildManager.isSupportedAds()
+                && getSupportFragmentManager().findFragmentByTag(adsFragmentTag) == null) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.ads_container, new AdFragment(), adsFragmentTag)
+                    .commit();
+        }
     }
 
     @Override
@@ -334,13 +443,36 @@ public class CommunicationActivity
         }
     }
 
-    protected void deployGCM() {
-        // Check GCM and register if needed
-        if (checkPlayServices()) {
-            String regId = mGcmManager.getRegistrationId();
-            if (TextUtils.isEmpty(regId)) {
-                updateGcm(ApiManager.GCM_ACTION_ADD, false);
+    @Override
+    public void onBackPressed() {
+        if (mCurrentCommunicationMode.isSecondaryDrawerOpening()) {
+            ((ChatboxModeManager) mCurrentCommunicationMode).closeSecondaryDrawer();
+        } else if (!mCurrentCommunicationMode.isCommunicationBoxDrawerOpening()) {
+            // Both online users and chat boxes/conversation lists are closed.
+            // Open chat boxes/conversation list now.
+            mCurrentCommunicationMode.openCommunicationBoxDrawer();
+        } else {
+            // Online users list is closed, chat boxes list is opened.
+            // User probably is trying to quit the app.
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            int stackSize = fragmentManager.getBackStackEntryCount();
+            if (stackSize == 0) {
+                finish();
+            } else {
+                String fragmentTag = fragmentManager.getBackStackEntryAt(stackSize - 1).getName();
+                fragmentManager.popBackStack(fragmentTag, FragmentManager.POP_BACK_STACK_INCLUSIVE);
             }
+        }
+    }
+
+    @Override
+    public void onContextMenuClosed(Menu menu) {
+        super.onContextMenuClosed(menu);
+        String fragmentTag = getString(R.string.tag_communication_messages);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        Fragment currentFragment = fragmentManager.findFragmentByTag(fragmentTag);
+        if (currentFragment instanceof CommunicationMessagesFragment) {
+            ((CommunicationMessagesFragment) currentFragment).onContextMenuClosed(menu);
         }
     }
 
@@ -504,6 +636,10 @@ public class CommunicationActivity
         }
     }
 
+    //////////////////////////////////////////////////////////////////
+    //          CommunicationMessagesFragment.Delegate
+    /////////////////////////////////////////////////////////////////
+
     @Override
     public final void showColorPickerDialogFragment(BBCodeParser.BBCode code) {
         if (code == null) {
@@ -538,6 +674,28 @@ public class CommunicationActivity
     }
 
     @Override
+    public void showConversation(CreateConversationParams.SimpleUser simpleUser) {
+        initConversationMenu();
+        addToLeftDrawer(new ConversationsFragment(), false);
+
+        Intent createConversation = new Intent(getActivity(), CreateConversationIntentService.class);
+        createConversation.putExtra(CreateConversationIntentService.EXTRA_USER, simpleUser);
+        startService(createConversation);
+    }
+
+    @Override
+    public void showBlockUserDialogFragment(Message message) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        BlockUserDialogFragment oldFragment = (BlockUserDialogFragment)
+                fragmentManager.findFragmentByTag(BLOCK_USER_DIALOG_FRAGMENT_TAG);
+        if (oldFragment == null || oldFragment.isDismissingByUser()) {
+            BlockUserDialogFragment newFragment = BlockUserDialogFragment.newInstance(message);
+            newFragment.show(getSupportFragmentManager(), BLOCK_USER_DIALOG_FRAGMENT_TAG);
+        }
+    }
+
+
+    @Override
     public final void onConfirmColor(Serializable code, int color) {
         BBCodePair pair = new BBCodePair((BBCodeParser.BBCode) code, color);
         getCommunicationMessagesFragment().appendBBCode(pair);
@@ -548,9 +706,15 @@ public class CommunicationActivity
         super.inject(fragment);
     }
 
+    ////////////////////////////////////////////////////
+    //          CommunicationModeManager.Delegate
+    ///////////////////////////////////////////////////
+
     @Override
     public void handle(Exception exception, int generalErrorMessageResId) {
-        if (exception instanceof ApiManager.UserUnauthenticatedException) {
+        if (exception instanceof ApiManager.InvalidIdentityException) {
+            onInvalidAuthentication((ApiManager.InvalidIdentityException) exception);
+        } else if (exception instanceof ApiManager.UserUnauthenticatedException) {
             onUserUnauthenticated();
         } else if (exception instanceof ApiManager.InvalidAccessTokenException) {
             onAccessTokenExpired();
@@ -559,14 +723,47 @@ public class CommunicationActivity
         } else if (exception instanceof ApiManager.OtherApplicationException) {
             mErrorMessageView.show(((ApiManager.OtherApplicationException) exception).getError().getMessage());
             logout();
-        } if (exception instanceof ApiManager.RequiredPermissionException) {
+        }
+        if (exception instanceof ApiManager.RequiredPermissionException) {
             mErrorMessageView.show(R.string.error_no_permission);
         } else { // General Error
-            if (generalErrorMessageResId != 0){
+            if (generalErrorMessageResId != 0) {
                 mErrorMessageView.show(exception, getString(generalErrorMessageResId));
             } else {
                 mErrorMessageView.show(exception, getString(R.string.error_unknown));
             }
+        }
+    }
+
+    @Override
+    public void dismissAuthenticationDialog() {
+        Fragment authenticationDialog = getSupportFragmentManager().findFragmentByTag(ACCOUNT_DIALOG_FRAGMENT_TAG);
+        if (authenticationDialog != null)
+            ((DialogFragment) authenticationDialog).dismiss();
+    }
+
+    @Subscribe
+    @Override
+    public void onAccountSwitch(AccountSwitchEvent accountSwitchEvent) {
+        getDrawerLayout().closeDrawers();
+        if (isInConversationMode()) {
+            mCurrentConversationManager.removeCurrentConversation();
+        }
+        mCurrentCommunicationMode.unsubscribeToChannels(mWebView);
+        mWebView = null;
+        mNotSubscribeToChannels = true;
+        //clean up irrelevant data
+        try {
+            mGcmManager.clearRegistrationId();
+
+            getContentResolver().applyBatch(ChatWingContentProvider.AUTHORITY,
+                    ChatWingContentProvider.getClearAllDataBatch());
+            startSyncingCommunications(true);
+
+            deployGCM();
+            invalidateOptionsMenu();
+        } catch (Exception e) {
+            LogUtils.e(e);
         }
     }
 
@@ -610,92 +807,7 @@ public class CommunicationActivity
         return mWebView;
     }
 
-    /**
-     * Calls this in subclass to use it as Conversation Mode
-     */
-    protected void setupConversationMode() {
-        setupMode(mConversationModeManager, ConversationMessagesFragment.newInstance());
-    }
-
-    /**
-     * Calls this in subclass to use it as Public ChatBox Mode
-     */
-    protected void setupChatboxMode() {
-        setupMode(mChatboxModeManager, ChatMessagesFragment.newInstance());
-    }
-
-    /**
-     * Requires to be overriden by subclass to be called by otto
-     *
-     * @param event
-     */
-    protected void onUserUnAuthenticatedEvent(UserUnauthenticatedEvent event) {
-        mQuickMessageView.show(R.string.message_need_login);
-    }
-
-    @Override
-    public void showCategories() {
-        setTitle(getActivity().getString(R.string.title_chat_boxes));
-        invalidateOptionsMenu();
-        if (!isInChatBoxMode()) {
-            setupChatboxMode();
-        }
-        addToLeftDrawer(getChatBoxesFragment());
-    }
-
-    @Override
-    public void showConversations() {
-        if (mUserManager.userCanLoadConversations()) {
-            setTitle(getActivity().getString(R.string.title_activity_conversation));
-            invalidateOptionsMenu();
-            if (isInChatBoxMode()) {
-                setupConversationMode();
-            }
-            addToLeftDrawer(new ConversationsFragment());
-        } else {
-            mErrorMessageView.show(R.string.error_required_login_except_guest);
-        }
-    }
-
-    @Override
-    public void showAdminList() {
-        if (mBuildManager.canShowAdminList()) {
-            addToLeftDrawer(new AdminListFragment());
-        } else {
-            mErrorMessageView.show(R.string.error_empty_message);
-        }
-    }
-
-    @Override
-    public void back(Fragment from) {
-        getSupportFragmentManager().beginTransaction()
-                .setCustomAnimations(0, R.anim.slide_out_left)
-                .remove(from)
-                .commit();
-        invalidateOptionsMenu();
-    }
-
-    @Override
-    public boolean onSwipe() {
-        return startSyncingCommunications(true);
-    }
-
-    @Override
-    public WebView getWebView() {
-        return mWebView;
-    }
-
-    @Override
-    public void showConversation(CreateConversationParams.SimpleUser simpleUser) {
-        initConversationMenu();
-        addToLeftDrawer(new ConversationsFragment(), false);
-
-        Intent createConversation = new Intent(getActivity(), CreateConversationIntentService.class);
-        createConversation.putExtra(CreateConversationIntentService.EXTRA_USER, simpleUser);
-        startService(createConversation);
-    }
-
-    @SuppressLint("SetJavaScriptEnabled")
+    @SuppressLint("JavascriptInterface")
     @Override
     public void ensureWebViewAndSubscribeToChannels() {
         if (mCurrentCommunicationMode == null) return;
@@ -756,13 +868,214 @@ public class CommunicationActivity
         }
     }
 
+    @Override
+    public void showConversations() {
+        if (mUserManager.userCanLoadConversations()) {
+            setTitle(getActivity().getString(R.string.title_activity_conversation));
+            invalidateOptionsMenu();
+            if (isInChatBoxMode()) {
+                setupConversationMode();
+            }
+            addToLeftDrawer(new ConversationsFragment());
+        } else {
+            mErrorMessageView.show(R.string.error_required_login_except_guest);
+        }
+    }
+
+
+    /**
+     * Calls this in subclass to use it as Conversation Mode
+     */
+    private void setupConversationMode() {
+        setupMode(mConversationModeManager, ConversationMessagesFragment.newInstance());
+    }
+
+    /**
+     * Calls this in subclass to use it as Public ChatBox Mode
+     */
+    private void setupChatboxMode() {
+        setupMode(mChatboxModeManager, ChatMessagesFragment.newInstance());
+    }
+
+    /////////////////////////////////////////////////
+    //     CommunicationDrawerFragment.Listener
+    //////////////////////////////////////////////////
+
+    @Override
+    public void showCategories() {
+        setTitle(getActivity().getString(R.string.title_chat_boxes));
+        invalidateOptionsMenu();
+        if (!isInChatBoxMode()) {
+            setupChatboxMode();
+        }
+        addToLeftDrawer(getChatBoxesFragment());
+    }
+
+
+    @Override
+    public void showAdminList() {
+        if (mBuildManager.canShowAdminList()) {
+            addToLeftDrawer(new AdminListFragment());
+        } else {
+            mErrorMessageView.show(R.string.error_empty_message);
+        }
+    }
+
+    @Override
+    public void showSettings() {
+        Intent i = new Intent(this, MainPreferenceActivity.class);
+        i.putExtra(SettingsFragment.LOAD_LATEST_USER_PROFILE, true);
+        startActivity(i);
+    }
+
+    @Override
+    public void updateAvatar() {
+        getDrawerLayout().closeDrawers();
+        showAvatarPicker();
+    }
+
+    @Override
+    public void searchChatBox() {
+        setTitle(getActivity().getString(R.string.title_chat_boxes));
+        invalidateOptionsMenu();
+        if (isInConversationMode()) {
+            setupChatboxMode();
+        }
+
+        Intent i = new Intent(this, SearchChatBoxActivity.class);
+        startActivityForResult(i, REQUEST_SEARCH_CHAT_BOX);
+    }
+
+    @Override
+    public void createChatBox() {
+        if (mUserManager.userCanCreateChatBox()) {
+            setTitle(getActivity().getString(R.string.title_chat_boxes));
+            invalidateOptionsMenu();
+            if (isInConversationMode()) {
+                setupChatboxMode();
+            }
+
+            Intent i = new Intent(this, CreateChatBoxActivity.class);
+            startActivityForResult(i, REQUEST_CREATE_CHAT_BOX);
+        } else {
+            mErrorMessageView.show(R.string.error_required_chat_wing_login_to_create_chat_boxes);
+        }
+    }
+
+    @Override
+    public void showBookmarks() {
+        if (mUserManager.userCanBookmark()) {
+            setTitle(getActivity().getString(R.string.title_chat_boxes));
+            invalidateOptionsMenu();
+            if (isInConversationMode()) {
+                setupChatboxMode();
+            }
+            addToLeftDrawer(new BookmarkedChatBoxesDrawerFragment());
+        } else {
+            mErrorMessageView.show(R.string.error_required_chat_wing_login);
+        }
+    }
+
+    @Override
+    public void openAccountPicker() {
+        if (!mBuildManager.isOfficialChatWingApp()) return;
+        getDrawerLayout().closeDrawers();
+        showAccountPicker(null);
+    }
+
+    @Override
+    public void showFeedsSources() {
+        setTitle(getActivity().getString(R.string.title_feeds));
+        invalidateOptionsMenu();
+        if (!isInFeedMode()) {
+            setupFeedMode();
+        }
+        addToLeftDrawer(new FeedDrawerFragment());
+    }
+
+    @Override
+    public void showMusicBox() {
+        setTitle(getActivity().getString(R.string.title_music_box));
+        invalidateOptionsMenu();
+        if (!isInMusicBoxMode()) {
+            setupMusicBoxMode();
+        }
+        addToLeftDrawer(new MusicDrawerFragment());
+    }
+
+    @Override
+    public void logout() {
+        if (mUserManager.getCurrentUser() == null) {
+            return;
+        }
+
+        new AsyncTask<Void, Void, Void>() {
+            public ProgressDialog dialog;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                dialog = ProgressDialog.show(getDialogContext(), "",
+                        getString(R.string.logging_out), true, false);
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    String regId = mGcmManager.getRegistrationId();
+                    mApiManager.updateGcm(mUserManager.getCurrentUser(), regId, ApiManager.GCM_ACTION_REMOVE);
+                } catch (Exception e) {
+                    LogUtils.e(e);
+                }
+                mGcmManager.clearRegistrationId();
+
+
+                try {
+                    getContentResolver().applyBatch(ChatWingContentProvider.AUTHORITY,
+                            ChatWingContentProvider.getClearAllDataBatch());
+                } catch (Exception e) {
+                    LogUtils.e(e);
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                if (dialog.isShowing()) {
+                    dialog.dismiss();
+                }
+                mCurrentCommunicationMode.logout();
+                mUserManager.removeUsers();
+
+                Intent i = new Intent(CommunicationActivity.this, getEntranceActivityClass());
+                startActivity(i);
+                finish();
+            }
+        }.execute();
+    }
+
+    @Override
+    public void back(Fragment from) {
+        getSupportFragmentManager().beginTransaction()
+                .setCustomAnimations(0, R.anim.slide_out_left)
+                .remove(from)
+                .commit();
+        invalidateOptionsMenu();
+    }
+
+    @Override
+    public boolean onSwipe() {
+        return startSyncingCommunications(true);
+    }
+
 
     //////////////////////////////////////////
     ///     Otto
     //////////////////////////////////////////
-
     @Subscribe
-    public void onAllSyncsCompleted(AllSyncsCompletedEvent event) {
+    public void onAllSyncsCompleted(AllSyncsCompletedEvent
+                                            event) {
         LogUtils.v("All Sync Completed");
         destroyWebview();
         ensureWebViewAndSubscribeToChannels();
@@ -772,6 +1085,108 @@ public class CommunicationActivity
                 mCurrentCommunicationMode != null) {
             mCurrentCommunicationMode.reloadCurrentBox();
         }
+
+        chatboxUnreadDownloadManager.downloadUnread();
+        syncRefreshAnimationState();
+    }
+
+    @Subscribe
+    public void onSyncUnreadEvent(SyncUnreadEvent event) {
+        syncRefreshAnimationState();
+
+        AckChatboxIntentService.ack(this, event.getUnAckChatboxIds());
+    }
+
+    @Subscribe
+    public void onUpdateUserProfileEvent(UpdateUserEvent event) {
+        Exception exception = event.getException();
+        if (exception != null) {
+            handle(exception, R.string.error_failed_to_update_user_profile);
+        }
+    }
+
+    @Subscribe
+    public void onSyncCommunicationBoxEvent
+            (SyncCommunicationBoxEvent event) {
+        SyncCommunicationBoxEvent.Status status = event.getStatus();
+        syncRefreshAnimationState();
+        switch (status) {
+            case STARTED:
+                break;
+            case SUCCEED:
+                /*
+                 * TODO when succeed, may need to check if the current chat
+                 * box is still valid.
+                 * And un-subscribe to all invalid chat boxes.
+                 */
+
+                ensureWebViewAndSubscribeToChannels();
+                startSyncingBookmarks();
+                startSyncingCurrentUser();
+                break;
+            case FAILED:
+                handle(event.getException(), R.string.error_failed_to_sync_data);
+                break;
+        }
+    }
+
+
+    /**
+     * After deleting bookmark on server, we delete on client
+     *
+     * @param event
+     */
+    @Subscribe
+    public void onDeletedBookmarkEvent(DeleteBookmarkEvent event) {
+        if (handleDeleteBookmarkEvent(event)) {
+            return;
+        }
+
+        DeleteBookmarkResponse.DeletedBookmark deletedBookmark = event.getResponse().getData();
+        if (deletedBookmark == null) {
+            LogUtils.e("Hmm... No data again.." + event.getResponse());
+            return;
+        }
+        Uri syncedBookmarkWithChatBoxIdUri = ChatWingContentProvider
+                .getSyncedBookmarkWithChatBoxIdUri(deletedBookmark.getChatBoxId());
+
+        int delete = getContentResolver()
+                .delete(syncedBookmarkWithChatBoxIdUri,
+                        null,
+                        null);
+        if (delete != 1) {
+            //Weird thing happen
+            LogUtils.e("After deleting on server, bookmark removal on client side has broken chatbox_id" +
+                    deletedBookmark.getChatBoxId());
+        }
+    }
+
+    @Subscribe
+    public void onBlockedUser(BlockedEvent event) {
+        if (event.getException() == null) {
+            Fragment fragmentByTag = getSupportFragmentManager().findFragmentByTag(BLOCK_USER_DIALOG_FRAGMENT_TAG);
+            if (fragmentByTag != null) {
+                ((DialogFragment) fragmentByTag).dismiss();
+            }
+            mErrorMessageView.show(R.string.message_blocked);
+            return;
+        }
+        if (event.getException() instanceof ApiManager.ValidationException) {
+            //Ignore this exception since it handle on BlockFragmentDialog
+            return;
+        }
+        if (event.getException() instanceof ApiManager.RequiredPermissionException) {
+            mErrorMessageView.show(event.getException(),
+                    getString(R.string.error_require_permission_to_view_ip));
+            return;
+        }
+
+        handle(event.getException(), R.string.error_while_blocking_user);
+    }
+
+    @Subscribe
+    public void onUserUnAuthenticatedEvent(UserUnauthenticatedEvent event) {
+        mQuickMessageView.show(R.string.message_need_login);
     }
 
     @Subscribe
@@ -837,28 +1252,6 @@ public class CommunicationActivity
                 mQuickMessageView.show(R.string.message_disconnected_from_server);
             }
             LogUtils.v("Disconnected from server.");
-        }
-    }
-
-    @Subscribe
-    public void onSyncCommunicationBoxEvent(SyncCommunicationBoxEvent event) {
-        SyncCommunicationBoxEvent.Status status = event.getStatus();
-        syncRefreshAnimationState();
-        switch (status) {
-            case STARTED:
-                break;
-            case SUCCEED:
-                /*
-                 * TODO when succeed, may need to check if the current chat
-                 * box is still valid.
-                 * And un-subscribe to all invalid chat boxes.
-                 */
-
-                ensureWebViewAndSubscribeToChannels();
-                break;
-            case FAILED:
-                handle(event.getException(), R.string.error_failed_to_sync_data);
-                break;
         }
     }
 
@@ -997,59 +1390,6 @@ public class CommunicationActivity
         invalidateOptionsMenu();
     }
 
-
-    @Override
-    public void logout() {
-        if (mUserManager.getCurrentUser() == null) {
-            return;
-        }
-
-        new AsyncTask<Void, Void, Void>() {
-            public ProgressDialog dialog;
-
-            @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-                dialog = ProgressDialog.show(getDialogContext(), "",
-                        getString(R.string.logging_out), true, false);
-            }
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    String regId = mGcmManager.getRegistrationId();
-                    mApiManager.updateGcm(mUserManager.getCurrentUser(), regId, ApiManager.GCM_ACTION_REMOVE);
-                } catch (Exception e) {
-                    LogUtils.e(e);
-                }
-                mGcmManager.clearRegistrationId();
-
-
-                try {
-                    getContentResolver().applyBatch(ChatWingContentProvider.AUTHORITY,
-                            ChatWingContentProvider.getClearAllDataBatch());
-                } catch (Exception e) {
-                    LogUtils.e(e);
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
-                if (dialog.isShowing()) {
-                    dialog.dismiss();
-                }
-                mCurrentCommunicationMode.logout();
-                mUserManager.removeUsers();
-
-                Intent i = new Intent(CommunicationActivity.this, getEntranceActivityClass());
-                startActivity(i);
-                finish();
-            }
-        }.execute();
-    }
-
     private Context getDialogContext() {
         Context context;
         if (getParent() != null) context = getParent();
@@ -1057,11 +1397,11 @@ public class CommunicationActivity
         return context;
     }
 
-    protected Class<? extends BaseABFragmentActivity> getEntranceActivityClass() {
-        return CommunicationActivity.class;
+    private Class<? extends BaseABFragmentActivity> getEntranceActivityClass() {
+        return mBuildManager.isOfficialChatWingApp() ? CommunicationActivity.class : WhiteLabelCoverActivity.class;
     }
 
-    protected boolean startSyncingCommunications(boolean needReload) {
+    private boolean startSyncingCommunications(boolean needReload) {
         if (SyncCommunicationBoxesIntentService.isInProgress()) {
             // A sync operation is running. Just wait for it.
             return false;
@@ -1088,7 +1428,7 @@ public class CommunicationActivity
             AckChatboxIntentService.ack(this, chatBox.getId());
         }
 
-
+        mSyncManager.addToQueue(DownloadUserDetailIntentService.class);
         return true;
     }
 
@@ -1158,13 +1498,23 @@ public class CommunicationActivity
         mLoadingView.setVisibility(View.VISIBLE);
     }
 
-    protected boolean syncingInProcess() {
-        return SyncCommunicationBoxesIntentService.isInProgress();
+    private boolean syncingInProcess() {
+        return SyncCommunicationBoxesIntentService.isInProgress()
+                || SyncBookmarkIntentService.isInProgress()
+                || ChatboxUnreadDownloadManager.isRunning();
     }
 
     private void onAccessTokenExpired() {
         mErrorMessageView.show(R.string.error_invalid_access_token);
         logout();
+    }
+
+    ///////////////////////////////////////////////////////
+    ///            OnlineUsersFragmentDelegate
+    ////////////////////////////////////////////////////////////
+    @Override
+    public void createConversation(CreateConversationParams.SimpleUser simpleUser) {
+        showConversation(simpleUser);
     }
 
     /////////////////////////////////////////////////////////
@@ -1214,7 +1564,7 @@ public class CommunicationActivity
 
 
     private void startAndBindMusicService() {
-        if(mBuildManager.isSupportedMusicBox()) {
+        if (mBuildManager.isSupportedMusicBox()) {
             if (playIntent == null) {
                 playIntent = new Intent(this, MusicService.class);
                 startService(playIntent);
@@ -1358,8 +1708,19 @@ public class CommunicationActivity
             // A sync operation is running. Just wait for it.
             return;
         }
-        super.mSyncManager.addToQueue(SyncBookmarkIntentService.class);
+        mSyncManager.addToQueue(SyncBookmarkIntentService.class);
 
         getActivity().startService(new Intent(getActivity(), SyncBookmarkIntentService.class));
+    }
+
+
+    private void deployGCM() {
+        // Check GCM and register if needed
+        if (checkPlayServices()) {
+            String regId = mGcmManager.getRegistrationId();
+            if (TextUtils.isEmpty(regId)) {
+                updateGcm(ApiManager.GCM_ACTION_ADD, false);
+            }
+        }
     }
 }

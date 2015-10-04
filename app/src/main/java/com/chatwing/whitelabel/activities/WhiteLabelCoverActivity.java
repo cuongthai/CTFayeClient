@@ -21,6 +21,7 @@ import javax.inject.Inject;
  */
 public class WhiteLabelCoverActivity extends BaseABFragmentActivity {
     private static final int REQUEST_AUTHENTICATION = 1990;
+
     @Inject
     protected UserManager mUserManager;
     @Inject
@@ -41,7 +42,7 @@ public class WhiteLabelCoverActivity extends BaseABFragmentActivity {
 
         //If user already signed in
         if (mUserManager.getCurrentUser() != null) {
-            startActivity(new Intent(this, ExtendCommunicationActivity.class));
+            startActivity(new Intent(this, CommunicationActivity.class));
             finish();
             return;
         }
@@ -76,7 +77,7 @@ public class WhiteLabelCoverActivity extends BaseABFragmentActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_AUTHENTICATION) {
             if (resultCode == RESULT_OK) {
-                startActivity(new Intent(this, ExtendCommunicationActivity.class));
+                startActivity(new Intent(this, CommunicationActivity.class));
                 finish();
                 return;
             }

@@ -61,18 +61,18 @@ import java.util.Map;
  */
 public abstract class CommunicationModeManager {
     private static final String MANAGE_NOTIFICATION_TAG = "MANAGE_NOTIFICATION_TAG";
-
     private static final String EXTRA_OPENING_VIDEO_URL = "opening_video_url";
 
-    private final Bus mBus;
     protected final Delegate mActivityDelegate;
     protected final UserManager mUserManager;
     protected final CommunicationActivityManager mCommunicationActivityManager;
     protected CharSequence mOriginalTitle;
     protected CharSequence mTitle;
+    protected boolean mIsActive;
+
+    private final Bus mBus;
     private String mOpeningVideoUrl;
     private boolean mIsRegisteredToBus;
-    protected boolean mIsActive;
 
     public CommunicationModeManager(Bus bus,
                                     Delegate delegate,
@@ -94,7 +94,7 @@ public abstract class CommunicationModeManager {
                 mActivityDelegate.setContentShown(false);
                 break;
             case LOADED:
-                LogUtils.v("Loaded chatbox "+event.getUrl());
+                LogUtils.v("Loaded chatbox " + event.getUrl());
                 mActivityDelegate.setContentShown(true);
                 break;
         }
@@ -118,15 +118,15 @@ public abstract class CommunicationModeManager {
         return mActivityDelegate.getDrawerLayout().isDrawerOpen(getCommunicationBoxDrawerGravity());
     }
 
-    public boolean onCreateOptionsMenu(Menu menu){
+    public boolean onCreateOptionsMenu(Menu menu) {
         return true;
     }
 
-    public boolean onPrepareOptionsMenu(Menu menu){
+    public boolean onPrepareOptionsMenu(Menu menu) {
         return false;
     }
 
-    public boolean onOptionsItemSelected(MenuItem item){
+    public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.manage_notification) {
             manageNotification();
             return true;
@@ -220,7 +220,7 @@ public abstract class CommunicationModeManager {
     protected boolean updateConversationUnreadCount(String conversationId, int unreadCount) {
         Uri uri = ChatWingContentProvider.getConversationWithIdUri(conversationId);
         ContentValues contentValues = new ContentValues();
-        LogUtils.v("updateConversationUnreadCount "+unreadCount);
+        LogUtils.v("updateConversationUnreadCount " + unreadCount);
         contentValues.put(ConversationTable.UNREAD_COUNT, unreadCount);
         contentValues.put(ConversationTable.DATE_UPDATED, System.currentTimeMillis());
 
@@ -234,42 +234,34 @@ public abstract class CommunicationModeManager {
         }
     }
 
-    public void onNewIntent(Intent intent) {
-
-    }
-
     public abstract void processMessageInCurrentCommunicationBox(Message message);
 
-    public static interface Delegate {
+    public interface Delegate {
+        String EXTRA_CHAT_BOX_ID = "chat_box_id";
+        int REQUEST_SEARCH_CHAT_BOX = 2;
+        int REQUEST_CREATE_CHAT_BOX = 3;
+
+        void handle(Exception exception, int errorMessageResId);
+
         void dismissAuthenticationDialog();
 
         void onAccountSwitch(AccountSwitchEvent accountSwitchEvent);
 
-        public static final String EXTRA_CHAT_BOX_ID = "chat_box_id";
+        BaseABFragmentActivity getActivity();
 
-        public static final int REQUEST_SEARCH_CHAT_BOX = 2;
-        public static final int REQUEST_CREATE_CHAT_BOX = 3;
+        CommunicationMessagesFragment getCommunicationMessagesFragment();
 
-        public void handle(Exception exception, int errorMessageResId);
+        void setProgressText(int resId, boolean showProgressBar);
 
-        public BaseABFragmentActivity getActivity();
+        void setContentShown(boolean show);
 
-        public CommunicationMessagesFragment getCommunicationMessagesFragment();
+        DrawerLayout getDrawerLayout();
 
-        public void setProgressText(int resId, boolean showProgressBar);
+        WebView getFayeWebView();
 
-        public void setContentShown(boolean show);
+        void ensureWebViewAndSubscribeToChannels();
 
-        public DrawerLayout getDrawerLayout();
-
-        public WebView getFayeWebView();
-
-        public void ensureWebViewAndSubscribeToChannels();
-
-        public void showConversation(CreateConversationParams.SimpleUser simpleUser);
-
-
-
+        void showConversation(CreateConversationParams.SimpleUser simpleUser);
     }
 
     /**
@@ -337,9 +329,9 @@ public abstract class CommunicationModeManager {
     }
 
     protected void setSubTitle(String subTitle) {
-        if(Constants.SHOW_CHAT_BOX_URL) {
+        if (Constants.SHOW_CHAT_BOX_URL) {
             mActivityDelegate.getActivity().getSupportActionBar().setSubtitle(subTitle);
-        }else{
+        } else {
             mActivityDelegate.getActivity().getSupportActionBar().setSubtitle(null);
         }
     }
@@ -403,7 +395,7 @@ public abstract class CommunicationModeManager {
                 c.close();
             }
         }
-        LogUtils.v("Test Duplicate subscribeToChatBoxChannels "+fayeChannels.size()+":"+mWebView);
+        LogUtils.v("Test Duplicate subscribeToChatBoxChannels " + fayeChannels.size() + ":" + mWebView);
 
         // Subscribe to all of them
         for (String fayeChannel : fayeChannels) {
@@ -424,7 +416,7 @@ public abstract class CommunicationModeManager {
     private void unsubscribeToChatBoxChannels(WebView mWebView) {
         // Subscribe to all of them
         ArrayList<String> allFayeChannels = getAllFayeChannels();
-        LogUtils.v("Test Duplicate unsubscribeToChatBoxChannels "+allFayeChannels.size());
+        LogUtils.v("Test Duplicate unsubscribeToChatBoxChannels " + allFayeChannels.size());
 
         for (String fayeChannel : allFayeChannels) {
             String js = String.format("javascript:unsubscribe('%s')", fayeChannel);

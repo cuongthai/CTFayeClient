@@ -129,7 +129,6 @@ public class ChatMessagesFragment extends CommunicationMessagesFragment {
         mDelegate = (Delegate) activity;
     }
 
-
     @Override
     public void onDetach() {
         super.onDetach();
@@ -237,7 +236,8 @@ public class ChatMessagesFragment extends CommunicationMessagesFragment {
     public boolean addNewMessage(Message newMessage) {
         if (newMessage.getStatus() == Message.Status.PUBLISHED) {
             //Ack if necessary
-            if (mLastReceiveMessageTime == 0 || (System.currentTimeMillis() - mLastReceiveMessageTime > ACK_TIMING_THRESHOLD)) {
+            if (mLastReceiveMessageTime == 0
+                    || (System.currentTimeMillis() - mLastReceiveMessageTime > ACK_TIMING_THRESHOLD)) {
                 AckChatboxIntentService.ack(getActivity(), newMessage.getChatBoxId());
             }
             mLastReceiveMessageTime = System.currentTimeMillis();
@@ -302,7 +302,7 @@ public class ChatMessagesFragment extends CommunicationMessagesFragment {
     }
 
     @Subscribe
-    public void onIgnoreUserUpdate(IgnoreUserEvent event){
+    public void onIgnoreUserUpdate(IgnoreUserEvent event) {
         mAdapter.notifyDataSetChanged();
     }
 
@@ -335,15 +335,6 @@ public class ChatMessagesFragment extends CommunicationMessagesFragment {
     @Subscribe
     public void onGotMoreMessagesEvent(GotMoreMessagesEvent event) {
         super.onGotMoreMessagesEvent(event);
-    }
-
-    private void onRequestOpenChatBox() {
-        if (!mRequestingChatBox.hasPassword()) {
-            mBus.post(new ResumeOpenChatBoxEvent(mRequestingChatBox));
-            return;
-        }
-        hide();
-        mDelegate.showPasswordDialogFragment();
     }
 
     @Override
@@ -496,15 +487,6 @@ public class ChatMessagesFragment extends CommunicationMessagesFragment {
         mDelegate.showBlockUserDialogFragment(message);
     }
 
-    private boolean hasAdminPermissions() {
-        return hasPermission(PermissionsValidator.Permission.DELETE_MESSAGE)
-                || hasPermission(PermissionsValidator.Permission.VIEW_MESSAGE_IP);
-    }
-
-    private boolean hasPermission(PermissionsValidator.Permission permission) {
-        return mUserManager.userHasPermission(mCurrentChatBoxManager.getCurrentChatBox(), permission);
-    }
-
     private void doBlockUser(BLOCK block,
                              RequestBlockEvent event) {
         Intent intent = new Intent(getActivity(), BlockUserIntentService.class);
@@ -544,5 +526,14 @@ public class ChatMessagesFragment extends CommunicationMessagesFragment {
 
 
         return !meOrGuest;
+    }
+
+    private void onRequestOpenChatBox() {
+        if (!mRequestingChatBox.hasPassword()) {
+            mBus.post(new ResumeOpenChatBoxEvent(mRequestingChatBox));
+            return;
+        }
+        hide();
+        mDelegate.showPasswordDialogFragment();
     }
 }

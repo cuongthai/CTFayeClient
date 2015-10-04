@@ -23,7 +23,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import com.chatwing.whitelabel.BuildConfig;
 import com.chatwing.whitelabel.ChatWing;
 import com.chatwing.whitelabel.R;
-import com.chatwing.whitelabel.activities.ExtendCommunicationActivity;
+import com.chatwing.whitelabel.activities.CommunicationActivity;
 import com.chatwing.whitelabel.pojos.Song;
 import com.chatwing.whitelabel.utils.AudioFocusHelper;
 import com.chatwing.whitelabel.utils.LogUtils;
@@ -457,7 +457,7 @@ public class MusicService extends Service implements
 
     private Intent getOpenIntent() {
         Intent i = new Intent(this, ChatWing.instance(this).getMainActivityClass());
-        i.setAction(ExtendCommunicationActivity.ACTION_STOP_MEDIA);
+        i.setAction(CommunicationActivity.ACTION_STOP_MEDIA);
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         return i;
     }
