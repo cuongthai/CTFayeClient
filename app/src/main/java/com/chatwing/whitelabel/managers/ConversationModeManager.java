@@ -192,7 +192,6 @@ public class ConversationModeManager extends CommunicationModeManager {
 
     @Override
     public void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
         String action = intent.getAction();
         if (CommunicationActivity.ACTION_OPEN_CONVERSATION.equals(action)) {
             LogUtils.v("Debug request open conversation: Set open conversation onNewIntent");

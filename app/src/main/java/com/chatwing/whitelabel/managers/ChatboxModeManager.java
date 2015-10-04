@@ -376,7 +376,6 @@ public class ChatboxModeManager extends CommunicationModeManager {
 
     @Override
     public void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
         String action = intent.getAction();
         LogUtils.v("GCM onNewIntent action" + action);
 

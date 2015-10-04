@@ -1,5 +1,6 @@
 package com.chatwing.whitelabel.managers;
 
+import android.content.Intent;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -81,6 +82,11 @@ public class FeedModeManager extends CommunicationModeManager {
 
     @Override
     public void processDeleteMessagesByIPEvent(Event event) {
+
+    }
+
+    @Override
+    public void onNewIntent(Intent intent) {
 
     }
 

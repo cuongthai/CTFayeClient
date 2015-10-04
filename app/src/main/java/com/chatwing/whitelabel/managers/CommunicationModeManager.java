@@ -114,6 +114,8 @@ public abstract class CommunicationModeManager {
 
     public abstract void processDeleteMessagesByIPEvent(Event event);
 
+    public abstract void onNewIntent(Intent intent);
+
     public boolean isCommunicationBoxDrawerOpening() {
         return mActivityDelegate.getDrawerLayout().isDrawerOpen(getCommunicationBoxDrawerGravity());
     }
