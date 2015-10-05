@@ -2,7 +2,7 @@ import ConfigParser
 from functools import partial
 from itertools import chain
 import shutil
-import os
+import os,time
 import colors
 import colorsys
 import urllib2
@@ -13,9 +13,18 @@ src_package = "/res/values"
 STRING_MAPPING = {"APP_NAME": "app_name","FACEBOOK_APP_ID":"fb_app_id","LOGIN_METHOD":"build_login_method","FLURRY_API_KEY":"flurry_api_key","ADMOBS_AD_UNIT":"banner_ad_unit_id"}
 BOOL_MAPPING = {"OFFICIAL":"official","ADS":"show_ads","ALLOW_REGISTER":"allow_register","SUPPORT_RSS":"support_rss","SUPPORT_MUSIC_BOX":"support_music_box"}
 
-APP_ID = "b4b391d0-e9bf-11e4-871f-f1829c245e2e"
-OUT_APP_PATH = "out/%s"%APP_ID
-SERVER_URL = "http://staging.chatwing.com"
+APP_ID = "cdd8d4e0-6629-11e5-8d92-aff32c7bf061"
+FLURRY_API_KEY = "Y8H9SHPZW7BZST2ZBDBV"
+ICON_LAUNCHER = "https://dl.dropboxusercontent.com/u/11028239/rene.png"
+VERSION_CODE = 1
+VERSION_NAME = 0.9
+LOGIN_METHOD = "custom"
+
+SERVER_URL = "http://cloud.chatwing.com"
+WHITE_LABEL_KEY_PATH= "../certs/whitelabel.keystore"
+WHITE_LABEL_STORE_PASSWORD="654321"
+WHITE_LABEL_KEY_ALIAS="whitelabel"
+WHITE_LABEL_KEY_PASSWORD="123456"
 class Helper:
     def __init__(self, section, file):
         self.readline = partial(next, chain(("[{0}]\n".format(section),), file, ("",)))
@@ -117,55 +126,52 @@ def write_color_theme():
         f.writelines("</resources>\n")
         f.close()
 
-
-def ensure_out_folder():
-    if not os.path.exists("out"):
-        os.makedirs("out")
-    if not os.path.exists(OUT_APP_PATH):
-        os.makedirs(OUT_APP_PATH)
-def ensure_cert(config_json):
-    if os.path.exists("%s/whitelabel.keystore"%OUT_APP_PATH): return
-
-    cmd = """keytool -genkeypair -alias %(alias)s -keypass %(key_pass)s -keystore %(key_path)s -storepass %(key_pass)s -dname "CN=%(cn)s,O=%(o)s,C=%(c)s" -validity 9999""" \
-          %{
-                "alias":config_json.get("key_alias",""),
-                "key_pass":config_json.get("key_password",""),
-                "key_path":"%s/whitelabel.keystore"%OUT_APP_PATH,
-                "cn":config_json.get("common_name",""),
-                "o":config_json.get("organization",""),
-                "c":config_json.get("country",""),
-            }
-    print cmd
-    os.system(cmd)
 def generate_gradle_properties():
-    response = urllib2.urlopen("http://staging.chatwing.com/api/3/app/build/android"
+    response = urllib2.urlopen("%s/api/3/app/build/android"
                     "?id=%s"
-                    "&secret=LNbSx3LpNhGgHn3dVdhBY5q2"%APP_ID)
+                    "&builder=true"
+                    "&secret=LNbSx3LpNhGgHn3dVdhBY5q2"%(SERVER_URL, APP_ID))
     response_str = response.read()
     config_json = json.loads(response_str)["data"]
-    ensure_cert(config_json)
     template = open("gradle.properties_template").read()
-    config_str = template % {"app_name":config_json.get("display_name","Unknown"),
+    config_str = template % {"app_id":APP_ID,
+                             "app_name":config_json.get("display_name","Unknown"),
                              "package_name":config_json.get("package_name","com.chatwing.unknown_package_name"),
-                             "release_key_path":"../%s/whitelabel.keystore"%OUT_APP_PATH,
-                             "release_key_password":config_json.get("key_password",""),
-                             "release_key_alias":config_json.get("key_alias",""),
+                             "release_key_path":WHITE_LABEL_KEY_PATH,
+                             "release_store_password":WHITE_LABEL_STORE_PASSWORD,
+                             "release_key_password":WHITE_LABEL_KEY_PASSWORD,
+                             "release_key_alias":WHITE_LABEL_KEY_ALIAS,
                              "facebook_app_id":config_json.get("facebook_app_id",""),
-                             "color_theme":config_json.get("color_theme","#05b0ff"),
-                             "ic_launcher":"%s%s"%(SERVER_URL,config_json.get("icon","")),
-                             "color_action_primary":config_json.get("color_action_primary","#E92754"),
-                             "allow_register":"Yes" if config_json.get("openRegistration",True) else "No",
-                             "login_method":config_json.get("loginMethod",True)
+                             "ic_launcher":ICON_LAUNCHER,
+
+                            "color_primary":config_json["android_settings"].get("color_primary","#9E9E9E"),
+                            "color_primary_dark":config_json["android_settings"].get("color_primary_dark","#212121"),
+                            "color_accent":config_json["android_settings"].get("color_accent","#FF5722"),
+                            "color_primary_text":config_json["android_settings"].get("color_primary_text","#212121"),
+                            "color_secondary_text":config_json["android_settings"].get("color_secondary_text","#727272"),
+                            "color_icon_on_primary":config_json["android_settings"].get("color_icon_on_primary","#FFFFFF"),
+                            "color_divider":config_json["android_settings"].get("color_divider","#B6B6B6"),
+                            "color_text_on_primary":config_json["android_settings"].get("color_text_on_primary","#FFFFFF"),
+
+                            "ads": "Yes" if config_json.get("admob_code",None) else "No",
+                            "admob_ad_unit":config_json.get("admob_code","") if config_json.get("admob_code","") else "",
+                            "login_method" : LOGIN_METHOD,
+
+                            "furry_api_key" : FLURRY_API_KEY,
+
+                             "allow_register" : "Yes" if config_json['json'].get("openRegistration",True) else "No",
+                             "version_code" : VERSION_CODE,
+                             "version_name" : VERSION_NAME
                              }
 
     print config_str
     f = open("gradle.properties","w")
     f.write(config_str)
-
+    f.close()
 
 
 #ensure_out_folder()
-#generate_gradle_properties()
+generate_gradle_properties()
 
 os.system("./gradlew clean")
 ensure_build_type_folders()
@@ -173,8 +179,8 @@ write_string_xml()
 write_bool_xml()
 write_ic_launcher()
 write_color_theme()
+time.sleep(5)
 # #create_certs()
 #
 print(get_value(config, "APP_NAME"))
 os.system("./gradlew assembleRelease")
-
