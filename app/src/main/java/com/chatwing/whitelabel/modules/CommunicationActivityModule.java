@@ -42,6 +42,7 @@ import com.chatwing.whitelabel.fragments.PasswordDialogFragment;
 import com.chatwing.whitelabel.fragments.PhotoPickerDialogFragment;
 import com.chatwing.whitelabel.fragments.ProfileFragment;
 import com.chatwing.whitelabel.interfaces.ChatWingJavaDelegate;
+import com.chatwing.whitelabel.interfaces.ChatwingJSInterface;
 import com.chatwing.whitelabel.interfaces.JSInterfaceImpl;
 import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.managers.BuildManager;
@@ -153,6 +154,12 @@ public class CommunicationActivityModule {
     @Singleton
     ChatWingJavaDelegate provideChatWingJavaDelegate(JSInterfaceImpl jsInterface) {
         return jsInterface;
+    }
+
+    @Provides
+    @Singleton
+    ChatwingJSInterface provideChatWingJSInterface(ChatWingJavaDelegate delegate) {
+        return new ChatwingJSInterface(delegate);
     }
 
     @Provides

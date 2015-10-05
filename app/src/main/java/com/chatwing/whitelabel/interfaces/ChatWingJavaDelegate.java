@@ -16,10 +16,10 @@
 
 package com.chatwing.whitelabel.interfaces;
 
+
 /**
  * Created by cuongthai on 26/08/2014.
  */
 public interface ChatWingJavaDelegate {
-    public static final String CHATWING_JS_NAME = "ChatwingMobile";
     void publish(String event, String data);
 }

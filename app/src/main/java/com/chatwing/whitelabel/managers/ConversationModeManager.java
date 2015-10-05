@@ -39,7 +39,6 @@ import com.chatwing.whitelabel.events.CurrentConversationEvent;
 import com.chatwing.whitelabel.events.PostAuthenticationEvent;
 import com.chatwing.whitelabel.events.UpdateSubscriptionEvent;
 import com.chatwing.whitelabel.events.UserSelectedConversationEvent;
-import com.chatwing.whitelabel.events.UserSelectedDefaultUsersEvent;
 import com.chatwing.whitelabel.fragments.NotificationFragment;
 import com.chatwing.whitelabel.pojos.Conversation;
 import com.chatwing.whitelabel.pojos.Event;

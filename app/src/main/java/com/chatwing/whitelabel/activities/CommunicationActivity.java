@@ -62,6 +62,7 @@ import com.chatwing.whitelabel.events.DeleteBookmarkEvent;
 import com.chatwing.whitelabel.events.SyncCommunicationBoxEvent;
 import com.chatwing.whitelabel.events.SyncUnreadEvent;
 import com.chatwing.whitelabel.events.UpdateUserEvent;
+import com.chatwing.whitelabel.events.UserSelectedDefaultUsersEvent;
 import com.chatwing.whitelabel.events.UserUnauthenticatedEvent;
 import com.chatwing.whitelabel.events.faye.ChannelSubscriptionChangedEvent;
 import com.chatwing.whitelabel.events.faye.FayePublishEvent;
@@ -91,7 +92,7 @@ import com.chatwing.whitelabel.fragments.PasswordDialogFragment;
 import com.chatwing.whitelabel.fragments.PhotoPickerDialogFragment;
 import com.chatwing.whitelabel.fragments.ProfileFragment;
 import com.chatwing.whitelabel.fragments.SettingsFragment;
-import com.chatwing.whitelabel.interfaces.ChatWingJavaDelegate;
+import com.chatwing.whitelabel.interfaces.ChatwingJSInterface;
 import com.chatwing.whitelabel.interfaces.MediaControlInterface;
 import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.managers.BuildManager;
@@ -199,7 +200,7 @@ public class CommunicationActivity
     @Inject
     protected GcmManager mGcmManager;
     @Inject
-    protected ChatWingJavaDelegate mFayeJsInterface;
+    protected ChatwingJSInterface mFayeJsInterface;
     @Inject
     protected ChatboxModeManager mChatboxModeManager;
     @Inject
@@ -807,7 +808,7 @@ public class CommunicationActivity
         return mWebView;
     }
 
-    @SuppressLint("JavascriptInterface")
+    @SuppressLint("setJavaScriptEnabled")
     @Override
     public void ensureWebViewAndSubscribeToChannels() {
         if (mCurrentCommunicationMode == null) return;
@@ -825,7 +826,7 @@ public class CommunicationActivity
 
             mWebView.addJavascriptInterface(
                     mFayeJsInterface,
-                    ChatWingJavaDelegate.CHATWING_JS_NAME);
+                    ChatwingJSInterface.CHATWING_JS_NAME);
 
             mWebView.setWebChromeClient(new WebChromeClient() {
                 @Override
@@ -1253,6 +1254,11 @@ public class CommunicationActivity
             }
             LogUtils.v("Disconnected from server.");
         }
+    }
+
+    @Subscribe
+    public void onUserSelectedDefaultUsersEvent(UserSelectedDefaultUsersEvent event){
+        showConversation(event.getSimpleUser());
     }
 
     private void processEvent(Event event) {
