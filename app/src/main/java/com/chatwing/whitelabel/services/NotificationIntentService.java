@@ -23,6 +23,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.RemoteException;
@@ -212,7 +213,7 @@ public class NotificationIntentService extends GcmListenerService {
                 0,
                 i,
                 PendingIntent.FLAG_UPDATE_CURRENT);
-        Uri sound = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.new_message);
+        Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(this)
