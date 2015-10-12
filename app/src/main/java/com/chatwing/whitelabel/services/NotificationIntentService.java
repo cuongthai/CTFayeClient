@@ -207,13 +207,19 @@ public class NotificationIntentService extends GcmListenerService {
     }
 
     private void doNotify(Intent i, String contentTitle, List<Message> messages, int notificationCode) {
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent contentIntent = PendingIntent.getActivity(
+                this,
+                0,
+                i,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        Uri sound = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.new_message);
 
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.ic_launcher)
                         .setContentTitle(contentTitle)
                         .setTicker(messages.get(0).getContent())
+                        .setSound(sound)
                         .setContentText(messages.get(0).getContent());
         NotificationCompat.InboxStyle inboxStyle =
                 new NotificationCompat.InboxStyle();
