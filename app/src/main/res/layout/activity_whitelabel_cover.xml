@@ -31,7 +31,8 @@
             android:layout_marginTop="@dimen/spacing_medium"
             android:background="@color/text_on_primary"
             android:layout_marginLeft="@dimen/spacing_medium"
-            android:layout_marginRight="@dimen/spacing_medium"/>
+            android:layout_marginRight="@dimen/spacing_medium"
+            android:id="@+id/separator"/>
 
         <Button
             android:id="@+id/btn_login"

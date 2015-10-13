@@ -69,6 +69,7 @@ public class WhiteLabelCoverActivity extends BaseABFragmentActivity {
 
         if (!mBuildManager.isSupportedRegister()) {
             registerButton.setVisibility(View.GONE);
+            findViewById(R.id.separator).setVisibility(View.GONE);
         }
     }
 
