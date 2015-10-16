@@ -235,7 +235,7 @@ public class ConversationMessagesFragment extends CommunicationMessagesFragment 
 
 
         Intent intent = new Intent(getActivity(), GetMessagesIntentService.class);
-        intent.putExtra(GetMessagesIntentService.EXTRA_CONVERSATION_ID, conversation.getId());
+        intent.putExtra(GetMessagesIntentService.EXTRA_CONVERSATION, conversation);
         intent.putExtra(GetMessagesIntentService.EXTRA_OLDEST_MESSAGE, mAdapter.getOldestMessageItem());
         getActivity().startService(intent);
     }

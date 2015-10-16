@@ -6,7 +6,9 @@ import android.net.Uri;
 
 import com.chatwing.whitelabel.contentproviders.ChatWingContentProvider;
 import com.chatwing.whitelabel.events.GotMoreMessagesEvent;
+import com.chatwing.whitelabel.pojos.Conversation;
 import com.chatwing.whitelabel.pojos.Message;
+import com.chatwing.whitelabel.pojos.User;
 import com.chatwing.whitelabel.pojos.responses.MessagesResponse;
 import com.chatwing.whitelabel.tables.MessageTable;
 import com.chatwing.whitelabel.utils.LogUtils;
@@ -22,7 +24,7 @@ import java.util.List;
  */
 public class GetMessagesIntentService extends BaseIntentService {
     public static final String EXTRA_CHAT_BOX_ID = "chat_box_id";
-    public static final String EXTRA_CONVERSATION_ID = "conversation_id";
+    public static final String EXTRA_CONVERSATION = "conversation";
     public static final String EXTRA_OLDEST_MESSAGE = "oldest_message";
     private static boolean isRunning;
 
@@ -35,7 +37,7 @@ public class GetMessagesIntentService extends BaseIntentService {
         if (intent == null) return;
         isRunning = true;
         int chatBoxId = intent.getIntExtra(EXTRA_CHAT_BOX_ID, 0);
-        String conversationId = intent.getStringExtra(EXTRA_CONVERSATION_ID);
+        Conversation conversation = (Conversation) intent.getSerializableExtra(EXTRA_CONVERSATION);
         Message oldestMessage
                 = (Message) intent.getSerializableExtra(EXTRA_OLDEST_MESSAGE);
         GotMoreMessagesEvent event;
@@ -51,7 +53,7 @@ public class GetMessagesIntentService extends BaseIntentService {
             } else {
                 messagesResponse = mApiManager.loadMessages(
                         mUserManager.getCurrentUser(),
-                        conversationId,
+                        conversation.getId(),
                         oldestMessage);
             }
             List<Message> messagesFromServer = messagesResponse.getMessages();
@@ -62,6 +64,15 @@ public class GetMessagesIntentService extends BaseIntentService {
 
             for (Message message : messagesFromServer) {
                 String messageId = message.getId();
+
+                //Dirty
+                if (chatBoxId == 0) {
+                    //Set username for conversation
+                    message.setUserName(getUserNameForMessage(message,
+                            mUserManager.getCurrentUser(),
+                            conversation));
+                }
+
                 Uri newRecord = contentResolver.insert(
                         uri,
                         MessageTable.getContentValues(message));
@@ -79,7 +90,7 @@ public class GetMessagesIntentService extends BaseIntentService {
                         insertedMessages);
             } else {
                 event = new GotMoreMessagesEvent(
-                        conversationId,
+                        conversation.getId(),
                         messagesFromServer,
                         insertedMessages);
             }
@@ -87,11 +98,21 @@ public class GetMessagesIntentService extends BaseIntentService {
             if (chatBoxId != 0) {
                 event = new GotMoreMessagesEvent(chatBoxId, exc);
             } else {
-                event = new GotMoreMessagesEvent(conversationId, exc);
+                event = new GotMoreMessagesEvent(conversation.getId(), exc);
             }
         }
         isRunning = false;
         post(event);
+    }
+
+    private String getUserNameForMessage(Message message, User me, Conversation conversation) {
+        if (me == null) {
+            return null;
+        }
+        if (me.getIdentifier().equals(message.getUserIdentifier())) {
+            return me.getName();
+        }
+        return conversation.getConversationAlias(me.getId());
     }
 
     public static boolean isRunning() {
