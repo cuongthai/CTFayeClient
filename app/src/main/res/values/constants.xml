@@ -21,7 +21,7 @@
     <string name="preference_gcm_app_version">"gcm_app_version"</string>
     <string name="preference_chat_boxes_password_remembered">"chat_boxes_password_remembered"</string>
 
-    <bool name="default_play_new_message_sound">true</bool>
+    <bool name="default_play_new_message_sound">false</bool>
     <bool name="default_remember_previous_style">true</bool>
     <bool name="default_scroll_to_latest_message">true</bool>
     <string name="fragment_tag_conversations">"conversations-fragment"</string>
