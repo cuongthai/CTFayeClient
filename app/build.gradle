@@ -88,6 +88,14 @@ android {
         debug.setRoot('build-types/debug')
         release.setRoot('build-types/release')
     }
+
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            output.outputFile = new File(
+                    output.outputFile.parent,
+                    APP_NAME + "-${variant.versionName}(${variant.versionCode}).apk")
+        }
+    }
 }
 
 allprojects {
