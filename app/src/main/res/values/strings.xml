@@ -50,6 +50,7 @@
     <string name="hint_guest_name">"Guest 123"</string>
     <string name="title_choose_guest_avatar">Choose Guest Avatar</string>
     <string name="progress_loading_url">"Loading…"</string>
+    <string name="progress_loading_settings">"Loading settings..."</string>
     <string name="progress_getting_request_token">"Getting request token…"</string>
     <string name="title_reset_password">"Reset Password"</string>
     <string name="title_register">Register</string>
@@ -114,6 +115,7 @@
     <string name="email_not_found">"Email's not found"</string>
     <string name="title_preference_feedback">Send feedback</string>
     <string name="title_preference_version">Version</string>
+    <string name="title_preference_play_new_message_sound">"Enable Sound"</string>
     <string name="title_preference_remember_previous_style">"Remember previous style"</string>
     <string name="title_preference_clear_previous_style">"Clear previous style"</string>
     <string name="title_manage_blacklist">"Manage BlackList"</string>
@@ -121,6 +123,7 @@
     <string name="title_open_in_browser">"Open in Browser"</string>
     <string name="title_activity_walkthrough">"Welcome"</string>
 
+    <string name="summary_play_new_message_sound">"Play sound when new message arrived."</string>
     <string name="summary_remember_previous_style">"Remember style of previous chat and apply to new ones."</string>
     <string name="summary_name">"Your name that is displayed in chat boxes."</string>
     <string name="summary_email">"Your email that will receive notification"</string>

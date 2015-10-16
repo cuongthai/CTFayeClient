@@ -16,6 +16,11 @@
             android:key="@string/preference_verify_email"
             android:title="@string/email_not_verified" />
         <CheckBoxPreference
+            android:key="@string/preference_play_new_message_sound"
+            android:title="@string/title_preference_play_new_message_sound"
+            android:summary="@string/summary_play_new_message_sound"
+            android:defaultValue="@bool/default_play_new_message_sound"/>
+        <CheckBoxPreference
             android:key="@string/preference_remember_previous_style"
             android:title="@string/title_preference_remember_previous_style"
             android:summary="@string/summary_remember_previous_style"

@@ -16,8 +16,13 @@
 
 package com.chatwing.whitelabel.modules;
 
+import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
+import android.media.SoundPool;
+import android.os.Build;
 import android.view.LayoutInflater;
 
 import com.chatwing.whitelabel.activities.CommunicationActivity;
@@ -267,6 +272,30 @@ public class CommunicationActivityModule {
                 chatBoxIdValidator,
                 taskProvider,
                 passwordManager);
+    }
+
+    @Provides
+    @Singleton
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    SoundPool provideSoundPool(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION_EVENT)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build();
+
+            return new SoundPool.Builder()
+                    .setMaxStreams(25)
+                    .setAudioAttributes(audioAttributes)
+                    .build();
+        } else {
+            return legacySoundPool();
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    private SoundPool legacySoundPool() {
+        return new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
     }
 }
 

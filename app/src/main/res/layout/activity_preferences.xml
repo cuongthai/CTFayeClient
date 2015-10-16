@@ -12,11 +12,18 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true" />
 
-    <fragment
-        class="com.chatwing.whitelabel.fragments.SettingsFragment"
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:gravity="center_horizontal|center_vertical"
+        android:id="@+id/loading_text"
         android:layout_below="@id/toolbar"
-        android:tag="@string/fragment_tag_settings" />
+        android:text="@string/progress_loading_settings"/>
+    <FrameLayout
+        android:id="@+id/setting_containner"
+        android:layout_below="@id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
+    </FrameLayout>
 </RelativeLayout>

@@ -24,6 +24,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.media.SoundPool;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -229,6 +230,8 @@ public class CommunicationActivity
     protected FeedModeManager mFeedModeManager;
     @Inject
     protected MusicModeManager mMusicModeManager;
+    @Inject
+    protected SoundPool mSoundEffectsPool;
 
     protected CommunicationModeManager mCurrentCommunicationMode;
 
@@ -246,6 +249,7 @@ public class CommunicationActivity
     private MusicService musicService;
     private Intent playIntent;
     private boolean musicBound = false;
+    private int mNewMessageSoundId;
 
     /**
      * This class makes the ad request and loads the ad.
@@ -343,6 +347,8 @@ public class CommunicationActivity
         mProgressText = (TextView) mProgressView.findViewById(R.id.progress_text);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mLoadingView = (ProgressBar) findViewById(R.id.progress_bar);
+
+        mNewMessageSoundId = getSoundNewMessageId();
 
         mChatboxModeManager.onCreate(savedInstanceState);
         mConversationModeManager.onCreate(savedInstanceState);
@@ -520,6 +526,9 @@ public class CommunicationActivity
         //Faye connection will stop receiving msg when the is destroyed
         //Either by user(backpress) or system destroy
         mBus.unregister(this);
+
+        mSoundEffectsPool.release();
+        mSoundEffectsPool = null;
 
         destroyWebview();
 
@@ -925,7 +934,6 @@ public class CommunicationActivity
     @Override
     public void showSettings() {
         Intent i = new Intent(this, MainPreferenceActivity.class);
-        i.putExtra(SettingsFragment.LOAD_LATEST_USER_PROFILE, true);
         startActivity(i);
     }
 
@@ -1228,10 +1236,6 @@ public class CommunicationActivity
         //Faye
         try {
             Event e = mEventParser.parse(event.getMessage());
-            if (Constants.DEBUG) {
-//                mQuickMessageView.show(getString(R.string.message_event) + e.getName());
-//                LogUtils.v("Event: " + e.getName());
-            }
             processEvent(e);
         } catch (JSONException ex) {
             handle(ex, R.string.message_error);
@@ -1257,7 +1261,7 @@ public class CommunicationActivity
     }
 
     @Subscribe
-    public void onUserSelectedDefaultUsersEvent(UserSelectedDefaultUsersEvent event){
+    public void onUserSelectedDefaultUsersEvent(UserSelectedDefaultUsersEvent event) {
         showConversation(event.getSimpleUser());
     }
 
@@ -1295,6 +1299,12 @@ public class CommunicationActivity
                 CommunicationMessagesFragment fragment = getCommunicationMessagesFragment();
                 added = (fragment != null && fragment.addNewMessage(message));
                 mCurrentCommunicationMode.processMessageInCurrentCommunicationBox(message);
+            }
+
+            if (mUserManager.isSoundEnabled()
+                    &&
+                    (appIsNotVisible() || !isInCurrentCommunicationBox)) {
+                mSoundEffectsPool.play(mNewMessageSoundId, 1.0f, 1.0f, 0, 0, 1);
             }
         }
     }
@@ -1728,5 +1738,13 @@ public class CommunicationActivity
                 updateGcm(ApiManager.GCM_ACTION_ADD, false);
             }
         }
+    }
+
+    private int getSoundNewMessageId() {
+        return mSoundEffectsPool.load(this, R.raw.new_message, 1);
+    }
+
+    private boolean appIsNotVisible() {
+        return !isVisible();
     }
 }

@@ -22,10 +22,8 @@ import com.chatwing.whitelabel.events.VerifyEmailEvent;
 import com.chatwing.whitelabel.managers.UserManager;
 import com.chatwing.whitelabel.modules.PreferenceActivityModule;
 import com.chatwing.whitelabel.pojos.UserProfile;
-import com.chatwing.whitelabel.services.DownloadUserDetailIntentService;
 import com.chatwing.whitelabel.services.UpdateUserProfileService;
 import com.chatwing.whitelabel.services.VerifyEmailIntentService;
-import com.chatwing.whitelabel.utils.LogUtils;
 import com.chatwing.whitelabel.views.ErrorMessageView;
 import com.chatwing.whitelabel.views.QuickMessageView;
 import com.squareup.otto.Bus;
@@ -41,7 +39,6 @@ public class SettingsFragment extends PreferenceFragment
         SharedPreferences.OnSharedPreferenceChangeListener,
         Preference.OnPreferenceChangeListener {
 
-    public static final String LOAD_LATEST_USER_PROFILE = "LOAD_LATEST_USER_PROFILE";
     private EditTextPreference mNamePreference;
     private EditTextPreference mEmailPreference;
     private Preference mFeedbackPreference;
@@ -50,6 +47,7 @@ public class SettingsFragment extends PreferenceFragment
     private String mVersion;
     private UserProfile mOldUserProfile;
     private Preference mClearPreference;
+    private Preference mSoundPreference;
     private Preference mVerifyPreference;
 
     @Inject
@@ -61,8 +59,6 @@ public class SettingsFragment extends PreferenceFragment
     @Inject
     QuickMessageView mQuickMessageView;
 
-    private SettingDelegate mDelegate;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,14 +68,8 @@ public class SettingsFragment extends PreferenceFragment
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mDelegate = (SettingDelegate) activity;
-        ChatWing.instance(activity).getChatwingGraph().plus(new PreferenceActivityModule(activity)).inject(this);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mDelegate = null;
+        ChatWing.instance(activity)
+                .getChatwingGraph().plus(new PreferenceActivityModule(activity)).inject(this);
     }
 
     @Override
@@ -91,6 +81,7 @@ public class SettingsFragment extends PreferenceFragment
         mChatBoxCategoryPreference = (PreferenceCategory) findPreference(getString(R.string.preference_category_chat_box));
 
         mClearPreference = findPreference(getString(R.string.preference_clear_previous_style));
+        mSoundPreference = findPreference(getString(R.string.preference_play_new_message_sound));
         mVerifyPreference = findPreference(getString(R.string.preference_verify_email));
         String name = mNamePreference.getSharedPreferences().getString(
                 mNamePreference.getKey(),
@@ -102,15 +93,18 @@ public class SettingsFragment extends PreferenceFragment
         mEmailPreference.setSummary(email);
         mEmailPreference.setTitle(getString(R.string.title_preference_email));
 
-        mFeedbackPreference.setOnPreferenceClickListener(this);
         mNamePreference.setOnPreferenceChangeListener(this);
         mEmailPreference.setOnPreferenceChangeListener(this);
+        mSoundPreference.setOnPreferenceChangeListener(this);
+
+        mFeedbackPreference.setOnPreferenceClickListener(this);
         mClearPreference.setOnPreferenceClickListener(this);
         mVerifyPreference.setOnPreferenceClickListener(this);
         String versionName;
         int versionCode;
         try {
-            PackageInfo info = getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), 0);
+            PackageInfo info = getActivity().getPackageManager()
+                    .getPackageInfo(getActivity().getPackageName(), 0);
             versionName = info.versionName;
             versionCode = info.versionCode;
         } catch (PackageManager.NameNotFoundException e) {
@@ -125,40 +119,7 @@ public class SettingsFragment extends PreferenceFragment
 
         updateUserViews();
 
-
         updateVerifyButtonState();
-
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        LogUtils.v("onViewCreated");
-        if (getActivity().getIntent().getBooleanExtra(LOAD_LATEST_USER_PROFILE, false)) {
-            startSyncUserProfile();
-        }
-    }
-
-    private void updateVerifyButtonState() {
-        if(mUserManager.getCurrentUser()==null){
-            mVerifyPreference.setEnabled(false);
-            mVerifyPreference.setTitle(getString(R.string.email_not_found));
-            return;
-        }
-
-        if(mUserManager.getCurrentUser().getProfile().isVerified()){
-            mVerifyPreference.setEnabled(false);
-            mVerifyPreference.setTitle(getString(R.string.email_verified));
-        }else{
-            mVerifyPreference.setEnabled(true);
-            mVerifyPreference.setTitle(getString(R.string.email_not_verified));
-        }
-    }
-
-    private void startSyncUserProfile() {
-        mDelegate.showLoading(true);
-        Intent service = new Intent(getActivity(), DownloadUserDetailIntentService.class);
-        getActivity().startService(service);
     }
 
     @Override
@@ -169,13 +130,12 @@ public class SettingsFragment extends PreferenceFragment
                 mErrorMessageView.show(R.string.error_invalid_name_length);
                 return false;
             }
-        }else if (preference.getKey().equals(mEmailPreference.getKey())) {
+        } else if (preference.getKey().equals(mEmailPreference.getKey())) {
 
         }
         mIsProfileChanged = true;
         return true;
     }
-
 
     @Override
     public boolean onPreferenceClick(Preference preference) {
@@ -194,8 +154,8 @@ public class SettingsFragment extends PreferenceFragment
                 mErrorMessageView.show(R.string.error_cant_handle_email);
             }
             return true;
-        }else if(key.equals(mVerifyPreference.getKey())){
-            if(!VerifyEmailIntentService.isInProgress()){
+        } else if (key.equals(mVerifyPreference.getKey())) {
+            if (!VerifyEmailIntentService.isInProgress()) {
                 getActivity().startService(new Intent(getActivity(), VerifyEmailIntentService.class));
             }
             return true;
@@ -242,6 +202,8 @@ public class SettingsFragment extends PreferenceFragment
                 .registerOnSharedPreferenceChangeListener(this);
         mEmailPreference.getSharedPreferences()
                 .registerOnSharedPreferenceChangeListener(this);
+        mSoundPreference.getSharedPreferences()
+                .registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
@@ -251,9 +213,10 @@ public class SettingsFragment extends PreferenceFragment
                 .unregisterOnSharedPreferenceChangeListener(this);
         mEmailPreference.getSharedPreferences()
                 .unregisterOnSharedPreferenceChangeListener(this);
+        mSoundPreference.getSharedPreferences()
+                .unregisterOnSharedPreferenceChangeListener(this);
         mBus.unregister(this);
     }
-
 
     @Override
     public void onStop() {
@@ -268,32 +231,14 @@ public class SettingsFragment extends PreferenceFragment
 
     @Subscribe
     public void onUpdateUserProfileEvent(UpdateUserEvent event) {
-        mDelegate.showLoading(false);
-        Exception exception = event.getException();
-        if (exception != null) {
-            mErrorMessageView.show(exception,
-                    getString(R.string.error_failed_to_update_user_profile));
-        }
-
-        // Refresh the view. Since PreferenceActivity doesn't provide a way,
-        // we need to work around.
-        // Also, if user makes new changes recently (steps: he makes changes,
-        // goes back to ChatActivity, then quickly opens and makes some more
-        // changes), just ignore the new changes because we don't want to
-        // recursively call the service and we can't keep track of old user
-        // profile.
         if (event.getState() == UpdateUserEvent.STATE.SUCCESS) {
             mIsProfileChanged = false;
-            Intent i = getActivity().getIntent();
-            i.putExtra(SettingsFragment.LOAD_LATEST_USER_PROFILE, false);
-            startActivity(i);
-            getActivity().finish();
         }
     }
 
     @Subscribe
-    public void onVerifyEmailEvent(VerifyEmailEvent event){
-        if(event.getState()== VerifyEmailEvent.STATE.SUCCESS){
+    public void onVerifyEmailEvent(VerifyEmailEvent event) {
+        if (event.getState() == VerifyEmailEvent.STATE.SUCCESS) {
             mQuickMessageView.show(getString(R.string.message_email_verification_sent));
         }
     }
@@ -304,11 +249,21 @@ public class SettingsFragment extends PreferenceFragment
         } else {
             mChatBoxCategoryPreference.setEnabled(false);
         }
-
     }
 
-    public interface SettingDelegate {
+    private void updateVerifyButtonState() {
+        if (mUserManager.getCurrentUser() == null) {
+            mVerifyPreference.setEnabled(false);
+            mVerifyPreference.setTitle(getString(R.string.email_not_found));
+            return;
+        }
 
-        void showLoading(boolean show);
+        if (mUserManager.getCurrentUser().getProfile().isVerified()) {
+            mVerifyPreference.setEnabled(false);
+            mVerifyPreference.setTitle(getString(R.string.email_verified));
+        } else {
+            mVerifyPreference.setEnabled(true);
+            mVerifyPreference.setTitle(getString(R.string.email_not_verified));
+        }
     }
 }
