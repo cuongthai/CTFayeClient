@@ -33,7 +33,7 @@ import java.util.Map;
  * Time: 11:43 AM
  */
 
-public class ChatBox implements Serializable{
+public class ChatBox implements Serializable {
     private int id;
     private String key;
     private String name;
@@ -92,7 +92,7 @@ public class ChatBox implements Serializable{
     }
 
     public boolean hasPassword() {
-        return !TextUtils.isEmpty(getChatboxPassword());
+        return !TextUtils.isEmpty(getChatboxPassword()) && json != null && json.isUsePassword();
     }
 
     public Network getNetwork() {
@@ -205,8 +205,8 @@ public class ChatBox implements Serializable{
     }
 
     public Map<String, String> getEmoticonsAsMap() {
-        Map<String, String> emos =new HashMap<String, String>();
-        for(Emoticon emoticon:emoticons){
+        Map<String, String> emos = new HashMap<String, String>();
+        for (Emoticon emoticon : emoticons) {
             emos.put(emoticon.getSymbol(), emoticon.getImage());
         }
         return emos;

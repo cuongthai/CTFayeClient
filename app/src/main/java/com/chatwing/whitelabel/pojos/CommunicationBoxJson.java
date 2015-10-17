@@ -43,6 +43,7 @@ public class CommunicationBoxJson implements Serializable{
     private int externalImageMaxHeight;
     @SerializedName("chatboxPassword")
     private String chatBoxPassword;
+    private boolean usePassword;
 
     private String userListBackgroundImage;
     @SerializedName("userListBgColor")
@@ -115,6 +116,10 @@ public class CommunicationBoxJson implements Serializable{
 
     public String getChatBoxPassword() {
         return chatBoxPassword;
+    }
+
+    public boolean isUsePassword() {
+        return usePassword;
     }
 
     public String getUserListBackgroundImage() {
