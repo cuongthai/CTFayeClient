@@ -524,11 +524,9 @@ public class LegacyLoginActivity extends AuthenticateActivity
      */
     private void onTaskFinished(TaskFinishedEvent event,
                                 @SuppressWarnings("UnusedParameters") ResetPasswordTask task) {
-        ResetPasswordResponse response = (ResetPasswordResponse) event.getResult();
-
         if (event.getStatus() == TaskFinishedEvent.Status.SUCCEED) {
             //FIXME: this is not localizable
-            mConfirmMessageView.show(response.getData());
+            mConfirmMessageView.show(getString(R.string.message_forgot_password_success));
 
             getSupportFragmentManager().popBackStack(
                     BACK_STACK_FORGOT_PASSWORD,

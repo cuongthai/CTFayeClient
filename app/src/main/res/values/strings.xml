@@ -192,6 +192,7 @@
     <string name="banner_ad_unit_id">ca-app-pub-7754323616870452/5130402252</string>
     <!--<string name="banner_ad_unit_id">ca-app-pub-9492949418759375/8073202249</string> &lt;!&ndash; Kentucky &ndash;&gt;-->
     <string name="message_flag">Flagged</string>
+    <string name="message_forgot_password_success">The reset password email has been sent to your email. Please follow the instruction in the email</string>
     <string name="error_failed_to_flag">Failed to flag this message</string>
 
     <string name="message_touch_to_stop">Touch to stop media</string>
