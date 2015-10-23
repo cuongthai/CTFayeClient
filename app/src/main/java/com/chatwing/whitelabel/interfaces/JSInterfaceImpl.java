@@ -58,8 +58,8 @@ public class JSInterfaceImpl implements ChatWingJavaDelegate {
 
     @Override
     public void publish(String event, final String data) {
+        LogUtils.v("event " + event + " data " + data);
         if (data == null || event == null) return;
-//        LogUtils.v("event " + event + " data " + data);
         if (FAYE_CONNECTED_TO_SERVER.equals(event)) {
             mHandler.post(new Runnable() {
                 @Override

@@ -30,6 +30,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -92,7 +93,6 @@ import com.chatwing.whitelabel.fragments.OnlineUsersFragment;
 import com.chatwing.whitelabel.fragments.PasswordDialogFragment;
 import com.chatwing.whitelabel.fragments.PhotoPickerDialogFragment;
 import com.chatwing.whitelabel.fragments.ProfileFragment;
-import com.chatwing.whitelabel.fragments.SettingsFragment;
 import com.chatwing.whitelabel.interfaces.ChatwingJSInterface;
 import com.chatwing.whitelabel.interfaces.MediaControlInterface;
 import com.chatwing.whitelabel.managers.ApiManager;
@@ -250,6 +250,16 @@ public class CommunicationActivity
     private Intent playIntent;
     private boolean musicBound = false;
     private int mNewMessageSoundId;
+    private Snackbar snackbar;
+
+    private View.OnClickListener snackbarRetryAction = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            destroyWebview();
+            ensureWebViewAndSubscribeToChannels();
+        }
+    };
+
 
     /**
      * This class makes the ad request and loads the ad.
@@ -321,11 +331,11 @@ public class CommunicationActivity
         }
     }
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ChatWing.instance(getApplicationContext()).getChatwingGraph().plus();
-
 
         setContentView(R.layout.activity_communication);
 
@@ -353,6 +363,7 @@ public class CommunicationActivity
         mChatboxModeManager.onCreate(savedInstanceState);
         mConversationModeManager.onCreate(savedInstanceState);
 
+        setupSnackbar(mContentView);
         stopRefreshAnimation();
 
         //This mode is priority due to user action requesting open
@@ -411,6 +422,13 @@ public class CommunicationActivity
                     .add(R.id.ads_container, new AdFragment(), adsFragmentTag)
                     .commit();
         }
+    }
+
+    private void setupSnackbar(View contentView) {
+        snackbar = Snackbar
+                .make(contentView, "", Snackbar.LENGTH_SHORT);
+
+        styleInfoSnackbar();
     }
 
     @Override
@@ -868,7 +886,7 @@ public class CommunicationActivity
                     }
                 }
             });
-
+            LogUtils.v("Load Faye URL");
             mWebView.loadUrl(Constants.FAYE_CLIENT_URL);
             return;
         }
@@ -1257,6 +1275,11 @@ public class CommunicationActivity
                 mQuickMessageView.show(R.string.message_disconnected_from_server);
             }
             LogUtils.v("Disconnected from server.");
+            styleErrorSnackbar();
+            snackbar.setAction("RETRY", snackbarRetryAction);
+            snackbar.setText("Disconnected to messaging server");
+            snackbar.setDuration(Snackbar.LENGTH_INDEFINITE);
+            snackbar.show();
         }
     }
 
@@ -1746,5 +1769,21 @@ public class CommunicationActivity
 
     private boolean appIsNotVisible() {
         return !isVisible();
+    }
+
+    private void styleInfoSnackbar() {
+        ViewGroup group = (ViewGroup) snackbar.getView();
+        group.setBackgroundColor(getResources().getColor(R.color.primary));
+        snackbar.setActionTextColor(getResources().getColor(R.color.accent));
+        TextView tv = (TextView) group.findViewById(android.support.design.R.id.snackbar_text);
+        tv.setTextColor(getResources().getColor(R.color.text_on_primary));
+    }
+
+    private void styleErrorSnackbar() {
+        ViewGroup group = (ViewGroup) snackbar.getView();
+        group.setBackgroundColor(getResources().getColor(android.R.color.holo_red_light));
+        snackbar.setActionTextColor(getResources().getColor(R.color.white));
+        TextView tv = (TextView) group.findViewById(android.support.design.R.id.snackbar_text);
+        tv.setTextColor(getResources().getColor(R.color.white));
     }
 }
