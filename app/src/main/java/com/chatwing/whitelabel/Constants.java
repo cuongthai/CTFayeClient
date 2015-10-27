@@ -12,7 +12,7 @@ public interface Constants {
     boolean DEBUG = ChatWing.isDebugging();
     String CHATWING_SDK_TAG = "ChatWingSDK";
     String CHATWING_BASE_URL =  "http://staging.chatwing.com";
-    String FAYE_CLIENT_URL = CHATWING_BASE_URL + "/mobile/client/1";
+    String FAYE_URL = CHATWING_BASE_URL + "/comet/1";
 
     String MAIN_COLOR = "#05b0ff";
 

@@ -41,6 +41,7 @@ import com.chatwing.whitelabel.events.ChatBoxUnreadCountChangedEvent;
 import com.chatwing.whitelabel.events.CurrentCommunicationEvent;
 import com.chatwing.whitelabel.fragments.CommunicationMessagesFragment;
 import com.chatwing.whitelabel.fragments.NotificationFragment;
+import com.chatwing.whitelabel.interfaces.FayeReceiver;
 import com.chatwing.whitelabel.pojos.Event;
 import com.chatwing.whitelabel.pojos.Message;
 import com.chatwing.whitelabel.pojos.params.CreateConversationParams;
@@ -55,6 +56,8 @@ import com.squareup.otto.Bus;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import asia.papaslove.ctfayeclient.CTFayeClient;
 
 /**
  * Created by cuongthai on 14/04/2014.
@@ -259,11 +262,9 @@ public abstract class CommunicationModeManager {
 
         DrawerLayout getDrawerLayout();
 
-        WebView getFayeWebView();
-
-        void ensureWebViewAndSubscribeToChannels();
-
         void showConversation(CreateConversationParams.SimpleUser simpleUser);
+
+        FayeReceiver getFayeReceiver();
     }
 
     /**
@@ -363,15 +364,12 @@ public abstract class CommunicationModeManager {
         }
     }
 
-    public void subscribeToChannels(WebView mWebView) {
-        if (mWebView == null) {
-            return;
-        }
-        subscribeToChatBoxChannels(mWebView);
-        subscribeToConversationChannels(mWebView);
+    public void subscribeToChannels(FayeReceiver fayeReceiver) {
+        subscribeToChatBoxChannels(fayeReceiver);
+        subscribeToConversationChannels(fayeReceiver);
     }
 
-    private void subscribeToChatBoxChannels(WebView mWebView) {
+    private void subscribeToChatBoxChannels(FayeReceiver fayeReceiver) {
         // Query for chat box keys
         Uri chatBoxesUri = ChatWingContentProvider.getChatBoxesUri();
         ArrayList<String> fayeChannels = new ArrayList<String>();
@@ -397,54 +395,43 @@ public abstract class CommunicationModeManager {
                 c.close();
             }
         }
-        LogUtils.v("Test Duplicate subscribeToChatBoxChannels " + fayeChannels.size() + ":" + mWebView);
+        LogUtils.v("Test Duplicate subscribeToChatBoxChannels " + fayeChannels.size());
 
         // Subscribe to all of them
         for (String fayeChannel : fayeChannels) {
-            String js = String.format("javascript:subscribe('%s')", fayeChannel);
-            mWebView.loadUrl(js);
-            mWebView.loadUrl(js);
+            fayeReceiver.subscribeToChannel(String.format("/%s", fayeChannel));
         }
     }
 
-    public void unsubscribeToChannels(WebView mWebView) {
-        if (mWebView == null) {
-            return;
-        }
-        unsubscribeToChatBoxChannels(mWebView);
-        unsubscribeToConversationChannels(mWebView);
+    public void unsubscribeToChannels(FayeReceiver fayeReceiver) {
+        unsubscribeToChatBoxChannels(fayeReceiver);
+        unsubscribeToConversationChannels(fayeReceiver);
     }
 
-    private void unsubscribeToChatBoxChannels(WebView mWebView) {
+    private void unsubscribeToChatBoxChannels(FayeReceiver fayeReceiver) {
         // Subscribe to all of them
         ArrayList<String> allFayeChannels = getAllFayeChannels();
         LogUtils.v("Test Duplicate unsubscribeToChatBoxChannels " + allFayeChannels.size());
 
         for (String fayeChannel : allFayeChannels) {
-            String js = String.format("javascript:unsubscribe('%s')", fayeChannel);
-            mWebView.loadUrl(js);
+            fayeReceiver.unsubscribeToChannel(String.format("/%s", fayeChannel));
         }
     }
 
-    private void unsubscribeToConversationChannels(WebView mWebView) {
+    private void unsubscribeToConversationChannels(FayeReceiver fayeReceiver) {
         if (mUserManager.getCurrentUser() == null) {
             return;
         }
         LogUtils.v("Test Duplicate unsubscribeToConversationChannels");
-
-        String js = String.format("javascript:unsubscribe('/user/%s')",
-                mUserManager.getCurrentUser().getId());
-        mWebView.loadUrl(js);
+        fayeReceiver.unsubscribeToChannel(String.format("/user/%s", mUserManager.getCurrentUser().getId()));
     }
 
-    private void subscribeToConversationChannels(WebView mWebView) {
+    private void subscribeToConversationChannels(FayeReceiver fayeReceiver) {
         if (mUserManager.getCurrentUser() == null) {
             return;
         }
         LogUtils.v("Test Duplicate subscribeToConversationChannels");
-        String js = String.format("javascript:subscribe('/user/%s')",
-                mUserManager.getCurrentUser().getId());
-        mWebView.loadUrl(js);
+        fayeReceiver.subscribeToChannel(String.format("/user/%s", mUserManager.getCurrentUser().getId()));
     }
 
     private void manageNotification() {

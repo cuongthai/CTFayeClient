@@ -23,6 +23,7 @@ import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Build;
+import android.os.Handler;
 import android.view.LayoutInflater;
 
 import com.chatwing.whitelabel.activities.CommunicationActivity;
@@ -46,9 +47,7 @@ import com.chatwing.whitelabel.fragments.OnlineUsersFragment;
 import com.chatwing.whitelabel.fragments.PasswordDialogFragment;
 import com.chatwing.whitelabel.fragments.PhotoPickerDialogFragment;
 import com.chatwing.whitelabel.fragments.ProfileFragment;
-import com.chatwing.whitelabel.interfaces.ChatWingJavaDelegate;
-import com.chatwing.whitelabel.interfaces.ChatwingJSInterface;
-import com.chatwing.whitelabel.interfaces.JSInterfaceImpl;
+import com.chatwing.whitelabel.interfaces.FayeReceiver;
 import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.managers.BuildManager;
 import com.chatwing.whitelabel.managers.ChatboxModeManager;
@@ -73,6 +72,7 @@ import com.squareup.otto.Bus;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import asia.papaslove.ctfayeclient.CTFayeClient;
 import dagger.Module;
 import dagger.Provides;
 
@@ -94,7 +94,6 @@ import dagger.Provides;
                 CategoriesFragment.class,
                 NotificationFragment.class,
                 EmoticonsFragment.class,
-                JSInterfaceImpl.class,
 
                 ChatMessagesFragment.class,
                 CommunicationDrawerFragment.class,
@@ -153,18 +152,6 @@ public class CommunicationActivityModule {
     @Singleton
     BBCodeParser provideBBCodeParser(BBCodeParserImpl impl) {
         return impl;
-    }
-
-    @Provides
-    @Singleton
-    ChatWingJavaDelegate provideChatWingJavaDelegate(JSInterfaceImpl jsInterface) {
-        return jsInterface;
-    }
-
-    @Provides
-    @Singleton
-    ChatwingJSInterface provideChatWingJSInterface(ChatWingJavaDelegate delegate) {
-        return new ChatwingJSInterface(delegate);
     }
 
     @Provides
@@ -291,6 +278,13 @@ public class CommunicationActivityModule {
         } else {
             return legacySoundPool();
         }
+    }
+
+    @Provides
+    @Singleton
+    FayeReceiver provideFayeClient(Bus bus,
+                                   @ForMainThread Handler handler) {
+        return new FayeReceiver(new CTFayeClient(), handler, bus);
     }
 
     @SuppressWarnings("deprecation")

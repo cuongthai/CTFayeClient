@@ -18,17 +18,11 @@ package com.chatwing.whitelabel;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Handler;
 
 import com.chatwing.whitelabel.activities.CommunicationActivity;
-import com.chatwing.whitelabel.contentproviders.ChatWingContentProvider;
-import com.chatwing.whitelabel.events.UnreadMessagesEvent;
-import com.chatwing.whitelabel.interfaces.JSInterfaceImpl;
-import com.chatwing.whitelabel.managers.UserManager;
 import com.chatwing.whitelabel.modules.ChatWingModule;
 import com.chatwing.whitelabel.modules.ForMainThread;
-import com.chatwing.whitelabel.services.SyncCommunicationBoxesIntentService;
 import com.squareup.otto.Bus;
 
 import javax.inject.Inject;

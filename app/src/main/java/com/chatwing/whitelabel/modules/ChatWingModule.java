@@ -31,6 +31,7 @@ import com.chatwing.whitelabel.managers.ApiManagerImpl;
 import com.chatwing.whitelabel.managers.SyncManager;
 import com.chatwing.whitelabel.managers.UserManager;
 import com.chatwing.whitelabel.managers.VolleyManager;
+import com.chatwing.whitelabel.receivers.NetworkReceiver;
 import com.chatwing.whitelabel.services.AckChatboxIntentService;
 import com.chatwing.whitelabel.services.AckConversationIntentService;
 import com.chatwing.whitelabel.services.BlockUserIntentService;
@@ -94,7 +95,8 @@ import dagger.Provides;
                 CreateBookmarkIntentService.class,
                 VerifyEmailIntentService.class,
                 DeleteBookmarkIntentService.class,
-                UpdateAvatarIntentService.class
+                UpdateAvatarIntentService.class,
+                NetworkReceiver.class
         },
         library = true
 )

@@ -306,5 +306,7 @@
     <string name="title_copy">Copy</string>
     <string name="title_chat">Send Private Messages</string>
     <string name="message_ignored_content">Ignored content</string>
+    <string name="error_faye_fail_event">There was an error while contacting messaging server</string>
+    <string name="error_faye_closed">Failed to connect to messaging server</string>
 
 </resources>

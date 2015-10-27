@@ -48,7 +48,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -72,6 +71,7 @@ import com.chatwing.whitelabel.events.UserSelectedChatBoxEvent;
 import com.chatwing.whitelabel.events.UserSelectedSongEvent;
 import com.chatwing.whitelabel.fragments.AccountDialogFragment;
 import com.chatwing.whitelabel.fragments.NotificationFragment;
+import com.chatwing.whitelabel.interfaces.FayeReceiver;
 import com.chatwing.whitelabel.interfaces.MediaControlInterface;
 import com.chatwing.whitelabel.pojos.ChatBox;
 import com.chatwing.whitelabel.pojos.Event;
@@ -736,16 +736,11 @@ public class ChatboxModeManager extends CommunicationModeManager {
     }
 
     private void subscribeToCurrentChatBox() {
-        WebView webView = mActivityDelegate.getFayeWebView();
-        if (webView == null) {
-            mActivityDelegate.ensureWebViewAndSubscribeToChannels();
-        } else {
-            ChatBox currentChatBox = mCurrentChatBoxManager.getCurrentChatBox();
-            if (currentChatBox != null) {
-                String js = String.format("javascript:subscribe('%s')",
-                        currentChatBox.getFayeChannel());
-                webView.loadUrl(js);
-            }
+        FayeReceiver fayeReceiver = mActivityDelegate.getFayeReceiver();
+        ChatBox currentChatBox = mCurrentChatBoxManager.getCurrentChatBox();
+        if (currentChatBox != null) {
+            fayeReceiver.subscribeToChannel(String.format("/%s",
+                    currentChatBox.getFayeChannel()));
         }
     }
 

@@ -150,4 +150,5 @@ dependencies {
     compile 'com.hannesdorfmann.smoothprogressbar:library:1.0.0'
     compile 'com.github.castorflex.smoothprogressbar:library-circular:1.0.0'
     compile 'com.pkmmte.view:circularimageview:1.1'
+    compile project(':CTFayeClient')
 }

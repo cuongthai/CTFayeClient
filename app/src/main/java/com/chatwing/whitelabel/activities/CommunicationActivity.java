@@ -17,7 +17,6 @@
 package com.chatwing.whitelabel.activities;
 
 
-import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.ContentValues;
@@ -27,7 +26,6 @@ import android.content.ServiceConnection;
 import android.media.SoundPool;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.Snackbar;
@@ -45,11 +43,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.ConsoleMessage;
-import android.webkit.WebChromeClient;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -61,12 +54,14 @@ import com.chatwing.whitelabel.events.AccountSwitchEvent;
 import com.chatwing.whitelabel.events.AllSyncsCompletedEvent;
 import com.chatwing.whitelabel.events.BlockedEvent;
 import com.chatwing.whitelabel.events.DeleteBookmarkEvent;
+import com.chatwing.whitelabel.events.NetworkAvaialbleEvent;
 import com.chatwing.whitelabel.events.SyncCommunicationBoxEvent;
 import com.chatwing.whitelabel.events.SyncUnreadEvent;
 import com.chatwing.whitelabel.events.UpdateUserEvent;
 import com.chatwing.whitelabel.events.UserSelectedDefaultUsersEvent;
 import com.chatwing.whitelabel.events.UserUnauthenticatedEvent;
 import com.chatwing.whitelabel.events.faye.ChannelSubscriptionChangedEvent;
+import com.chatwing.whitelabel.events.faye.FayeFailedEvent;
 import com.chatwing.whitelabel.events.faye.FayePublishEvent;
 import com.chatwing.whitelabel.events.faye.MessageReceivedEvent;
 import com.chatwing.whitelabel.events.faye.ServerConnectionChangedEvent;
@@ -93,7 +88,7 @@ import com.chatwing.whitelabel.fragments.OnlineUsersFragment;
 import com.chatwing.whitelabel.fragments.PasswordDialogFragment;
 import com.chatwing.whitelabel.fragments.PhotoPickerDialogFragment;
 import com.chatwing.whitelabel.fragments.ProfileFragment;
-import com.chatwing.whitelabel.interfaces.ChatwingJSInterface;
+import com.chatwing.whitelabel.interfaces.FayeReceiver;
 import com.chatwing.whitelabel.interfaces.MediaControlInterface;
 import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.managers.BuildManager;
@@ -196,12 +191,8 @@ public class CommunicationActivity
     private static final int REQUEST_CODE_GET_GOOGLE_PLAY_SERVICES = 9000;
 
 
-    protected WebView mWebView;
-    protected boolean mNotSubscribeToChannels;
     @Inject
     protected GcmManager mGcmManager;
-    @Inject
-    protected ChatwingJSInterface mFayeJsInterface;
     @Inject
     protected ChatboxModeManager mChatboxModeManager;
     @Inject
@@ -232,6 +223,8 @@ public class CommunicationActivity
     protected MusicModeManager mMusicModeManager;
     @Inject
     protected SoundPool mSoundEffectsPool;
+    @Inject
+    protected FayeReceiver mFayeReceiver;
 
     protected CommunicationModeManager mCurrentCommunicationMode;
 
@@ -255,8 +248,8 @@ public class CommunicationActivity
     private View.OnClickListener snackbarRetryAction = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            destroyWebview();
-            ensureWebViewAndSubscribeToChannels();
+            ensureFayeIsConnected();
+            ensureChannelsAreSubscribed();
         }
     };
 
@@ -347,9 +340,7 @@ public class CommunicationActivity
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
 
-
         mBus.register(this);
-
 
         mContentView = findViewById(R.id.fragment_container);
         mProgressView = findViewById(R.id.progress_container);
@@ -363,7 +354,6 @@ public class CommunicationActivity
         mChatboxModeManager.onCreate(savedInstanceState);
         mConversationModeManager.onCreate(savedInstanceState);
 
-        setupSnackbar(mContentView);
         stopRefreshAnimation();
 
         //This mode is priority due to user action requesting open
@@ -548,30 +538,18 @@ public class CommunicationActivity
         mSoundEffectsPool.release();
         mSoundEffectsPool = null;
 
-        destroyWebview();
+        mFayeReceiver.disconnect();
 
         mCurrentCommunicationMode.onDestroy();
         mCurrentCommunicationMode = null;
-    }
-
-    private void destroyWebview() {
-        mNotSubscribeToChannels = true;
-        if (mWebView != null) {
-            mWebView.destroy();
-            mWebView = null;
-        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        if (Build.VERSION.SDK_INT >= 11) {
-            if (mWebView != null) {
-                mWebView.onResume();
-            }
-        }
-        ensureWebViewAndSubscribeToChannels();
+        ensureFayeIsConnected();
+        ensureChannelsAreSubscribed();
         syncRefreshAnimationState();
 
         mChatboxModeManager.onResume();
@@ -584,11 +562,6 @@ public class CommunicationActivity
     protected void onPause() {
         super.onPause();
 
-        if (mWebView != null) {
-            if (Build.VERSION.SDK_INT >= 11) {
-                mWebView.onPause();
-            }
-        }
         mChatboxModeManager.onPause();
         mConversationModeManager.onPause();
 
@@ -712,6 +685,11 @@ public class CommunicationActivity
     }
 
     @Override
+    public FayeReceiver getFayeReceiver() {
+        return mFayeReceiver;
+    }
+
+    @Override
     public void showBlockUserDialogFragment(Message message) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         BlockUserDialogFragment oldFragment = (BlockUserDialogFragment)
@@ -777,9 +755,7 @@ public class CommunicationActivity
         if (isInConversationMode()) {
             mCurrentConversationManager.removeCurrentConversation();
         }
-        mCurrentCommunicationMode.unsubscribeToChannels(mWebView);
-        mWebView = null;
-        mNotSubscribeToChannels = true;
+        mCurrentCommunicationMode.unsubscribeToChannels(mFayeReceiver);
         //clean up irrelevant data
         try {
             mGcmManager.clearRegistrationId();
@@ -830,70 +806,13 @@ public class CommunicationActivity
         return mDrawerLayout;
     }
 
-    @Override
-    public WebView getFayeWebView() {
-        return mWebView;
+    public void ensureFayeIsConnected() {
+        mFayeReceiver.connect(Constants.FAYE_URL);
     }
 
-    @SuppressLint("setJavaScriptEnabled")
-    @Override
-    public void ensureWebViewAndSubscribeToChannels() {
+    public void ensureChannelsAreSubscribed() {
         if (mCurrentCommunicationMode == null) return;
-        // Check whether the web view is available or not.
-        // If not, init it and load faye client. When loading finished,
-        // this method will be recursively called. At that point,
-        // the actual subscribe code will be executed.
-        if (mWebView == null) {
-            mNotSubscribeToChannels = true;
-            mWebView = new WebView(this);
-
-            WebSettings webSettings = mWebView.getSettings();
-            webSettings.setJavaScriptEnabled(true);
-            webSettings.setDomStorageEnabled(true);
-
-            mWebView.addJavascriptInterface(
-                    mFayeJsInterface,
-                    ChatwingJSInterface.CHATWING_JS_NAME);
-
-            mWebView.setWebChromeClient(new WebChromeClient() {
-                @Override
-                public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
-
-                    LogUtils.v(consoleMessage.message()
-                            + " -- level " + consoleMessage.messageLevel()
-                            + " -- From line " + consoleMessage.lineNumber()
-                            + " of " + consoleMessage.sourceId());
-
-                    //This workaround tries to fix issue webview is not subscribe successfully
-                    //when the screen is off, we cant listen for otto event since it's dead before that
-                    //this likely happens on development or very rare case in production
-                    if (consoleMessage.messageLevel().equals(ConsoleMessage.MessageLevel.ERROR)) {
-                        destroyWebview();
-                    }
-                    return true;
-                }
-            });
-
-            mWebView.setWebViewClient(new WebViewClient() {
-                @Override
-                public void onPageFinished(WebView view, String url) {
-                    super.onPageFinished(view, url);
-
-                    if (url.equals(Constants.FAYE_CLIENT_URL)) {
-                        // Recursively call this method,
-                        // to execute subscribe code.
-                        ensureWebViewAndSubscribeToChannels();
-                    }
-                }
-            });
-            LogUtils.v("Load Faye URL");
-            mWebView.loadUrl(Constants.FAYE_CLIENT_URL);
-            return;
-        }
-        if (mNotSubscribeToChannels) {
-            mNotSubscribeToChannels = false;
-            mCurrentCommunicationMode.subscribeToChannels(mWebView);
-        }
+        mCurrentCommunicationMode.subscribeToChannels(mFayeReceiver);
     }
 
     @Override
@@ -938,7 +857,6 @@ public class CommunicationActivity
         }
         addToLeftDrawer(getChatBoxesFragment());
     }
-
 
     @Override
     public void showAdminList() {
@@ -1104,8 +1022,8 @@ public class CommunicationActivity
     public void onAllSyncsCompleted(AllSyncsCompletedEvent
                                             event) {
         LogUtils.v("All Sync Completed");
-        destroyWebview();
-        ensureWebViewAndSubscribeToChannels();
+        ensureFayeIsConnected();
+        ensureChannelsAreSubscribed();
 
 
         if (event.needReload() &&
@@ -1147,7 +1065,8 @@ public class CommunicationActivity
                  * And un-subscribe to all invalid chat boxes.
                  */
 
-                ensureWebViewAndSubscribeToChannels();
+                ensureFayeIsConnected();
+                ensureChannelsAreSubscribed();
                 startSyncingBookmarks();
                 startSyncingCurrentUser();
                 break;
@@ -1224,13 +1143,10 @@ public class CommunicationActivity
                 mQuickMessageView.show(getString(R.string.message_subscribed_to_channel) + event.getChannel());
             }
             LogUtils.v("Subscribed to channel: " + event.getChannel());
-            mNotSubscribeToChannels = false;
         } else {
             // Failed
             mErrorMessageView.show(getString(R.string.message_error) + event.getError());
             LogUtils.e(event.getError());
-            //We resubscribe next time
-            destroyWebview();
         }
     }
 
@@ -1260,7 +1176,6 @@ public class CommunicationActivity
         }
     }
 
-
     @Subscribe
     public void onServerConnectionChangedEvent(ServerConnectionChangedEvent event) {
         //Faye
@@ -1269,18 +1184,31 @@ public class CommunicationActivity
                 mQuickMessageView.show(R.string.message_connected_to_server);
             }
             LogUtils.v("Connected to server.");
+
+            ensureChannelsAreSubscribed();
+            setupSnackbar(mContentView);
+            styleInfoSnackbar();
+            snackbar.setText(R.string.message_connected_to_server);
+            snackbar.setDuration(Snackbar.LENGTH_SHORT);
+            snackbar.show();
         } else {
             // Disconnected
             if (Constants.DEBUG) {
                 mQuickMessageView.show(R.string.message_disconnected_from_server);
             }
             LogUtils.v("Disconnected from server.");
+            setupSnackbar(mContentView);
             styleErrorSnackbar();
             snackbar.setAction("RETRY", snackbarRetryAction);
-            snackbar.setText("Disconnected to messaging server");
+            snackbar.setText(R.string.error_faye_closed);
             snackbar.setDuration(Snackbar.LENGTH_INDEFINITE);
             snackbar.show();
         }
+    }
+
+    @Subscribe
+    public void onFayeFailedEvent(FayeFailedEvent event) {
+        mErrorMessageView.show(R.string.error_faye_fail_event);
     }
 
     @Subscribe
@@ -1330,6 +1258,15 @@ public class CommunicationActivity
                 mSoundEffectsPool.play(mNewMessageSoundId, 1.0f, 1.0f, 0, 0, 1);
             }
         }
+    }
+
+    @Subscribe
+    public void onNetworkAvaialbleEvent(NetworkAvaialbleEvent event) {
+        if (snackbar != null) {
+            snackbar.dismiss();
+        }
+        ensureFayeIsConnected();
+        ensureChannelsAreSubscribed();
     }
 
     //////////////////////////
