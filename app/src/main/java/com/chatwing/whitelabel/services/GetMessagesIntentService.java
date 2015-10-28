@@ -1,11 +1,11 @@
 package com.chatwing.whitelabel.services;
 
-import android.content.ContentResolver;
+import android.content.ContentProviderOperation;
 import android.content.Intent;
 import android.net.Uri;
 
 import com.chatwing.whitelabel.contentproviders.ChatWingContentProvider;
-import com.chatwing.whitelabel.events.GotMoreMessagesEvent;
+import com.chatwing.whitelabel.events.GotMessagesEvent;
 import com.chatwing.whitelabel.pojos.Conversation;
 import com.chatwing.whitelabel.pojos.Message;
 import com.chatwing.whitelabel.pojos.User;
@@ -26,7 +26,8 @@ public class GetMessagesIntentService extends BaseIntentService {
     public static final String EXTRA_CHAT_BOX_ID = "chat_box_id";
     public static final String EXTRA_CONVERSATION = "conversation";
     public static final String EXTRA_OLDEST_MESSAGE = "oldest_message";
-    private static boolean isRunning;
+    public static final String EXTRA_MORE = "more";
+    public static final int MAX_MESSAGES = 20;
 
     public GetMessagesIntentService() {
         super("GetMessagesIntentService");
@@ -35,12 +36,16 @@ public class GetMessagesIntentService extends BaseIntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent == null) return;
-        isRunning = true;
         int chatBoxId = intent.getIntExtra(EXTRA_CHAT_BOX_ID, 0);
+        boolean loadMore = intent.getBooleanExtra(EXTRA_MORE, true);
         Conversation conversation = (Conversation) intent.getSerializableExtra(EXTRA_CONVERSATION);
         Message oldestMessage
                 = (Message) intent.getSerializableExtra(EXTRA_OLDEST_MESSAGE);
-        GotMoreMessagesEvent event;
+        //If not load from tail, will remove oldestMessage
+        if (!loadMore) {
+            oldestMessage = null;
+        }
+        GotMessagesEvent event;
         try {
             // Save messages to DB and only notify the ones that are inserted
             // to DB.
@@ -57,14 +62,10 @@ public class GetMessagesIntentService extends BaseIntentService {
                         oldestMessage);
             }
             List<Message> messagesFromServer = messagesResponse.getMessages();
-            LogUtils.v(oldestMessage + "<==oldest Loaded from server " + (messagesFromServer != null ? messagesFromServer.size() : "null"));
-            List<Message> insertedMessages = new ArrayList<Message>();
+
             Uri uri = ChatWingContentProvider.getMessagesUri();
-            ContentResolver contentResolver = getContentResolver();
-
+            ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
             for (Message message : messagesFromServer) {
-                String messageId = message.getId();
-
                 //Dirty
                 if (chatBoxId == 0) {
                     //Set username for conversation
@@ -73,36 +74,34 @@ public class GetMessagesIntentService extends BaseIntentService {
                             conversation));
                 }
 
-                Uri newRecord = contentResolver.insert(
-                        uri,
-                        MessageTable.getContentValues(message));
-                if (newRecord.getLastPathSegment().equals("-1")) {
-                    LogUtils.e("Failed to insert message with ID: " + messageId);
-                } else {
-                    insertedMessages.add(message);
-                }
+                batch.add(ContentProviderOperation.newInsert(uri)
+                        .withValues(MessageTable.getContentValues(message))
+                        .build());
             }
+            getContentResolver().applyBatch(ChatWingContentProvider.AUTHORITY, batch);
+
+            LogUtils.v(oldestMessage + "<==oldest Loaded from server " + (messagesFromServer != null ? messagesFromServer.size() : "null") + " loadMore " + loadMore);
 
             if (chatBoxId != 0) {
-                event = new GotMoreMessagesEvent(
+                event = new GotMessagesEvent(
                         chatBoxId,
                         messagesFromServer,
-                        insertedMessages);
+                        loadMore);
             } else {
-                event = new GotMoreMessagesEvent(
+                event = new GotMessagesEvent(
                         conversation.getId(),
                         messagesFromServer,
-                        insertedMessages);
+                        loadMore);
             }
         } catch (Exception exc) {
             if (chatBoxId != 0) {
-                event = new GotMoreMessagesEvent(chatBoxId, exc);
+                event = new GotMessagesEvent(chatBoxId, exc);
             } else {
-                event = new GotMoreMessagesEvent(conversation.getId(), exc);
+                event = new GotMessagesEvent(conversation.getId(), exc);
             }
         }
-        isRunning = false;
         post(event);
+        LogUtils.v("oldest Loaded from server NOT RUNNING NOW");
     }
 
     private String getUserNameForMessage(Message message, User me, Conversation conversation) {
@@ -115,11 +114,7 @@ public class GetMessagesIntentService extends BaseIntentService {
         return conversation.getConversationAlias(me.getId());
     }
 
-    public static boolean isRunning() {
-        return isRunning;
-    }
-
-    private void post(final GotMoreMessagesEvent event) {
+    private void post(final GotMessagesEvent event) {
         mHandler.post(new Runnable() {
             @Override
             public void run() {

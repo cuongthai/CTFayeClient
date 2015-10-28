@@ -213,7 +213,7 @@ public class ChatboxModeManager extends CommunicationModeManager {
         MenuItem copyAliasItem = menu.findItem(R.id.copy_alias);
         MenuItem manageBlackListItem = menu.findItem(R.id.manage_blacklist);
         MenuItem bookmarkChatBoxItem = menu.findItem(R.id.bookmark_chat_box);
-        MenuItem onlineUsersItem = menu.findItem(R.id.bookmark_chat_box);
+        MenuItem onlineUsersItem = menu.findItem(R.id.online_users);
 
         // Invalidate all menu related objects
         onlineUsersItem.setVisible(false);

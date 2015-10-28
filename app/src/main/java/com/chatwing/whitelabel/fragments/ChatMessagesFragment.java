@@ -35,7 +35,7 @@ import com.chatwing.whitelabel.events.CurrentChatBoxEvent;
 import com.chatwing.whitelabel.events.CurrentCommunicationEvent;
 import com.chatwing.whitelabel.events.EditChatMessageEvent;
 import com.chatwing.whitelabel.events.FlagMessageEvent;
-import com.chatwing.whitelabel.events.GotMoreMessagesEvent;
+import com.chatwing.whitelabel.events.GotMessagesEvent;
 import com.chatwing.whitelabel.events.IgnoreUserEvent;
 import com.chatwing.whitelabel.events.MessageEvent;
 import com.chatwing.whitelabel.events.PasswordEnteredEvent;
@@ -46,6 +46,7 @@ import com.chatwing.whitelabel.events.RequestBlockTypeEvent;
 import com.chatwing.whitelabel.events.RequestOpenChatBoxEvent;
 import com.chatwing.whitelabel.events.ResumeOpenChatBoxEvent;
 import com.chatwing.whitelabel.events.ViewProfileEvent;
+import com.chatwing.whitelabel.events.faye.ServerConnectionChangedEvent;
 import com.chatwing.whitelabel.loaders.CommunicationBoxMessagesLoader;
 import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.managers.CurrentChatBoxManager;
@@ -181,6 +182,7 @@ public class ChatMessagesFragment extends CommunicationMessagesFragment {
             LogUtils.v("Debug messgae not shown LOADED");
             super.handleComposeView(event.getChatbox());
             loadMessagesFromDb();
+            loadMessagesFromServer(true);
             updateCommunicationBoxDetail();
 
             loadEmoticons(event.getChatbox().getEmoticons());
@@ -246,19 +248,22 @@ public class ChatMessagesFragment extends CommunicationMessagesFragment {
     }
 
     @Override
-    protected void loadMessagesFromServer() {
+    protected void loadMessagesFromServer(boolean forceLoadLatest) {
         ChatBox chatBox = mCurrentChatBoxManager.getCurrentChatBox();
         if (chatBox == null
-                || mAdapter == null || mIsNoMoreMessages) {
+                || mAdapter == null
+                || (mIsNoMoreMessages && !forceLoadLatest)) {
             // Chat box and user are required.
             // So if they are unavailable by now, don't load.
-            // Also, don't load if there adapter is not ready or there is no more messages.
+            // Also, don't load if there adapter is not ready or there is no more messages
+            //If forceLoadLatest, it means not load from tail. Will trigger full reload
             return;
         }
 
         Intent intent = new Intent(getActivity(), GetMessagesIntentService.class);
         intent.putExtra(GetMessagesIntentService.EXTRA_CHAT_BOX_ID, chatBox.getId());
         intent.putExtra(GetMessagesIntentService.EXTRA_OLDEST_MESSAGE, mAdapter.getOldestMessageItem());
+        intent.putExtra(GetMessagesIntentService.EXTRA_MORE, !forceLoadLatest);
         getActivity().startService(intent);
     }
 
@@ -333,8 +338,16 @@ public class ChatMessagesFragment extends CommunicationMessagesFragment {
 
     @Override
     @Subscribe
-    public void onGotMoreMessagesEvent(GotMoreMessagesEvent event) {
-        super.onGotMoreMessagesEvent(event);
+    public void onGotMessagesEvent(GotMessagesEvent event) {
+        super.onGotMessagesEvent(event);
+    }
+
+    @Subscribe
+    public void onServerConnectionChangedEvent(ServerConnectionChangedEvent event) {
+        //Faye
+        if (event.getStatus() == ServerConnectionChangedEvent.Status.CONNECTED) {
+            loadMessagesFromServer(true);
+        }
     }
 
     @Override
@@ -345,7 +358,6 @@ public class ChatMessagesFragment extends CommunicationMessagesFragment {
         }
         doUpdateCommunicationBoxDetail(chatBox.getJson(), chatBox.getEmoticonsAsMap(), hasAdminPermissions());
     }
-
 
     @Subscribe
     public void onPasswordEntered(PasswordEnteredEvent event) {

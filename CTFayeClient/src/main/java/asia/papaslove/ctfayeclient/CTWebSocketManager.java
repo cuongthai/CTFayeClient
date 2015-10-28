@@ -26,12 +26,15 @@ class CTWebSocketManager {
     private static final String TAG = "CTWebSocketManager";
     private WebSocket mWebSocket;
     private CTWebSocketListener mListener;
+    private boolean isOpenning = false;
 
     public CTWebSocketManager(CTWebSocketListener listener) {
         mListener = listener;
     }
 
     public void openWebSocketConnection(final String url) {
+        if (isOpenning) return;
+        isOpenning = true;
         //Close current WebSocket Connection
         close();
         AsyncHttpClient.getDefaultInstance().websocket(
@@ -40,10 +43,11 @@ class CTWebSocketManager {
                 new AsyncHttpClient.WebSocketConnectCallback() {
                     @Override
                     public void onCompleted(Exception ex, final WebSocket webSocket) {
-                        Log.d(TAG, "onCompleted " + ex);
+                        Log.d(TAG, "onCompleted " + ex + ":" + webSocket);
                         if (ex != null) {
                             mListener.onWebSocketClosedByError(ex);
                             ex.printStackTrace();
+                            isOpenning = false;
                             return;
                         }
                         mWebSocket = webSocket;
@@ -62,6 +66,7 @@ class CTWebSocketManager {
                                 mListener.onWebSocketClosedByError(e);
                             }
                         });
+                        isOpenning = false;
                     }
                 });
     }
@@ -82,5 +87,9 @@ class CTWebSocketManager {
 
     public boolean isWebSocketConnectionReady() {
         return mWebSocket != null && mWebSocket.isOpen();
+    }
+
+    public boolean isWebSocketOpenning() {
+        return isOpenning;
     }
 }

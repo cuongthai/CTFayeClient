@@ -264,4 +264,9 @@ public class Message extends Params implements Comparable<Message> {
     public void setConversationID(String conversationID) {
         this.conversationID = conversationID;
     }
+
+    @Override
+    public String toString() {
+        return "["+id+":"+content+":"+createdDate+"]";
+    }
 }

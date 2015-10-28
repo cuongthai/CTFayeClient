@@ -234,7 +234,7 @@ public class CommunicationActivity
     private TextView mProgressText;
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
-    // Flag to determined onCreate is called. It is used onResume to decide
+    // Flag to determined onCreate is called. It is used onStart to decide
     // whether a sync operation should be triggered or not and reset right
     // after that.
     private boolean mIsCreated;
@@ -1021,7 +1021,6 @@ public class CommunicationActivity
     @Subscribe
     public void onAllSyncsCompleted(AllSyncsCompletedEvent
                                             event) {
-        LogUtils.v("All Sync Completed");
         ensureFayeIsConnected();
         ensureChannelsAreSubscribed();
 
@@ -1075,7 +1074,6 @@ public class CommunicationActivity
                 break;
         }
     }
-
 
     /**
      * After deleting bookmark on server, we delete on client

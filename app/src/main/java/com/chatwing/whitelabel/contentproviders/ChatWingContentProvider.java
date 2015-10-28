@@ -269,6 +269,7 @@ public class ChatWingContentProvider extends ContentProvider {
         batch.add(ContentProviderOperation.newDelete(getConversationsUri()).build());
         batch.add(ContentProviderOperation.newDelete(getChatBoxesUri()).build());
         batch.add(ContentProviderOperation.newDelete(getMessagesUri()).build());
+        batch.add(ContentProviderOperation.newDelete(getNotificationMessagesUri()).build());
         batch.add(ContentProviderOperation.newDelete(getSyncedBookmarksUri()).build());
         batch.add(ContentProviderOperation.newDelete(getCategoriesUri()).build());
         batch.add(ContentProviderOperation.newDelete(getModeratorsUri()).build());

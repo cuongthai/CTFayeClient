@@ -16,12 +16,10 @@
 
 package com.chatwing.whitelabel.fragments;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
@@ -43,7 +41,7 @@ import com.chatwing.whitelabel.adapters.EmoticonPackagesAdapter;
 import com.chatwing.whitelabel.events.AccessTokenExpiredEvent;
 import com.chatwing.whitelabel.events.AppendEmoticonEvent;
 import com.chatwing.whitelabel.events.CreateMessageEvent;
-import com.chatwing.whitelabel.events.GotMoreMessagesEvent;
+import com.chatwing.whitelabel.events.GotMessagesEvent;
 import com.chatwing.whitelabel.events.InvalidIdentityEvent;
 import com.chatwing.whitelabel.events.MessageEvent;
 import com.chatwing.whitelabel.events.UserUnauthenticatedEvent;
@@ -122,6 +120,7 @@ public abstract class CommunicationMessagesFragment extends BaseFragment {
     protected View newContentBtn;
     protected View newEmoBtn;
     protected Delegate mDelegate;
+    protected boolean isLoadingMore = false;
 
     public interface Delegate extends InjectableFragmentDelegate {
         void showColorPickerDialogFragment(BBCodeParser.BBCode code);
@@ -169,7 +168,7 @@ public abstract class CommunicationMessagesFragment extends BaseFragment {
 
     protected abstract boolean isInCurrentCommunicationBox(MessageEvent event);
 
-    protected abstract void loadMessagesFromServer();
+    protected abstract void loadMessagesFromServer(boolean forceLoadLatest);
 
     protected abstract void updateCommunicationBoxDetail();
 
@@ -253,30 +252,31 @@ public abstract class CommunicationMessagesFragment extends BaseFragment {
         getLoaderManager().restartLoader(MESSAGE_LOADER_ID, null, mLoaderCallbacks);
     }
 
-    protected void onGotMoreMessagesEvent(GotMoreMessagesEvent event) {
+    protected void onGotMessagesEvent(GotMessagesEvent event) {
         if (onMessageEvent(event, getString(R.string.error_while_loading_messages))) {
+            isLoadingMore = false;
             return;
         }
 
         List<Message> messagesFromServer = event.getMessagesFromServer();
         if (messagesFromServer == null) {
+            isLoadingMore = false;
             LogUtils.e("Both exception and new messages are null. " +
                     "Something is wrong.");
             return;
         }
         if (mIsNoMoreMessages = messagesFromServer.size() == 0) {
+            isLoadingMore = false;
             return;
         }
 
-        List<Message> insertedMessages = event.getInsertedMessages();
-        if (insertedMessages.size() == 0) {
-            // No new message inserted to DB. It means we already have all
-            // messages in DB for the last request. So we don't need to touch
-            // the view.
-            return;
+        if (event.isLoadMore()) {
+            mAdapter.addAllDataToTail(messagesFromServer);
+        } else {
+            //Is not a loadMore. We trigger full load
+            loadMessagesFromDb();
         }
-
-        mAdapter.addAllDataToTail(insertedMessages);
+        isLoadingMore = false;
     }
 
     protected void onCreateMessageEvent(CreateMessageEvent event) {
@@ -521,6 +521,11 @@ public abstract class CommunicationMessagesFragment extends BaseFragment {
     public void onResume() {
         super.onResume();
         mBus.register(this);
+
+        //Reload messages on local and remote ONLY we resume the fragment from background
+        //but NOT after the first sync. Otherwise, it will be unnecessarily loaded.
+        //This to make sure user see the up-to-date messages when coming back from background
+        loadMessagesFromServer(true);
     }
 
     public void onAppendEmoticonEvent(AppendEmoticonEvent event) {
@@ -642,7 +647,6 @@ public abstract class CommunicationMessagesFragment extends BaseFragment {
         emoticonsPager.setAdapter(adapter);
         indicator.setViewPager(emoticonsPager);
         indicator.notifyDataSetChanged();
-
     }
 
     public abstract class CommunicationBoxMessagesLoaderCallbacks implements
@@ -653,18 +657,12 @@ public abstract class CommunicationMessagesFragment extends BaseFragment {
                                    CommunicationBoxMessagesLoader.Result data) {
             List<Message> messagesFromDB = data.getMessages();
 
-            LogUtils.v("CommunicationBoxMessagesLoaderCallbacks finished ");
+            LogUtils.v("CommunicationBoxMessagesLoaderCallbacks finished " + loader.getId());
             if (data.getException() != null) {
                 mErrorMessageView.show(data.getException());
             } else if (messagesFromDB != null && messagesFromDB.size() > 0) {
                 mAdapter.setData(messagesFromDB);
             }
-
-            /**
-             * After adding data to adapter, we start loading more to fill the view
-             * If adapter is empty, load from server
-             */
-            loadMessagesFromServer();
         }
 
         @Override
@@ -798,10 +796,11 @@ public abstract class CommunicationMessagesFragment extends BaseFragment {
                 totalItemCount = mLayoutManager.getItemCount();
                 pastVisiblesItems = mLayoutManager.findFirstVisibleItemPosition();
 
-                if (!GetMessagesIntentService.isRunning()) {
+                if (!isLoadingMore) {
                     if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
                         LogUtils.v("Last Item Wow !");
-                        loadMessagesFromServer();
+                        isLoadingMore = true;
+                        loadMessagesFromServer(false);
                     }
                 }
             }

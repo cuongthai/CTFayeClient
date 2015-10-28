@@ -82,8 +82,8 @@ public class CTFayeClient implements CTWebSocketManager.CTWebSocketListener {
         this.listener = listener;
     }
 
-    public boolean connect(String url) {
-        if (isConnected || mCTWebSocketManager.isWebSocketConnectionReady()) {
+    public synchronized boolean connect(String url) {
+        if (isConnected || mCTWebSocketManager.isWebSocketOpenning()) {
             return false;
         }
         mUrl = url;
@@ -92,6 +92,7 @@ public class CTFayeClient implements CTWebSocketManager.CTWebSocketListener {
     }
 
     public void disconnect() {
+        shouldRetryConnection = false; //We disconnect manually so we don't want to retry when connection lost
         doFayeDisconnect();
     }
 
@@ -186,7 +187,7 @@ public class CTFayeClient implements CTWebSocketManager.CTWebSocketListener {
 
                         mFayeClientId = message.getClientId();
                         isConnected = true;
-
+                        shouldRetryConnection = true;
                         if (listener != null) listener.onConnectedToServer(mUrl);
                         doFayeConnect();
                         subscribePendingSubscriptions();
@@ -217,9 +218,11 @@ public class CTFayeClient implements CTWebSocketManager.CTWebSocketListener {
                     pendingChannelSubscriptions.remove(message.getSubscription());
                     if (message.isSuccessful()) {
                         openChannelSubscriptions.add(message.getSubscription());
-                        if (listener != null) listener.onSubscribeToChannel(message.getSubscription());
+                        if (listener != null)
+                            listener.onSubscribeToChannel(message.getSubscription());
                     } else {
-                        if (listener != null) listener.onFayeFailedWithError(new Exception("Faye could not subscribe to channel " + message.getSubscription()));
+                        if (listener != null)
+                            listener.onFayeFailedWithError(new Exception("Faye could not subscribe to channel " + message.getSubscription()));
                     }
                 } else if (message.getChannel().equals(FAYE_UNSUBSCRIBE_CHANNEL)) {
                     if (message.isSuccessful()) {
@@ -227,10 +230,12 @@ public class CTFayeClient implements CTWebSocketManager.CTWebSocketListener {
                         pendingChannelSubscriptions.remove(message.getSubscription());
                         openChannelSubscriptions.remove(message.getSubscription());
                     } else {
-                        if (listener != null) listener.onUnSubscribeFromChannel(message.getSubscription());
+                        if (listener != null)
+                            listener.onUnSubscribeFromChannel(message.getSubscription());
                     }
                 } else if (openChannelSubscriptions.contains(message.getChannel())) {
-                    if (listener != null) listener.onMessageReceived(message.getChannel(), message.getData());
+                    if (listener != null)
+                        listener.onMessageReceived(message.getChannel(), message.getData());
                 }
             }
         } catch (JSONException e) {
@@ -337,7 +342,8 @@ public class CTFayeClient implements CTWebSocketManager.CTWebSocketListener {
 
     private void doSendFayePublishMessage(JSONObject message, String channel, JSONObject extension) {
         if (!(isConnected && mCTWebSocketManager.isWebSocketConnectionReady())) {
-            if (listener != null) listener.onFayeFailedWithError(new Exception("FayeClient not connected to server."));
+            if (listener != null)
+                listener.onFayeFailedWithError(new Exception("FayeClient not connected to server."));
             return;
         }
 

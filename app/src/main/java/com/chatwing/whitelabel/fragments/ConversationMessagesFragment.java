@@ -31,10 +31,11 @@ import com.chatwing.whitelabel.events.CreateMessageEvent;
 import com.chatwing.whitelabel.events.CurrentChatBoxEvent;
 import com.chatwing.whitelabel.events.CurrentCommunicationEvent;
 import com.chatwing.whitelabel.events.CurrentConversationEvent;
-import com.chatwing.whitelabel.events.GotMoreMessagesEvent;
+import com.chatwing.whitelabel.events.GotMessagesEvent;
 import com.chatwing.whitelabel.events.IgnoreUserEvent;
 import com.chatwing.whitelabel.events.MessageEvent;
 import com.chatwing.whitelabel.events.UserUnauthenticatedEvent;
+import com.chatwing.whitelabel.events.faye.ServerConnectionChangedEvent;
 import com.chatwing.whitelabel.loaders.CommunicationBoxMessagesLoader;
 import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.managers.CurrentConversationManager;
@@ -132,8 +133,16 @@ public class ConversationMessagesFragment extends CommunicationMessagesFragment 
 
     @Override
     @Subscribe
-    public void onGotMoreMessagesEvent(GotMoreMessagesEvent event) {
-        super.onGotMoreMessagesEvent(event);
+    public void onGotMessagesEvent(GotMessagesEvent event) {
+        super.onGotMessagesEvent(event);
+    }
+
+    @Subscribe
+    public void onServerConnectionChangedEvent(ServerConnectionChangedEvent event) {
+        //Faye
+        if (event.getStatus() == ServerConnectionChangedEvent.Status.CONNECTED) {
+            loadMessagesFromServer(true);
+        }
     }
 
     @Subscribe
@@ -146,10 +155,11 @@ public class ConversationMessagesFragment extends CommunicationMessagesFragment 
         } else if (CurrentConversationEvent.Status.LOADING.equals(status)) {
         } else if (CurrentConversationEvent.Status.LOADED.equals(status)) {
             loadMessagesFromDb();
+            loadMessagesFromServer(true);
             updateCommunicationBoxDetail();
 
             loadEmoticons(event.getConversation().getEmoticons());
-        }else if (CurrentChatBoxEvent.Status.UPDATED.equals(status)) {
+        } else if (CurrentChatBoxEvent.Status.UPDATED.equals(status)) {
             updateCommunicationBoxDetail();
         }
     }
@@ -171,7 +181,7 @@ public class ConversationMessagesFragment extends CommunicationMessagesFragment 
     }
 
     @Subscribe
-    public void onIgnoreUserUpdate(IgnoreUserEvent event){
+    public void onIgnoreUserUpdate(IgnoreUserEvent event) {
         mAdapter.notifyDataSetChanged();
     }
 
@@ -223,10 +233,11 @@ public class ConversationMessagesFragment extends CommunicationMessagesFragment 
     }
 
     @Override
-    protected void loadMessagesFromServer() {
+    protected void loadMessagesFromServer(boolean forceLoadLatest) {
         Conversation conversation = mCurrentConversationManager.getCurrentConversation();
         if (conversation == null || mUserManager.getCurrentUser() == null
-                || mAdapter == null || mIsNoMoreMessages) {
+                || mAdapter == null
+                || (mIsNoMoreMessages && !forceLoadLatest)) {
             // Chat box and user are required.
             // So if they are unavailable by now, don't load.
             // Also, don't load if there adapter is not ready or there is no more messages.
@@ -237,6 +248,7 @@ public class ConversationMessagesFragment extends CommunicationMessagesFragment 
         Intent intent = new Intent(getActivity(), GetMessagesIntentService.class);
         intent.putExtra(GetMessagesIntentService.EXTRA_CONVERSATION, conversation);
         intent.putExtra(GetMessagesIntentService.EXTRA_OLDEST_MESSAGE, mAdapter.getOldestMessageItem());
+        intent.putExtra(GetMessagesIntentService.EXTRA_MORE, !forceLoadLatest);
         getActivity().startService(intent);
     }
 
