@@ -16,25 +16,34 @@
 
 package com.chatwing.whitelabel.modules;
 
+import android.annotation.TargetApi;
 import android.app.NotificationManager;
 import android.app.SearchManager;
 import android.content.Context;
 import android.graphics.Typeface;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.net.ConnectivityManager;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.inputmethod.InputMethodManager;
 
 import com.chatwing.whitelabel.ChatWing;
+import com.chatwing.whitelabel.interfaces.FayeReceiver;
 import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.managers.ApiManagerImpl;
 import com.chatwing.whitelabel.managers.SyncManager;
 import com.chatwing.whitelabel.managers.UserManager;
 import com.chatwing.whitelabel.managers.VolleyManager;
+import com.chatwing.whitelabel.parsers.EventParser;
+import com.chatwing.whitelabel.parsers.EventParserImpl;
 import com.chatwing.whitelabel.receivers.NetworkReceiver;
 import com.chatwing.whitelabel.services.AckChatboxIntentService;
 import com.chatwing.whitelabel.services.AckConversationIntentService;
 import com.chatwing.whitelabel.services.BlockUserIntentService;
+import com.chatwing.whitelabel.services.ChatWingChatService;
 import com.chatwing.whitelabel.services.CreateBookmarkIntentService;
 import com.chatwing.whitelabel.services.CreateConversationIntentService;
 import com.chatwing.whitelabel.services.CreateMessageIntentService;
@@ -64,6 +73,7 @@ import com.squareup.otto.ThreadEnforcer;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import asia.papaslove.ctfayeclient.CTFayeClient;
 import dagger.Module;
 import dagger.Provides;
 
@@ -96,6 +106,7 @@ import dagger.Provides;
                 VerifyEmailIntentService.class,
                 DeleteBookmarkIntentService.class,
                 UpdateAvatarIntentService.class,
+                ChatWingChatService.class,
                 NetworkReceiver.class
         },
         library = true
@@ -186,6 +197,44 @@ public class ChatWingModule {
     @Provides
     SearchManager provideSearchManager() {
         return (SearchManager) mApplication.getSystemService(Context.SEARCH_SERVICE);
+    }
+
+    @Provides
+    @Singleton
+    FayeReceiver provideFayeClient(Bus bus,
+                                   @ForMainThread Handler handler) {
+        return new FayeReceiver(new CTFayeClient(), handler, bus);
+    }
+
+
+    @Provides
+    @Singleton
+    EventParser provideEventParser(EventParserImpl impl) {
+        return impl;
+    }
+
+    @Provides
+    @Singleton
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    SoundPool provideSoundPool(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION_EVENT)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build();
+
+            return new SoundPool.Builder()
+                    .setMaxStreams(25)
+                    .setAudioAttributes(audioAttributes)
+                    .build();
+        } else {
+            return legacySoundPool();
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    private SoundPool legacySoundPool() {
+        return new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
     }
 
 }

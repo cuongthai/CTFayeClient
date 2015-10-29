@@ -30,7 +30,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.webkit.WebView;
 
 import com.chatwing.whitelabel.Constants;
 import com.chatwing.whitelabel.R;
@@ -41,7 +40,6 @@ import com.chatwing.whitelabel.events.ChatBoxUnreadCountChangedEvent;
 import com.chatwing.whitelabel.events.CurrentCommunicationEvent;
 import com.chatwing.whitelabel.fragments.CommunicationMessagesFragment;
 import com.chatwing.whitelabel.fragments.NotificationFragment;
-import com.chatwing.whitelabel.interfaces.FayeReceiver;
 import com.chatwing.whitelabel.pojos.Event;
 import com.chatwing.whitelabel.pojos.Message;
 import com.chatwing.whitelabel.pojos.params.CreateConversationParams;
@@ -53,11 +51,8 @@ import com.chatwing.whitelabel.utils.LogUtils;
 import com.google.gson.Gson;
 import com.squareup.otto.Bus;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-import asia.papaslove.ctfayeclient.CTFayeClient;
 
 /**
  * Created by cuongthai on 14/04/2014.
@@ -72,8 +67,8 @@ public abstract class CommunicationModeManager {
     protected CharSequence mOriginalTitle;
     protected CharSequence mTitle;
     protected boolean mIsActive;
+    protected final Bus mBus;
 
-    private final Bus mBus;
     private String mOpeningVideoUrl;
     private boolean mIsRegisteredToBus;
 
@@ -88,7 +83,6 @@ public abstract class CommunicationModeManager {
         mIsActive = false;
         mCommunicationActivityManager = communicationActivityManager;
     }
-
 
     protected void onCurrentCommunicationChanged(CurrentCommunicationEvent event) {
         switch (event.getStatus()) {
@@ -264,7 +258,6 @@ public abstract class CommunicationModeManager {
 
         void showConversation(CreateConversationParams.SimpleUser simpleUser);
 
-        FayeReceiver getFayeReceiver();
     }
 
     /**
@@ -364,76 +357,6 @@ public abstract class CommunicationModeManager {
         }
     }
 
-    public void subscribeToChannels(FayeReceiver fayeReceiver) {
-        subscribeToChatBoxChannels(fayeReceiver);
-        subscribeToConversationChannels(fayeReceiver);
-    }
-
-    private void subscribeToChatBoxChannels(FayeReceiver fayeReceiver) {
-        // Query for chat box keys
-        Uri chatBoxesUri = ChatWingContentProvider.getChatBoxesUri();
-        ArrayList<String> fayeChannels = new ArrayList<String>();
-        Cursor c = null;
-        try {
-            c = mActivityDelegate.getActivity().getContentResolver().query(
-                    chatBoxesUri,
-                    new String[]{ChatBoxTable.FAYE_CHANNEL},
-                    null, null, null);
-            if (c.getCount() > 0 && c.moveToFirst()) {
-                int fayeChannelIndex = c.getColumnIndex(ChatBoxTable.FAYE_CHANNEL);
-                do {
-                    // We can subscribe to each chat box here,
-                    // but it can take a lot of time and holding the Cursor for
-                    // that long is not a good idea. So, to be safe,
-                    // let's get all chat box keys first and subscribe later.
-                    String fayeChannel = c.getString(fayeChannelIndex);
-                    fayeChannels.add(fayeChannel);
-                } while (c.moveToNext());
-            }
-        } finally {
-            if (c != null && !c.isClosed()) {
-                c.close();
-            }
-        }
-        LogUtils.v("Test Duplicate subscribeToChatBoxChannels " + fayeChannels.size());
-
-        // Subscribe to all of them
-        for (String fayeChannel : fayeChannels) {
-            fayeReceiver.subscribeToChannel(String.format("/%s", fayeChannel));
-        }
-    }
-
-    public void unsubscribeToChannels(FayeReceiver fayeReceiver) {
-        unsubscribeToChatBoxChannels(fayeReceiver);
-        unsubscribeToConversationChannels(fayeReceiver);
-    }
-
-    private void unsubscribeToChatBoxChannels(FayeReceiver fayeReceiver) {
-        // Subscribe to all of them
-        ArrayList<String> allFayeChannels = getAllFayeChannels();
-        LogUtils.v("Test Duplicate unsubscribeToChatBoxChannels " + allFayeChannels.size());
-
-        for (String fayeChannel : allFayeChannels) {
-            fayeReceiver.unsubscribeToChannel(String.format("/%s", fayeChannel));
-        }
-    }
-
-    private void unsubscribeToConversationChannels(FayeReceiver fayeReceiver) {
-        if (mUserManager.getCurrentUser() == null) {
-            return;
-        }
-        LogUtils.v("Test Duplicate unsubscribeToConversationChannels");
-        fayeReceiver.unsubscribeToChannel(String.format("/user/%s", mUserManager.getCurrentUser().getId()));
-    }
-
-    private void subscribeToConversationChannels(FayeReceiver fayeReceiver) {
-        if (mUserManager.getCurrentUser() == null) {
-            return;
-        }
-        LogUtils.v("Test Duplicate subscribeToConversationChannels");
-        fayeReceiver.subscribeToChannel(String.format("/user/%s", mUserManager.getCurrentUser().getId()));
-    }
-
     private void manageNotification() {
         FragmentManager supportFragmentManager = mActivityDelegate.getActivity().getSupportFragmentManager();
         Fragment notificationFragment = supportFragmentManager.findFragmentByTag(MANAGE_NOTIFICATION_TAG);
@@ -444,34 +367,5 @@ public abstract class CommunicationModeManager {
                 .add(getNotificationSettingFragment(), MANAGE_NOTIFICATION_TAG)
                 .addToBackStack(null)
                 .commit();
-    }
-
-    private ArrayList<String> getAllFayeChannels() {
-        // Query for chat box keys
-        Uri chatBoxesUri = ChatWingContentProvider.getChatBoxesUri();
-        ArrayList<String> fayeChannels = new ArrayList<String>();
-        Cursor c = null;
-        try {
-            c = mActivityDelegate.getActivity().getContentResolver().query(
-                    chatBoxesUri,
-                    new String[]{ChatBoxTable.FAYE_CHANNEL},
-                    null, null, null);
-            if (c.getCount() > 0 && c.moveToFirst()) {
-                int fayeChannelIndex = c.getColumnIndex(ChatBoxTable.FAYE_CHANNEL);
-                do {
-                    // We can subscribe to each chat box here,
-                    // but it can take a lot of time and holding the Cursor for
-                    // that long is not a good idea. So, to be safe,
-                    // let's get all chat box keys first and subscribe later.
-                    String fayeChannel = c.getString(fayeChannelIndex);
-                    fayeChannels.add(fayeChannel);
-                } while (c.moveToNext());
-            }
-        } finally {
-            if (c != null && !c.isClosed()) {
-                c.close();
-            }
-        }
-        return fayeChannels;
     }
 }

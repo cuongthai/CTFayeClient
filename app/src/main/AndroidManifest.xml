@@ -175,6 +175,9 @@
             </intent-filter>
         </service>
 
+        <service
+            android:name=".services.ChatWingChatService"
+            android:exported="false" />
 
         <!-- FB 3.0 section -->
         <meta-data
@@ -194,7 +197,7 @@
             android:exported="false" />
 
 
-        <receiver android:name=".receivers.NetworkReceiver" >
+        <receiver android:name=".receivers.NetworkReceiver">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>

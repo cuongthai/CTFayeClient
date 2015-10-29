@@ -33,7 +33,7 @@ import dagger.ObjectGraph;
  * Created by cuongthai on 19/07/2014.
  */
 public class ChatWing {
-    private static  ChatWing chatWing;
+    private static ChatWing chatWing;
     private static boolean isDebugging = true;
 
     @Inject
@@ -49,6 +49,7 @@ public class ChatWing {
 
     private Class<? extends Activity> mAuthenticationEntranceClass;
     private Class<? extends CommunicationActivity> mainActivityClass;
+    private boolean isAppVisible;
 
 
     public static void initialize(Context context,
@@ -132,5 +133,13 @@ public class ChatWing {
 
     public void setMainActivityClass(Class<? extends CommunicationActivity> mainActivityClass) {
         this.mainActivityClass = mainActivityClass;
+    }
+
+    public void setAppVisible(boolean visible) {
+        isAppVisible = visible;
+    }
+
+    public boolean isAppVisible() {
+        return isAppVisible;
     }
 }

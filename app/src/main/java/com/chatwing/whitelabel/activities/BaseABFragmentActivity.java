@@ -77,6 +77,7 @@ public abstract class BaseABFragmentActivity extends AppCompatActivity {
         userManager.onResume();
         userManager.ping();
         isVisible = true;
+        ChatWing.instance(this).setAppVisible(true);
     }
 
     @Override
@@ -84,6 +85,7 @@ public abstract class BaseABFragmentActivity extends AppCompatActivity {
         super.onPause();
         userManager.onPause();
         isVisible = false;
+        ChatWing.instance(this).setAppVisible(false);
     }
 
     @Override

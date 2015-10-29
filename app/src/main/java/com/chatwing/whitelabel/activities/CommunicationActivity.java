@@ -53,6 +53,7 @@ import com.chatwing.whitelabel.contentproviders.ChatWingContentProvider;
 import com.chatwing.whitelabel.events.AccountSwitchEvent;
 import com.chatwing.whitelabel.events.AllSyncsCompletedEvent;
 import com.chatwing.whitelabel.events.BlockedEvent;
+import com.chatwing.whitelabel.events.ChatServiceEvent;
 import com.chatwing.whitelabel.events.DeleteBookmarkEvent;
 import com.chatwing.whitelabel.events.NetworkAvaialbleEvent;
 import com.chatwing.whitelabel.events.SyncCommunicationBoxEvent;
@@ -88,7 +89,6 @@ import com.chatwing.whitelabel.fragments.OnlineUsersFragment;
 import com.chatwing.whitelabel.fragments.PasswordDialogFragment;
 import com.chatwing.whitelabel.fragments.PhotoPickerDialogFragment;
 import com.chatwing.whitelabel.fragments.ProfileFragment;
-import com.chatwing.whitelabel.interfaces.FayeReceiver;
 import com.chatwing.whitelabel.interfaces.MediaControlInterface;
 import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.managers.BuildManager;
@@ -120,6 +120,7 @@ import com.chatwing.whitelabel.pojos.responses.ChatBoxDetailsResponse;
 import com.chatwing.whitelabel.pojos.responses.DeleteBookmarkResponse;
 import com.chatwing.whitelabel.services.AckChatboxIntentService;
 import com.chatwing.whitelabel.services.AckConversationIntentService;
+import com.chatwing.whitelabel.services.ChatWingChatService;
 import com.chatwing.whitelabel.services.CreateConversationIntentService;
 import com.chatwing.whitelabel.services.DownloadUserDetailIntentService;
 import com.chatwing.whitelabel.services.MusicService;
@@ -223,8 +224,7 @@ public class CommunicationActivity
     protected MusicModeManager mMusicModeManager;
     @Inject
     protected SoundPool mSoundEffectsPool;
-    @Inject
-    protected FayeReceiver mFayeReceiver;
+
 
     protected CommunicationModeManager mCurrentCommunicationMode;
 
@@ -249,7 +249,6 @@ public class CommunicationActivity
         @Override
         public void onClick(View view) {
             ensureFayeIsConnected();
-            ensureChannelsAreSubscribed();
         }
     };
 
@@ -412,6 +411,9 @@ public class CommunicationActivity
                     .add(R.id.ads_container, new AdFragment(), adsFragmentTag)
                     .commit();
         }
+
+        //We start our lovely ChatService so that it listen to faye server
+        startService(new Intent(this, ChatWingChatService.class));
     }
 
     private void setupSnackbar(View contentView) {
@@ -538,8 +540,6 @@ public class CommunicationActivity
         mSoundEffectsPool.release();
         mSoundEffectsPool = null;
 
-        mFayeReceiver.disconnect();
-
         mCurrentCommunicationMode.onDestroy();
         mCurrentCommunicationMode = null;
     }
@@ -549,7 +549,6 @@ public class CommunicationActivity
         super.onResume();
 
         ensureFayeIsConnected();
-        ensureChannelsAreSubscribed();
         syncRefreshAnimationState();
 
         mChatboxModeManager.onResume();
@@ -685,11 +684,6 @@ public class CommunicationActivity
     }
 
     @Override
-    public FayeReceiver getFayeReceiver() {
-        return mFayeReceiver;
-    }
-
-    @Override
     public void showBlockUserDialogFragment(Message message) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         BlockUserDialogFragment oldFragment = (BlockUserDialogFragment)
@@ -755,7 +749,7 @@ public class CommunicationActivity
         if (isInConversationMode()) {
             mCurrentConversationManager.removeCurrentConversation();
         }
-        mCurrentCommunicationMode.unsubscribeToChannels(mFayeReceiver);
+        mBus.post(ChatServiceEvent.unsubscribeAllChannels());
         //clean up irrelevant data
         try {
             mGcmManager.clearRegistrationId();
@@ -807,12 +801,10 @@ public class CommunicationActivity
     }
 
     public void ensureFayeIsConnected() {
-        mFayeReceiver.connect(Constants.FAYE_URL);
-    }
-
-    public void ensureChannelsAreSubscribed() {
-        if (mCurrentCommunicationMode == null) return;
-        mCurrentCommunicationMode.subscribeToChannels(mFayeReceiver);
+        if (snackbar != null) {
+            snackbar.dismiss();
+        }
+        mBus.post(ChatServiceEvent.connect());
     }
 
     @Override
@@ -992,6 +984,7 @@ public class CommunicationActivity
                 }
                 mCurrentCommunicationMode.logout();
                 mUserManager.removeUsers();
+                mBus.post(ChatServiceEvent.unsubscribeAllChannels());
 
                 Intent i = new Intent(CommunicationActivity.this, getEntranceActivityClass());
                 startActivity(i);
@@ -1022,7 +1015,6 @@ public class CommunicationActivity
     public void onAllSyncsCompleted(AllSyncsCompletedEvent
                                             event) {
         ensureFayeIsConnected();
-        ensureChannelsAreSubscribed();
 
 
         if (event.needReload() &&
@@ -1065,7 +1057,6 @@ public class CommunicationActivity
                  */
 
                 ensureFayeIsConnected();
-                ensureChannelsAreSubscribed();
                 startSyncingBookmarks();
                 startSyncingCurrentUser();
                 break;
@@ -1183,7 +1174,6 @@ public class CommunicationActivity
             }
             LogUtils.v("Connected to server.");
 
-            ensureChannelsAreSubscribed();
             setupSnackbar(mContentView);
             styleInfoSnackbar();
             snackbar.setText(R.string.message_connected_to_server);
@@ -1250,21 +1240,14 @@ public class CommunicationActivity
                 mCurrentCommunicationMode.processMessageInCurrentCommunicationBox(message);
             }
 
+            //Handle sound when app is visible
+            //When app not visible chatservice will handle it
             if (mUserManager.isSoundEnabled()
                     &&
-                    (appIsNotVisible() || !isInCurrentCommunicationBox)) {
+                    (!appIsNotVisible() && !isInCurrentCommunicationBox)) {
                 mSoundEffectsPool.play(mNewMessageSoundId, 1.0f, 1.0f, 0, 0, 1);
             }
         }
-    }
-
-    @Subscribe
-    public void onNetworkAvaialbleEvent(NetworkAvaialbleEvent event) {
-        if (snackbar != null) {
-            snackbar.dismiss();
-        }
-        ensureFayeIsConnected();
-        ensureChannelsAreSubscribed();
     }
 
     //////////////////////////

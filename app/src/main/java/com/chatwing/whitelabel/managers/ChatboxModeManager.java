@@ -62,6 +62,7 @@ import com.chatwing.whitelabel.activities.NoMenuWebViewActivity;
 import com.chatwing.whitelabel.activities.SearchChatBoxActivity;
 import com.chatwing.whitelabel.contentproviders.ChatWingContentProvider;
 import com.chatwing.whitelabel.events.AccountSwitchEvent;
+import com.chatwing.whitelabel.events.ChatServiceEvent;
 import com.chatwing.whitelabel.events.CreateBookmarkEvent;
 import com.chatwing.whitelabel.events.CurrentChatBoxEvent;
 import com.chatwing.whitelabel.events.LoadCurrentChatBoxFailedEvent;
@@ -71,7 +72,6 @@ import com.chatwing.whitelabel.events.UserSelectedChatBoxEvent;
 import com.chatwing.whitelabel.events.UserSelectedSongEvent;
 import com.chatwing.whitelabel.fragments.AccountDialogFragment;
 import com.chatwing.whitelabel.fragments.NotificationFragment;
-import com.chatwing.whitelabel.interfaces.FayeReceiver;
 import com.chatwing.whitelabel.interfaces.MediaControlInterface;
 import com.chatwing.whitelabel.pojos.ChatBox;
 import com.chatwing.whitelabel.pojos.Event;
@@ -736,11 +736,10 @@ public class ChatboxModeManager extends CommunicationModeManager {
     }
 
     private void subscribeToCurrentChatBox() {
-        FayeReceiver fayeReceiver = mActivityDelegate.getFayeReceiver();
         ChatBox currentChatBox = mCurrentChatBoxManager.getCurrentChatBox();
         if (currentChatBox != null) {
-            fayeReceiver.subscribeToChannel(String.format("/%s",
-                    currentChatBox.getFayeChannel()));
+            mBus.post(ChatServiceEvent.subscribeChannel(String.format("/%s",
+                    currentChatBox.getFayeChannel())));
         }
     }
 

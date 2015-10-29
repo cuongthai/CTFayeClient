@@ -124,12 +124,6 @@ public class CommunicationActivityModule {
         return mActivity;
     }
 
-    @Provides
-    @Singleton
-    EventParser provideEventParser(EventParserImpl impl) {
-        return impl;
-    }
-
     /**
      * Provides layout inflater for this activity.
      * It's different from the one provided by Application
@@ -259,37 +253,6 @@ public class CommunicationActivityModule {
                 chatBoxIdValidator,
                 taskProvider,
                 passwordManager);
-    }
-
-    @Provides
-    @Singleton
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    SoundPool provideSoundPool(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            AudioAttributes audioAttributes = new AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_NOTIFICATION_EVENT)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .build();
-
-            return new SoundPool.Builder()
-                    .setMaxStreams(25)
-                    .setAudioAttributes(audioAttributes)
-                    .build();
-        } else {
-            return legacySoundPool();
-        }
-    }
-
-    @Provides
-    @Singleton
-    FayeReceiver provideFayeClient(Bus bus,
-                                   @ForMainThread Handler handler) {
-        return new FayeReceiver(new CTFayeClient(), handler, bus);
-    }
-
-    @SuppressWarnings("deprecation")
-    private SoundPool legacySoundPool() {
-        return new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
     }
 }
 

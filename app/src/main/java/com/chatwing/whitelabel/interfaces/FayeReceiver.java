@@ -104,10 +104,12 @@ public class FayeReceiver implements CTFayeClient.CTFayeClientInterface {
     }
 
     public void subscribeToChannel(String channel) {
+        LogUtils.v("Service is subscribing to " + channel);
         mFayeClient.subscribeToChannel(channel);
     }
 
     public void unsubscribeToChannel(String channel) {
+        LogUtils.v("Service is unsubscribing to " + channel);
         mFayeClient.unsubscribeToChannel(channel);
     }
 }
