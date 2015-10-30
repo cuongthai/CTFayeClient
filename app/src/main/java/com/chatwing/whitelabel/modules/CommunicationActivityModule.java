@@ -16,14 +16,8 @@
 
 package com.chatwing.whitelabel.modules;
 
-import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.media.AudioAttributes;
-import android.media.AudioManager;
-import android.media.SoundPool;
-import android.os.Build;
-import android.os.Handler;
 import android.view.LayoutInflater;
 
 import com.chatwing.whitelabel.activities.CommunicationActivity;
@@ -47,7 +41,6 @@ import com.chatwing.whitelabel.fragments.OnlineUsersFragment;
 import com.chatwing.whitelabel.fragments.PasswordDialogFragment;
 import com.chatwing.whitelabel.fragments.PhotoPickerDialogFragment;
 import com.chatwing.whitelabel.fragments.ProfileFragment;
-import com.chatwing.whitelabel.interfaces.FayeReceiver;
 import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.managers.BuildManager;
 import com.chatwing.whitelabel.managers.ChatboxModeManager;
@@ -61,8 +54,6 @@ import com.chatwing.whitelabel.managers.PasswordManager;
 import com.chatwing.whitelabel.managers.UserManager;
 import com.chatwing.whitelabel.parsers.BBCodeParser;
 import com.chatwing.whitelabel.parsers.BBCodeParserImpl;
-import com.chatwing.whitelabel.parsers.EventParser;
-import com.chatwing.whitelabel.parsers.EventParserImpl;
 import com.chatwing.whitelabel.tasks.LoadOnlineUsersTask;
 import com.chatwing.whitelabel.validators.ChatBoxIdValidator;
 import com.chatwing.whitelabel.validators.ConversationIdValidator;
@@ -72,7 +63,6 @@ import com.squareup.otto.Bus;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import asia.papaslove.ctfayeclient.CTFayeClient;
 import dagger.Module;
 import dagger.Provides;
 

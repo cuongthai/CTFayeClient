@@ -3,24 +3,25 @@ package com.chatwing.whitelabel.services;
 import android.app.Service;
 import android.content.Intent;
 import android.database.Cursor;
-import android.media.SoundPool;
 import android.net.Uri;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 import com.chatwing.whitelabel.ChatWing;
 import com.chatwing.whitelabel.Constants;
-import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.contentproviders.ChatWingContentProvider;
 import com.chatwing.whitelabel.events.ChatServiceEvent;
 import com.chatwing.whitelabel.events.NetworkAvaialbleEvent;
 import com.chatwing.whitelabel.events.faye.MessageReceivedEvent;
 import com.chatwing.whitelabel.events.faye.ServerConnectionChangedEvent;
 import com.chatwing.whitelabel.interfaces.FayeReceiver;
+import com.chatwing.whitelabel.managers.CWNotificationManager;
 import com.chatwing.whitelabel.managers.UserManager;
 import com.chatwing.whitelabel.modules.ChatWingModule;
 import com.chatwing.whitelabel.parsers.EventParser;
 import com.chatwing.whitelabel.pojos.Event;
+import com.chatwing.whitelabel.pojos.Message;
+import com.chatwing.whitelabel.pojos.User;
 import com.chatwing.whitelabel.tables.ChatBoxTable;
 import com.chatwing.whitelabel.utils.LogUtils;
 import com.squareup.otto.Bus;
@@ -50,10 +51,9 @@ public class ChatWingChatService extends Service {
     @Inject
     protected UserManager mUserManager;
     @Inject
-    protected SoundPool mSoundEffectsPool;
+    protected CWNotificationManager mNotificationManager;
 
     private ChatWing chatWing;
-    private int newMessageSoundId;
 
     /**
      * This is called when system hate us or user hate our app and kill it. This service is killed too
@@ -75,8 +75,6 @@ public class ChatWingChatService extends Service {
          */
         mBus.register(this);
         LogUtils.v("Create service +" + chatWing);
-
-        newMessageSoundId = mSoundEffectsPool.load(this, R.raw.new_message, 1);
     }
 
     @Override
@@ -104,23 +102,24 @@ public class ChatWingChatService extends Service {
     @Subscribe
     public void onServerConnectionChangedEvent(ServerConnectionChangedEvent event) {
         if (event.getStatus() == ServerConnectionChangedEvent.Status.CONNECTED) {
+            LogUtils.v("Service is connected to chat server");
             //After we connected, make sure all known channels are subscribed
             ensureChannelsAreSubscribed();
         }
     }
 
     @Subscribe
-    public void onMessageReceived(MessageReceivedEvent event) throws IOException {
+    public void onMessageReceived(MessageReceivedEvent messageReceivedEvent) throws IOException {
         //Faye
         try {
-            Event message = mEventParser.parse(event.getMessage());
-            String name = message.getName();
+            Event event = mEventParser.parse(messageReceivedEvent.getMessage());
+            String name = event.getName();
             if (name.equals(EventParser.EVENT_NEW_MESSAGE)
                     || name.equals(EventParser.EVENT_NETWORK_NEW_MESSAGE)) {
-
-                LogUtils.v("Message here = " + event.getMessage());
+                Message message = (Message) event.getParams();
+                LogUtils.v("Message receive in ChatService "+message);
                 if (mUserManager.isSoundEnabled() && !chatWing.isAppVisible()) {
-                    mSoundEffectsPool.play(newMessageSoundId, 1.0f, 1.0f, 0, 0, 1);
+                    mNotificationManager.notifyMessage(message, true);
                 }
             }
         } catch (JSONException ex) {

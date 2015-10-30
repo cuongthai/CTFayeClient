@@ -179,10 +179,8 @@ public class ChatMessagesFragment extends CommunicationMessagesFragment {
         } else if (CurrentChatBoxEvent.Status.LOADING.equals(status)) {
 
         } else if (CurrentChatBoxEvent.Status.LOADED.equals(status)) {
-            LogUtils.v("Debug messgae not shown LOADED");
             super.handleComposeView(event.getChatbox());
             loadMessagesFromDb();
-            loadMessagesFromServer(true);
             updateCommunicationBoxDetail();
 
             loadEmoticons(event.getChatbox().getEmoticons());

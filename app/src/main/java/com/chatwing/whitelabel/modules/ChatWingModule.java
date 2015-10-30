@@ -34,6 +34,7 @@ import com.chatwing.whitelabel.ChatWing;
 import com.chatwing.whitelabel.interfaces.FayeReceiver;
 import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.managers.ApiManagerImpl;
+import com.chatwing.whitelabel.managers.CWNotificationManager;
 import com.chatwing.whitelabel.managers.SyncManager;
 import com.chatwing.whitelabel.managers.UserManager;
 import com.chatwing.whitelabel.managers.VolleyManager;
@@ -216,7 +217,7 @@ public class ChatWingModule {
     @Provides
     @Singleton
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    SoundPool provideSoundPool(){
+    SoundPool provideSoundPool() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             AudioAttributes audioAttributes = new AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_NOTIFICATION_EVENT)
@@ -234,7 +235,16 @@ public class ChatWingModule {
 
     @SuppressWarnings("deprecation")
     private SoundPool legacySoundPool() {
-        return new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
+        return new SoundPool(1, AudioManager.STREAM_NOTIFICATION, 0);
+    }
+
+    @Provides
+    @Singleton
+    public CWNotificationManager provideCWNotificationManager(@ForApplication Context context,
+                                                              SoundPool soundPool,
+                                                              UserManager userManager,
+                                                              NotificationManager notificationManager) {
+        return new CWNotificationManager(context, soundPool, notificationManager, userManager);
     }
 
 }

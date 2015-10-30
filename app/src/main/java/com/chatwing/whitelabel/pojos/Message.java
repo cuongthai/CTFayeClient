@@ -64,6 +64,8 @@ public class Message extends Params implements Comparable<Message> {
     private String userIp;
     @SerializedName("user_name")
     private String userName;
+    @SerializedName("chatbox_name")
+    private String chatboxName;
     @SerializedName("login_type")
     private String userType;
     @SerializedName("user_avatar")
@@ -186,6 +188,10 @@ public class Message extends Params implements Comparable<Message> {
 
     public String getAvatar() {
         return avatar;
+    }
+
+    public String getChatboxName() {
+        return chatboxName;
     }
 
     public void copyUserData(Message anotherMsg) {

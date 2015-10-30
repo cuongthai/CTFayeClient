@@ -31,8 +31,8 @@ public class CTFayeClient implements CTWebSocketManager.CTWebSocketListener {
     private static final String FAYE_VALUE_MIN_VERSION = "1.0beta";
     private static final String FAYE_VALUE_CONNECTION_TYPE = "websocket";
 
-    private static final int MAX_RETRY_ATTEMPT = 5;
-    private static final int RETRY_INTERVAL = 1000;
+    private static final int MAX_RETRY_ATTEMPT = 20;
+    private static final int RETRY_INTERVAL = 2000;
     private String mUrl;
 
     public interface CTFayeClientInterface {
@@ -355,7 +355,6 @@ public class CTFayeClient implements CTWebSocketManager.CTWebSocketListener {
             json.put(CTFayeMessage.FAYE_KEY_MESSAGE_CLIENT_ID, mFayeClientId);
             json.put(CTFayeMessage.FAYE_KEY_MESSAGE_DATA, message);
             json.put(CTFayeMessage.FAYE_KEY_MESSAGE_ID, messageID);
-
 
             if (extension != null) {
                 json.put(CTFayeMessage.FAYE_KEY_MESSAGE_EXTENSION, extension);

@@ -96,6 +96,8 @@ android {
                     APP_NAME + "-${variant.versionName}(${variant.versionCode}).apk")
         }
     }
+
+    dexOptions { jumboMode = true }
 }
 
 allprojects {

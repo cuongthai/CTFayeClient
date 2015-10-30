@@ -146,10 +146,7 @@ public class CommunicationMessagesAdapter extends RecyclerView.Adapter<Communica
         }else{
             viewHolder.content.setBBCodeText("[i]"+mContext.getString(R.string.message_ignored_content)+"[/i]");
         }
-
-
     }
-
 
     @Override
     public int getItemCount() {

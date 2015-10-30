@@ -33,6 +33,7 @@ import com.chatwing.whitelabel.ChatWing;
 import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.activities.CommunicationActivity;
 import com.chatwing.whitelabel.contentproviders.ChatWingContentProvider;
+import com.chatwing.whitelabel.managers.CWNotificationManager;
 import com.chatwing.whitelabel.managers.UserManager;
 import com.chatwing.whitelabel.pojos.BroadCastMessageResponse;
 import com.chatwing.whitelabel.pojos.ChatBox;
@@ -70,9 +71,9 @@ public class NotificationIntentService extends GcmListenerService {
     private static final int CURRENT_PUSH_VERSION = PUSH_VERION_1;
 
     @Inject
-    NotificationManager mNotificationManager;
+    protected UserManager mUserManager;
     @Inject
-    UserManager mUserManager;
+    protected CWNotificationManager mCWNotificationManager;
 
     public NotificationIntentService() {
         ChatWing.instance(this).getChatwingGraph().inject(this);
@@ -116,12 +117,18 @@ public class NotificationIntentService extends GcmListenerService {
                 List<Message> freshConversations = getMessagesByGroup(conversationId);
                 LogUtils.v("Test notification not receive getMessagesByGroup " + freshConversations.size());
 
-                notifyForBox(freshConversations, messageResponse.getConversation(), targetUser);
+                mCWNotificationManager.notifyForBox(freshConversations,
+                        messageResponse.getConversation().getId(),
+                        targetUser,
+                        false); // We use GCM notification just as backup plan to update latest message so no need to make sound
             } else {
                 ChatBox chatbox = messageResponse.getChatbox();
 
                 List<Message> freshChatboxes = getMessagesByGroup(chatbox.getId());
-                notifyForBox(freshChatboxes, chatbox);
+                mCWNotificationManager.notifyForBox(freshChatboxes,
+                        chatbox.getName(),
+                        chatbox.getId(),
+                        false); // We use GCM notification just as backup plan to update latest message so no need to make sound
             }
         }
     }
@@ -154,87 +161,12 @@ public class NotificationIntentService extends GcmListenerService {
             String paramsString = extras.getString("params");
             BroadCastMessageResponse broadCastMessageResponse =
                     new Gson().fromJson(paramsString, BroadCastMessageResponse.class);
-            showBroadCastMessage(broadCastMessageResponse.getChatUser().getName(), broadCastMessageResponse.getMessage());
+            mCWNotificationManager.showBroadCastMessage(
+                    broadCastMessageResponse.getChatUser().getName(),
+                    broadCastMessageResponse.getMessage());
             return true;
         }
         return false;
-    }
-
-    private void showBroadCastMessage(String name, String message) {
-        StatisticTracker.trackReceiveNotification(StatisticTracker.NOTIFICATION_BROADCAST_TYPE);
-
-        PendingIntent contentIntent = PendingIntent.getActivity(this,
-                0,
-                new Intent(this, ChatWing.instance(this).getMainActivityClass()),
-                PendingIntent.FLAG_UPDATE_CURRENT);
-
-        NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.ic_launcher)
-                        .setContentTitle(getString(R.string.broadcast_tag) + " " + name + " ")
-                        .setTicker(message)
-                        .setContentText(message);
-
-        builder.setContentIntent(contentIntent);
-        builder.setAutoCancel(true);
-        mNotificationManager.notify(message.hashCode(), builder.build());
-    }
-
-    private void notifyForBox(List<Message> messages, Conversation conversation, User targetUser) {
-        if (!targetUser.equals(mUserManager.getCurrentUser()))
-            return; //Not send to me, so nothing right now
-        if (messages.size() == 0) return;
-        StatisticTracker.trackReceiveNotification(StatisticTracker.NOTIFICATION_CONVERSATION_TYPE);
-
-        Intent i = new Intent(this, ChatWing.instance(this).getMainActivityClass());
-        i.setAction(CommunicationActivity.ACTION_OPEN_CONVERSATION);
-        i.putExtra(CommunicationActivity.CONVERSATION_ID, conversation.getId());
-        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-
-        LogUtils.v("Check user name " + messages.get(0).getUserName());
-        doNotify(i, messages.get(0).getUserName(), messages, conversation.getId().hashCode());
-    }
-
-    private void notifyForBox(List<Message> messages, ChatBox chatbox) {
-        if (messages.size() == 0) return;
-
-        StatisticTracker.trackReceiveNotification(StatisticTracker.NOTIFICATION_CHATBOX_TYPE);
-        Intent i = new Intent(this, ChatWing.instance(this).getMainActivityClass());
-        i.setAction(CommunicationActivity.ACTION_OPEN_CHATBOX);
-        i.putExtra(CommunicationActivity.CHATBOX_ID, chatbox.getId());
-        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-
-        doNotify(i, chatbox.getName(), messages, chatbox.getId());
-    }
-
-    private void doNotify(Intent i, String contentTitle, List<Message> messages, int notificationCode) {
-        PendingIntent contentIntent = PendingIntent.getActivity(
-                this,
-                0,
-                i,
-                PendingIntent.FLAG_UPDATE_CURRENT);
-        Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
-        NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.ic_launcher)
-                        .setContentTitle(contentTitle)
-                        .setTicker(messages.get(0).getContent())
-                        .setSound(sound)
-                        .setContentText(messages.get(0).getContent());
-        NotificationCompat.InboxStyle inboxStyle =
-                new NotificationCompat.InboxStyle();
-        String[] lastMessages = new String[Math.min(messages.size(), MAX_MESSAGES_PER_GROUP)];
-        inboxStyle.setBigContentTitle(contentTitle);
-        for (int j = 0; j < lastMessages.length; j++) {
-            inboxStyle.addLine(messages.get(j).getContent());
-        }
-        builder.setStyle(inboxStyle);
-        builder.setNumber(messages.size());
-
-        builder.setContentIntent(contentIntent);
-        builder.setAutoCancel(true);
-        mNotificationManager.notify(notificationCode, builder.build());
     }
 
     private List<Message> getMessagesByGroup(Integer chatboxId) {
@@ -249,7 +181,7 @@ public class NotificationIntentService extends GcmListenerService {
             List<Message> messages = new ArrayList<Message>();
             while (hasNext) {
                 Message message = NotificationMessagesTable.getMessage(cursor);
-                if (message!=null) {
+                if (message != null) {
                     messages.add(message);
                 }
 
@@ -275,7 +207,7 @@ public class NotificationIntentService extends GcmListenerService {
             List<Message> messages = new ArrayList<Message>();
             while (hasNext) {
                 Message message = NotificationMessagesTable.getMessage(cursor);
-                if (message!=null) {
+                if (message != null) {
                     messages.add(message);
                 }
                 hasNext = cursor.moveToNext();

@@ -537,9 +537,6 @@ public class CommunicationActivity
         //Either by user(backpress) or system destroy
         mBus.unregister(this);
 
-        mSoundEffectsPool.release();
-        mSoundEffectsPool = null;
-
         mCurrentCommunicationMode.onDestroy();
         mCurrentCommunicationMode = null;
     }

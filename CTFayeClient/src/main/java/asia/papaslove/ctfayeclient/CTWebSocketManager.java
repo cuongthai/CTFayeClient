@@ -45,12 +45,19 @@ class CTWebSocketManager {
                     public void onCompleted(Exception ex, final WebSocket webSocket) {
                         Log.d(TAG, "onCompleted " + ex + ":" + webSocket);
                         if (ex != null) {
+                            isOpenning = false;
                             mListener.onWebSocketClosedByError(ex);
                             ex.printStackTrace();
+                            return;
+                        }
+
+                        if (webSocket == null) {
                             isOpenning = false;
+                            mListener.onWebSocketClosedByError(new Exception("Can't establish connection to server. Probably server closed connection"));
                             return;
                         }
                         mWebSocket = webSocket;
+                        isOpenning = false;
                         mListener.onWebSocketReady();
 
                         mWebSocket.setStringCallback(new WebSocket.StringCallback() {
@@ -66,7 +73,6 @@ class CTWebSocketManager {
                                 mListener.onWebSocketClosedByError(e);
                             }
                         });
-                        isOpenning = false;
                     }
                 });
     }

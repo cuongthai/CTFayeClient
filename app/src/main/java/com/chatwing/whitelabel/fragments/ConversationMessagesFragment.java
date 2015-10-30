@@ -155,7 +155,6 @@ public class ConversationMessagesFragment extends CommunicationMessagesFragment 
         } else if (CurrentConversationEvent.Status.LOADING.equals(status)) {
         } else if (CurrentConversationEvent.Status.LOADED.equals(status)) {
             loadMessagesFromDb();
-            loadMessagesFromServer(true);
             updateCommunicationBoxDetail();
 
             loadEmoticons(event.getConversation().getEmoticons());
@@ -243,7 +242,6 @@ public class ConversationMessagesFragment extends CommunicationMessagesFragment 
             // Also, don't load if there adapter is not ready or there is no more messages.
             return;
         }
-
 
         Intent intent = new Intent(getActivity(), GetMessagesIntentService.class);
         intent.putExtra(GetMessagesIntentService.EXTRA_CONVERSATION, conversation);

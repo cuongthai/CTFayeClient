@@ -273,8 +273,7 @@ public abstract class CommunicationMessagesFragment extends BaseFragment {
         if (event.isLoadMore()) {
             mAdapter.addAllDataToTail(messagesFromServer);
         } else {
-            //Is not a loadMore. We trigger full load
-            loadMessagesFromDb();
+            mAdapter.setData(messagesFromServer);
         }
         isLoadingMore = false;
     }
@@ -521,11 +520,6 @@ public abstract class CommunicationMessagesFragment extends BaseFragment {
     public void onResume() {
         super.onResume();
         mBus.register(this);
-
-        //Reload messages on local and remote ONLY we resume the fragment from background
-        //but NOT after the first sync. Otherwise, it will be unnecessarily loaded.
-        //This to make sure user see the up-to-date messages when coming back from background
-        loadMessagesFromServer(true);
     }
 
     public void onAppendEmoticonEvent(AppendEmoticonEvent event) {
@@ -547,6 +541,8 @@ public abstract class CommunicationMessagesFragment extends BaseFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        //Clear adapter to make sure we load the whole new messages
+        mAdapter.clear();
         getLoaderManager().destroyLoader(MESSAGE_LOADER_ID);
     }
 
@@ -663,6 +659,8 @@ public abstract class CommunicationMessagesFragment extends BaseFragment {
             } else if (messagesFromDB != null && messagesFromDB.size() > 0) {
                 mAdapter.setData(messagesFromDB);
             }
+            //Load Remote Messages for up to date
+            loadMessagesFromServer(true);
         }
 
         @Override

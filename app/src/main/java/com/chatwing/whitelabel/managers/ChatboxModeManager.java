@@ -322,7 +322,6 @@ public class ChatboxModeManager extends CommunicationModeManager {
         if (mRequestedChatboxId != 0) {
             LogUtils.v("Duplicate load onPostResume");
             mCurrentChatBoxManager.loadCurrentChatBox(mRequestedChatboxId);
-            mRequestedChatboxId = 0;
             mActivityDelegate.getDrawerLayout().closeDrawer(DRAWER_GRAVITY_CHAT_BOXES);
         } else if (mCurrentChatBoxManager.getCurrentChatBox() == null) {
             mActivityDelegate.getDrawerLayout().openDrawer(DRAWER_GRAVITY_CHAT_BOXES);
@@ -582,6 +581,7 @@ public class ChatboxModeManager extends CommunicationModeManager {
         int chatBoxId = event.getChatBoxId();
         LogUtils.v("Duplicate load onUserSelectedChatBox");
         mCurrentChatBoxManager.loadCurrentChatBox(chatBoxId);
+        mRequestedChatboxId = chatBoxId;
     }
 
     @Subscribe

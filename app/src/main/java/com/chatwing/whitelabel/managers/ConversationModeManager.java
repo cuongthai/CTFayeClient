@@ -149,7 +149,6 @@ public class ConversationModeManager extends CommunicationModeManager {
 
             mActivityDelegate.getDrawerLayout().closeDrawer(DRAWER_GRAVITY_CONVERSATIONS);
             mCurrentConversationManager.loadConversation(mRequestedConversationKey);
-            mRequestedConversationKey = null;
         } else if (mCurrentConversationManager.getCurrentConversation() == null) {
             LogUtils.v("Debug request open conversation: onPostResume 3");
             mActivityDelegate.setProgressText(R.string.message_select_conversation, false);
@@ -157,8 +156,6 @@ public class ConversationModeManager extends CommunicationModeManager {
         }
 
     }
-
-
 
     @Override
     public boolean isSecondaryDrawerOpening() {
@@ -298,6 +295,7 @@ public class ConversationModeManager extends CommunicationModeManager {
         mActivityDelegate.getDrawerLayout().closeDrawers();
         String conversationId = event.getConversationId();
         loadConversation(conversationId);
+        mRequestedConversationKey = conversationId;
     }
 
     @Subscribe
