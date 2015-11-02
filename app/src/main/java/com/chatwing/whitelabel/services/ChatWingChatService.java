@@ -116,14 +116,22 @@ public class ChatWingChatService extends Service {
             if (name.equals(EventParser.EVENT_NEW_MESSAGE)
                     || name.equals(EventParser.EVENT_NETWORK_NEW_MESSAGE)) {
                 Message message = (Message) event.getParams();
-                LogUtils.v("Message receive in ChatService "+message);
-                if (mUserManager.isSoundEnabled() && !chatWing.isAppVisible()) {
+                LogUtils.v("Message receive in ChatService " + message);
+                if (shouldShowNotification(message) && !chatWing.isAppVisible()) {
                     mNotificationManager.notifyMessage(message, true);
                 }
             }
         } catch (JSONException ex) {
             LogUtils.e(ex);
         }
+    }
+
+    private boolean shouldShowNotification(Message message) {
+        return mUserManager.getNotificationSetting(mUserManager.getCurrentUser(),
+                message.getChatBoxId() != 0 ?
+                        String.valueOf(message.getChatBoxId()) :
+                        message.getConversationID(),
+                message.getChatBoxId() != 0 ? true : false);
     }
 
     /**

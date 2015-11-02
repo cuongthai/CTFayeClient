@@ -61,9 +61,7 @@ public abstract class PreferenceManager {
 
     public void setBoolean(int keyResId, boolean value) {
         String key = mContext.getString(keyResId);
-        SharedPreferences.Editor editor = mSharedPreferences.edit();
-        editor.putBoolean(key, value);
-        SharedPrefUtils.apply(editor);
+        setBoolean(key, value);
     }
 
     public int getInt(int keyResId, int defaultValue) {
@@ -138,5 +136,15 @@ public abstract class PreferenceManager {
             editor.remove(mContext.getString(id));
         }
         SharedPrefUtils.apply(editor);
+    }
+
+    public void setBoolean(String key, boolean value) {
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putBoolean(key, value);
+        SharedPrefUtils.apply(editor);
+    }
+
+    public boolean getBoolean(String key, boolean defaultValue) {
+        return mSharedPreferences.getBoolean(key, defaultValue);
     }
 }

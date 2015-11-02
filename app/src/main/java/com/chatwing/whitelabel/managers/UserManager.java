@@ -34,6 +34,7 @@ import com.chatwing.whitelabel.pojos.User;
 import com.chatwing.whitelabel.pojos.UserProfile;
 import com.chatwing.whitelabel.pojos.responses.ChatBoxDetailsResponse;
 import com.chatwing.whitelabel.tasks.PingUserTask;
+import com.chatwing.whitelabel.utils.LogUtils;
 import com.chatwing.whitelabel.utils.SharedPrefUtils;
 import com.chatwing.whitelabel.validators.PermissionsValidator;
 import com.google.gson.Gson;
@@ -85,11 +86,11 @@ public class UserManager extends PreferenceManager {
         loadCurrentUser();
     }
 
-    public void onResume(){
+    public void onResume() {
         mBus.register(this);
     }
 
-    public void onPause(){
+    public void onPause() {
         mBus.unregister(this);
         if (mPingHandler != null) {
             mPingHandler.removeMessages(MSG_PING);
@@ -409,6 +410,15 @@ public class UserManager extends PreferenceManager {
             mPingHandler.sendMessageDelayed(msg,
                     PING_INTERVAL);
         }
+    }
+
+    public void setNotificationSetting(User user, String channel, boolean value) {
+        if (user == null) return;
+        setBoolean(String.format("%s/%s", user.getId(), channel), value);
+    }
+
+    public boolean getNotificationSetting(User user, String channel, boolean isChatbox) {
+        return getBoolean(String.format("%s/%s", user.getId(), channel), isChatbox ? false : true);
     }
 
     public static class UserAccountNotFoundException extends Exception {

@@ -337,25 +337,7 @@ public class ConversationModeManager extends CommunicationModeManager {
 
     @Subscribe
     public void onUpdateSubscriptionEvent(UpdateSubscriptionEvent event) {
-        if (event.getStatus() == UpdateSubscriptionEvent.Status.SUCCEED) {
-            boolean set = UpdateNotificationSettingsService.ACTION_SUBSCRIBE.equals(event.getAction()) ? true : false;
-            if (event.getException() == null) {
-
-                Conversation currentConversation = mCurrentConversationManager.getCurrentConversation();
-                if (currentConversation == null) return;
-                User me = currentConversation.getMe(mUserManager.getCurrentUser());
-                if (me != null) {
-                    if (UpdateNotificationSettingsService.TARGET_EMAIL.equals(event.getSubscriptionResponse().getData().get("type"))) {
-                        me.setConversationEmailNotification(set);
-                    } else {
-                        me.setConversationPushNotification(set);
-                    }
-                }
-
-            }
-            invalidateOptionsMenu();
-
-        } else if (event.getStatus() == UpdateSubscriptionEvent.Status.FAILED) {
+        if (event.getStatus() == UpdateSubscriptionEvent.Status.FAILED) {
             if (event.getException() != null &&
                     event.getException() instanceof ApiManager.NotVerifiedEmailException) {
                 Toast.makeText(mActivityDelegate.getActivity(), getString(R.string.error_email_verify), Toast.LENGTH_LONG).show();

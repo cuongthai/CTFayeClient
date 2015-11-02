@@ -107,6 +107,10 @@ public class NotificationIntentService extends GcmListenerService {
                 return;
             }
 
+            if (!shouldShowNotification(messages[0])){
+                return;
+            }
+
             //Fill chatbox_id or conversation_id to message
             fillGroupIDToMessage(messages, extras.getString("type"), messageResponse);
 
@@ -244,4 +248,13 @@ public class NotificationIntentService extends GcmListenerService {
     private MessageResponse getMessagesFromParams(String params) {
         return new Gson().fromJson(params, MessageResponse.class);
     }
+
+    private boolean shouldShowNotification(Message message) {
+        return mUserManager.getNotificationSetting(mUserManager.getCurrentUser(),
+                message.getChatBoxId() != 0 ?
+                        String.valueOf(message.getChatBoxId()) :
+                        message.getConversationID(),
+                message.getChatBoxId() != 0 ? true : false);
+    }
+
 }

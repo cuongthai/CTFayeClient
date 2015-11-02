@@ -121,7 +121,6 @@ public class CWNotificationManager {
                 notificationCode,
                 i,
                 PendingIntent.FLAG_UPDATE_CURRENT);
-        Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(mContext)

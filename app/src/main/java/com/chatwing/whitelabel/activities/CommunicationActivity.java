@@ -55,6 +55,7 @@ import com.chatwing.whitelabel.events.AllSyncsCompletedEvent;
 import com.chatwing.whitelabel.events.BlockedEvent;
 import com.chatwing.whitelabel.events.ChatServiceEvent;
 import com.chatwing.whitelabel.events.DeleteBookmarkEvent;
+import com.chatwing.whitelabel.events.NetworkStatusEvent;
 import com.chatwing.whitelabel.events.SyncCommunicationBoxEvent;
 import com.chatwing.whitelabel.events.SyncUnreadEvent;
 import com.chatwing.whitelabel.events.UpdateUserEvent;
@@ -758,6 +759,13 @@ public class CommunicationActivity
             invalidateOptionsMenu();
         } catch (Exception e) {
             LogUtils.e(e);
+        }
+    }
+
+    @Subscribe
+    public void onNetworkStatusEvent(NetworkStatusEvent event) {
+        if (event.getStatus()== NetworkStatusEvent.Status.ON){
+            chatboxUnreadDownloadManager.downloadUnread();
         }
     }
 

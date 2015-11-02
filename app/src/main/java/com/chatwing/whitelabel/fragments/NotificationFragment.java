@@ -33,11 +33,13 @@ import javax.inject.Inject;
  */
 public class NotificationFragment extends DialogFragment {
     @Inject
-    UserManager mUserManager;
+    protected UserManager mUserManager;
     @Inject
-    Bus mBus;
+    protected Bus mBus;
     @Inject
-    QuickMessageView messageView;
+    protected QuickMessageView messageView;
+
+
     private static final String CHATBOX_ID = "CHATBOX_ID";
     private static final String CONVERSATION_ID = "CONVERSATION_ID";
 

@@ -123,19 +123,4 @@ public class User extends BaseUser implements Serializable {
         this.avatar = avatar;
     }
 
-    public boolean isConversationEmailNotification() {
-        return conversationEmailNotification;
-    }
-
-    public boolean isConversationPushNotification() {
-        return conversationPushNotification;
-    }
-
-    public void setConversationEmailNotification(boolean notify) {
-        conversationEmailNotification = notify;
-    }
-
-    public void setConversationPushNotification(boolean notify) {
-        conversationPushNotification = notify;
-    }
 }

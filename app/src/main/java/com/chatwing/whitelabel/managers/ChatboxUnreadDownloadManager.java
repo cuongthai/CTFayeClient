@@ -49,7 +49,7 @@ public class ChatboxUnreadDownloadManager {
         if (isRunning || mUserManager.getCurrentUser() == null) {
             return;
         }
-        final ArrayList<Integer> unAckChatboxIds=new ArrayList<Integer>();
+        final ArrayList<Integer> unAckChatboxIds = new ArrayList<>();
         AsyncJob.OnBackgroundJob backgroundJob = new AsyncJob.OnBackgroundJob() {
             @Override
             public void doOnBackground() {
@@ -71,12 +71,15 @@ public class ChatboxUnreadDownloadManager {
                             @Override
                             public void doOnBackground() {
                                 try {
-                                    UnreadCountResponse unreadCountForChatbox = mApiManager.getUnreadCountForChatbox(mUserManager.getCurrentUser(), chatboxID);
+                                    UnreadCountResponse unreadCountForChatbox = mApiManager
+                                            .getUnreadCountForChatbox(mUserManager.getCurrentUser(),
+                                                    chatboxID);
+
                                     int count = unreadCountForChatbox.getData().getCount();
-                                    if(!unreadCountForChatbox.getData().hasChatboxFirstAck()){
+                                    if (!unreadCountForChatbox.getData().hasChatboxFirstAck()) {
                                         unAckChatboxIds.add(chatboxID);
                                     }
-                                    LogUtils.v("Unread Count = "+count +" since > 0? "+unreadCountForChatbox.getData().hasChatboxFirstAck());
+                                    LogUtils.v("Unread Count = " + count + " since > 0? " + unreadCountForChatbox.getData().hasChatboxFirstAck());
                                     chatboxIDUnreadMap.put(chatboxID, count);
                                 } catch (Exception e) {
                                     e.printStackTrace();
@@ -118,8 +121,6 @@ public class ChatboxUnreadDownloadManager {
                         cursor.close();
                     }
                 }
-
-
             }
         };
 
@@ -128,15 +129,15 @@ public class ChatboxUnreadDownloadManager {
     }
 
     private void insertToDatabase(Map<Integer, Integer> chatboxIDUnreadMap) {
-        ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
+        ArrayList<ContentProviderOperation> batch = new ArrayList<>();
         Set<Integer> chatboxIDs = chatboxIDUnreadMap.keySet();
         for (Integer chatboxID : chatboxIDs) {
             ContentValues contentValues = new ContentValues();
             ChatBox currentChatBox = mCurrentChatboxManager.getCurrentChatBox();
-            if(currentChatBox!=null && currentChatBox.getId()==chatboxID){
+            if (currentChatBox != null && currentChatBox.getId() == chatboxID) {
                 //We ignore updating unread count for opening chatbox
                 contentValues.put(ChatBoxTable.UNREAD_COUNT, 0);
-            }else {
+            } else {
                 contentValues.put(ChatBoxTable.UNREAD_COUNT, chatboxIDUnreadMap.get(chatboxID));
             }
             batch.add(ContentProviderOperation.newUpdate(ChatWingContentProvider.getChatBoxWithIdUri(chatboxID))
