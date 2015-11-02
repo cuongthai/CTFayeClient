@@ -92,8 +92,15 @@ public class CTFayeClient implements CTWebSocketManager.CTWebSocketListener {
     }
 
     public void disconnect() {
-        shouldRetryConnection = false; //We disconnect manually so we don't want to retry when connection lost
         doFayeDisconnect();
+    }
+
+    /**
+     * This helper method to help terminating the websocket. Force calling ClosedCallback
+     * A dirty workaround for note 5 issue when client network drop but no ClosedCallback call
+     */
+    public void terminateWebSocket() {
+        mCTWebSocketManager.close();
     }
 
     public void subscribeToChannel(String channel) {

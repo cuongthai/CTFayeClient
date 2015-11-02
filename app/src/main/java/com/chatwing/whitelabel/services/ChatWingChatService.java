@@ -11,7 +11,7 @@ import com.chatwing.whitelabel.ChatWing;
 import com.chatwing.whitelabel.Constants;
 import com.chatwing.whitelabel.contentproviders.ChatWingContentProvider;
 import com.chatwing.whitelabel.events.ChatServiceEvent;
-import com.chatwing.whitelabel.events.NetworkAvaialbleEvent;
+import com.chatwing.whitelabel.events.NetworkStatusEvent;
 import com.chatwing.whitelabel.events.faye.MessageReceivedEvent;
 import com.chatwing.whitelabel.events.faye.ServerConnectionChangedEvent;
 import com.chatwing.whitelabel.interfaces.FayeReceiver;
@@ -21,7 +21,6 @@ import com.chatwing.whitelabel.modules.ChatWingModule;
 import com.chatwing.whitelabel.parsers.EventParser;
 import com.chatwing.whitelabel.pojos.Event;
 import com.chatwing.whitelabel.pojos.Message;
-import com.chatwing.whitelabel.pojos.User;
 import com.chatwing.whitelabel.tables.ChatBoxTable;
 import com.chatwing.whitelabel.utils.LogUtils;
 import com.squareup.otto.Bus;
@@ -150,8 +149,14 @@ public class ChatWingChatService extends Service {
     }
 
     @Subscribe
-    public void onNetworkAvaialbleEvent(NetworkAvaialbleEvent event) {
-        mFayeReceiver.connect(Constants.FAYE_URL);
+    public void onNetworkAvaialbleEvent(NetworkStatusEvent event) {
+        if (event.getStatus() == NetworkStatusEvent.Status.ON) {
+            LogUtils.v("Receive NetworkStatusEvent...Going to connect faye now");
+            mFayeReceiver.connect(Constants.FAYE_URL);
+        } else {
+            //Dirty fix for note 5 issue not calling AndroidAsync Websocket's ClosedCallback
+            mFayeReceiver.terminateWebSocket();
+        }
     }
 
     private List<Object> getModules() {

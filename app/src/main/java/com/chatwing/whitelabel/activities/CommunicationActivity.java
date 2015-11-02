@@ -55,7 +55,6 @@ import com.chatwing.whitelabel.events.AllSyncsCompletedEvent;
 import com.chatwing.whitelabel.events.BlockedEvent;
 import com.chatwing.whitelabel.events.ChatServiceEvent;
 import com.chatwing.whitelabel.events.DeleteBookmarkEvent;
-import com.chatwing.whitelabel.events.NetworkAvaialbleEvent;
 import com.chatwing.whitelabel.events.SyncCommunicationBoxEvent;
 import com.chatwing.whitelabel.events.SyncUnreadEvent;
 import com.chatwing.whitelabel.events.UpdateUserEvent;

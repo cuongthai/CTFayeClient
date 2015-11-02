@@ -7,7 +7,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
 import com.chatwing.whitelabel.ChatWing;
-import com.chatwing.whitelabel.events.NetworkAvaialbleEvent;
+import com.chatwing.whitelabel.events.NetworkStatusEvent;
 import com.chatwing.whitelabel.modules.ChatWingModule;
 import com.chatwing.whitelabel.utils.LogUtils;
 import com.squareup.otto.Bus;
@@ -42,7 +42,10 @@ public class NetworkReceiver extends BroadcastReceiver {
         boolean isWifiConnected = wifiActiveNetInfo != null && wifiActiveNetInfo.isConnectedOrConnecting();
         LogUtils.v("Network is available? " + isWifiConnected + ":" + isMobileConnected);
         if (isWifiConnected || isMobileConnected) {
-            mBus.post(new NetworkAvaialbleEvent());
+            mBus.post(new NetworkStatusEvent(NetworkStatusEvent.Status.ON));
+        } else {
+            LogUtils.v("No Network");
+            mBus.post(new NetworkStatusEvent(NetworkStatusEvent.Status.OFF));
         }
     }
 

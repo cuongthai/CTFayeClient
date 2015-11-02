@@ -58,7 +58,6 @@ class CTWebSocketManager {
                         }
                         mWebSocket = webSocket;
                         isOpenning = false;
-                        mListener.onWebSocketReady();
 
                         mWebSocket.setStringCallback(new WebSocket.StringCallback() {
                             public void onStringAvailable(String s) {
@@ -73,6 +72,8 @@ class CTWebSocketManager {
                                 mListener.onWebSocketClosedByError(e);
                             }
                         });
+
+                        mListener.onWebSocketReady();
                     }
                 });
     }

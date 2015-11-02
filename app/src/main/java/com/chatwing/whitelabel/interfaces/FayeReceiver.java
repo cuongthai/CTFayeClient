@@ -112,4 +112,8 @@ public class FayeReceiver implements CTFayeClient.CTFayeClientInterface {
         LogUtils.v("Service is unsubscribing to " + channel);
         mFayeClient.unsubscribeToChannel(channel);
     }
+
+    public void terminateWebSocket() {
+        mFayeClient.terminateWebSocket();
+    }
 }
