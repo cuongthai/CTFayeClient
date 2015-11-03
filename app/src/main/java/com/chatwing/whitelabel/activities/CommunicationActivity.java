@@ -673,6 +673,9 @@ public class CommunicationActivity
     @Override
     public void showConversation(CreateConversationParams.SimpleUser simpleUser) {
         initConversationMenu();
+        if (!isInConversationMode()) {
+            setupConversationMode();
+        }
         addToLeftDrawer(new ConversationsFragment(), false);
 
         Intent createConversation = new Intent(getActivity(), CreateConversationIntentService.class);
@@ -989,7 +992,7 @@ public class CommunicationActivity
                 mCurrentCommunicationMode.logout();
                 mUserManager.removeUsers();
                 mBus.post(ChatServiceEvent.unsubscribeAllChannels());
-
+                mCurrentCommunicationMode.deactivate();
                 Intent i = new Intent(CommunicationActivity.this, getEntranceActivityClass());
                 startActivity(i);
                 finish();
@@ -1294,7 +1297,8 @@ public class CommunicationActivity
     private void addToLeftDrawer(Fragment fragment, boolean animate) {
         if (animate) {
             getSupportFragmentManager().beginTransaction()
-                    .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left,
+                    .setCustomAnimations(R.anim.slide_in_right,
+                            R.anim.slide_out_left,
                             R.anim.slide_in_right, R.anim.slide_out_left)
                     .replace(R.id.left_drawer_container, fragment)
                     .addToBackStack(null)

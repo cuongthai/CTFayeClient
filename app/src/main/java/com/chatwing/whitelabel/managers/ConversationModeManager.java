@@ -39,14 +39,11 @@ import com.chatwing.whitelabel.events.CurrentConversationEvent;
 import com.chatwing.whitelabel.events.PostAuthenticationEvent;
 import com.chatwing.whitelabel.events.UpdateSubscriptionEvent;
 import com.chatwing.whitelabel.events.UserSelectedConversationEvent;
-import com.chatwing.whitelabel.events.UserSelectedDefaultUsersEvent;
 import com.chatwing.whitelabel.fragments.NotificationFragment;
 import com.chatwing.whitelabel.pojos.Conversation;
 import com.chatwing.whitelabel.pojos.Event;
 import com.chatwing.whitelabel.pojos.Message;
-import com.chatwing.whitelabel.pojos.User;
 import com.chatwing.whitelabel.services.AckConversationIntentService;
-import com.chatwing.whitelabel.services.UpdateNotificationSettingsService;
 import com.chatwing.whitelabel.tables.NotificationMessagesTable;
 import com.chatwing.whitelabel.utils.LogUtils;
 import com.chatwing.whitelabel.validators.ConversationIdValidator;
@@ -296,11 +293,6 @@ public class ConversationModeManager extends CommunicationModeManager {
         String conversationId = event.getConversationId();
         loadConversation(conversationId);
         mRequestedConversationKey = conversationId;
-    }
-
-    @Subscribe
-    public void onUserSelectedDefaultUsersEvent(UserSelectedDefaultUsersEvent event) {
-        mActivityDelegate.showConversation(event.getSimpleUser());
     }
 
     @Subscribe
