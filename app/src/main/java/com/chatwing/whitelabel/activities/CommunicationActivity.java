@@ -356,7 +356,7 @@ public class CommunicationActivity
         stopRefreshAnimation();
 
         //This mode is priority due to user action requesting open
-        int actionMode = getActionMode();
+        int actionMode = getActionMode(getIntent());
         LogUtils.v("Intent to use actionMode mode " + actionMode);
 
         int pauseSavedMode = mCommunicationActivityManager.getInt(R.string.current_mode_state, 0);
@@ -1405,11 +1405,11 @@ public class CommunicationActivity
         return true;
     }
 
-    private int getActionMode() {
-        if (ACTION_OPEN_CONVERSATION.equals(getIntent().getAction())) {
+    private int getActionMode(Intent intent) {
+        if (ACTION_OPEN_CONVERSATION.equals(intent.getAction())) {
             return MODE_CONVERSATION;
         }
-        if (ACTION_OPEN_CHATBOX.equals(getIntent().getAction())) {
+        if (ACTION_OPEN_CHATBOX.equals(intent.getAction())) {
             return MODE_CHAT_BOX;
         }
         return MODE_NONE;

@@ -21,6 +21,7 @@ import com.chatwing.whitelabel.modules.ChatWingModule;
 import com.chatwing.whitelabel.parsers.EventParser;
 import com.chatwing.whitelabel.pojos.Event;
 import com.chatwing.whitelabel.pojos.Message;
+import com.chatwing.whitelabel.pojos.User;
 import com.chatwing.whitelabel.tables.ChatBoxTable;
 import com.chatwing.whitelabel.utils.LogUtils;
 import com.squareup.otto.Bus;
@@ -96,6 +97,7 @@ public class ChatWingChatService extends Service {
 
     /**
      * Everytime the service is connected to faye. We subscribe all known channels
+     *
      * @param event
      */
     @Subscribe
@@ -127,7 +129,11 @@ public class ChatWingChatService extends Service {
     }
 
     private boolean shouldShowNotification(Message message) {
-        return mUserManager.getNotificationSetting(mUserManager.getCurrentUser(),
+        User currentUser = mUserManager.getCurrentUser();
+        if (currentUser == null) {
+            return false;
+        }
+        return mUserManager.getNotificationSetting(currentUser,
                 message.getChatBoxId() != 0 ?
                         String.valueOf(message.getChatBoxId()) :
                         message.getConversationID(),
