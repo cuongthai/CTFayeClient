@@ -89,6 +89,12 @@ public class CategoriesFragment extends BaseExpandableListFragment {
         mBus.unregister(this);
     }
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
     @Subscribe
     public void onChatBoxUnreadCountChanged(ChatBoxUnreadCountChangedEvent event) {
         // Ideally, the adapter should observe child cursors using

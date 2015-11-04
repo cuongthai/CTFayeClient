@@ -426,6 +426,14 @@ public class CommunicationActivity
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        int actionMode = getActionMode(intent);
+        LogUtils.v("Action Mode "+actionMode);
+        if (actionMode == MODE_CHAT_BOX) {
+            setupChatboxMode();
+        } else if (actionMode == MODE_CONVERSATION){
+            setupConversationMode();
+        }
+
         if (mCurrentCommunicationMode != null) {
             mCurrentCommunicationMode.onNewIntent(intent);
         }

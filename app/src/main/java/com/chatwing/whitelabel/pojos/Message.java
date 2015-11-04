@@ -273,6 +273,6 @@ public class Message extends Params implements Comparable<Message> {
 
     @Override
     public String toString() {
-        return "["+id+":"+content+":"+createdDate+"]";
+        return "["+id+":"+content+":"+createdDate+"]==>"+chatboxName+"<====";
     }
 }
