@@ -44,7 +44,7 @@ public class NotificationStatusIntentService extends BaseIntentService {
             //Sync November 2015, we override push notification setting on local.
             //The reason for this is that faye message doesn't contains notification settings
             //So we have to manage push setting on local
-            overrideNotificationSettings(user,
+            overrideNotificationSettings(
                     subscriptionResponse,
                     chatboxID != 0 ?
                             String.valueOf(chatboxID) :
@@ -58,12 +58,12 @@ public class NotificationStatusIntentService extends BaseIntentService {
         }
     }
 
-    private void overrideNotificationSettings(User user,
+    private void overrideNotificationSettings(
                                               SubscriptionStatusResponse subscriptionResponse,
                                               String channel,
                                               boolean isChatbox) {
         Map<String, Boolean> data = subscriptionResponse.getData();
-        boolean setting = mUserManager.getNotificationSetting(user, channel, isChatbox);
+        boolean setting = mUserManager.getNotificationSetting(channel, isChatbox);
         data.put("push", setting);
     }
 

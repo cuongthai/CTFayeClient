@@ -250,7 +250,7 @@ public class NotificationIntentService extends GcmListenerService {
     }
 
     private boolean shouldShowNotification(Message message) {
-        return mUserManager.getNotificationSetting(mUserManager.getCurrentUser(),
+        return mUserManager.getNotificationSetting(
                 message.getChatBoxId() != 0 ?
                         String.valueOf(message.getChatBoxId()) :
                         message.getConversationID(),

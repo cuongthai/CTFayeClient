@@ -129,11 +129,7 @@ public class ChatWingChatService extends Service {
     }
 
     private boolean shouldShowNotification(Message message) {
-        User currentUser = mUserManager.getCurrentUser();
-        if (currentUser == null) {
-            return false;
-        }
-        return mUserManager.getNotificationSetting(currentUser,
+        return mUserManager.getNotificationSetting(
                 message.getChatBoxId() != 0 ?
                         String.valueOf(message.getChatBoxId()) :
                         message.getConversationID(),

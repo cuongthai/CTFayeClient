@@ -417,8 +417,11 @@ public class UserManager extends PreferenceManager {
         setBoolean(String.format("%s/%s", user.getId(), channel), value);
     }
 
-    public boolean getNotificationSetting(User user, String channel, boolean isChatbox) {
-        return getBoolean(String.format("%s/%s", user.getId(), channel), isChatbox ? false : true);
+    public boolean getNotificationSetting(String channel, boolean isChatbox) {
+        if (mCurrentUser == null) {
+            return false;
+        }
+        return getBoolean(String.format("%s/%s", mCurrentUser.getId(), channel), isChatbox ? false : true);
     }
 
     public static class UserAccountNotFoundException extends Exception {
