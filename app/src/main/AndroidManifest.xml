@@ -122,6 +122,10 @@
                     android:scheme="https" />
             </intent-filter>
         </activity>
+        <activity android:name=".activities.PhotoViewerActivity"
+            android:icon="@drawable/ic_launcher"
+            android:theme="@style/Theme.ChatWing"/>
+
 
         <service android:name=".services.CreateConversationIntentService" />
         <service android:name=".services.LoadChatBoxDetailsService" />

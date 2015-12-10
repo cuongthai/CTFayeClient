@@ -1,4 +1,4 @@
-    package com.chatwing.whitelabel;
+package com.chatwing.whitelabel;
 
 import com.pkmmte.pkrss.Category;
 
@@ -11,7 +11,7 @@ import java.util.List;
 public interface Constants {
     boolean DEBUG = ChatWing.isDebugging();
     String CHATWING_SDK_TAG = "ChatWingSDK";
-    String CHATWING_BASE_URL =  "http://staging.chatwing.com";
+    String CHATWING_BASE_URL =  "http://cloud.chatwing.com";
     String FAYE_URL = CHATWING_BASE_URL + "/comet/1";
 
     String MAIN_COLOR = "#05b0ff";

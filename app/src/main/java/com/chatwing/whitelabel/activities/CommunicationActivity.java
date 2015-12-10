@@ -61,6 +61,8 @@ import com.chatwing.whitelabel.events.SyncUnreadEvent;
 import com.chatwing.whitelabel.events.UpdateUserEvent;
 import com.chatwing.whitelabel.events.UserSelectedDefaultUsersEvent;
 import com.chatwing.whitelabel.events.UserUnauthenticatedEvent;
+import com.chatwing.whitelabel.events.ViewMessageContentImageEvent;
+import com.chatwing.whitelabel.events.ViewVideoEvent;
 import com.chatwing.whitelabel.events.faye.ChannelSubscriptionChangedEvent;
 import com.chatwing.whitelabel.events.faye.FayeFailedEvent;
 import com.chatwing.whitelabel.events.faye.FayePublishEvent;
@@ -427,10 +429,10 @@ public class CommunicationActivity
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         int actionMode = getActionMode(intent);
-        LogUtils.v("Action Mode "+actionMode);
+        LogUtils.v("Action Mode " + actionMode);
         if (actionMode == MODE_CHAT_BOX) {
             setupChatboxMode();
-        } else if (actionMode == MODE_CONVERSATION){
+        } else if (actionMode == MODE_CONVERSATION) {
             setupConversationMode();
         }
 
@@ -775,7 +777,7 @@ public class CommunicationActivity
 
     @Subscribe
     public void onNetworkStatusEvent(NetworkStatusEvent event) {
-        if (event.getStatus()== NetworkStatusEvent.Status.ON){
+        if (event.getStatus() == NetworkStatusEvent.Status.ON) {
             chatboxUnreadDownloadManager.downloadUnread();
         }
     }
@@ -1217,6 +1219,18 @@ public class CommunicationActivity
     @Subscribe
     public void onUserSelectedDefaultUsersEvent(UserSelectedDefaultUsersEvent event) {
         showConversation(event.getSimpleUser());
+    }
+
+    @Subscribe
+    public void onViewMessageContentImageEvent(ViewMessageContentImageEvent event) {
+        Intent i=new Intent(this, PhotoViewerActivity.class);
+        i.putExtra(PhotoViewerActivity.PHOTO_URL, event.getImageUrl());
+        startActivity(i);
+    }
+
+    @Subscribe
+    public void onViewVideoEvent(ViewVideoEvent event) {
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(event.getVideoUrl())));
     }
 
     private void processEvent(Event event) {

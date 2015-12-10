@@ -10,7 +10,7 @@ import json
 from PIL import Image
 import numpy
 
-APP_ID = "b2440810-77bf-11e5-8028-a9ea52b2b943"
+APP_ID = "6d13fbf0-88e6-11e5-bf4e-178efd84da36"
 FLURRY_API_KEY = "RFBTRTS7TJHTZBQT44R5"
 ICON_LAUNCHER = "https://dl.dropboxusercontent.com/u/11028239/commerceassociates512.png"
 VERSION_CODE = 1
@@ -33,7 +33,7 @@ BOOL_MAPPING = {"OFFICIAL": "official",
                 "SUPPORT_RSS": "support_rss",
                 "SUPPORT_MUSIC_BOX": "support_music_box"}
 
-SERVER_URL = "http://staging.chatwing.com"
+SERVER_URL = "http://cloud.chatwing.com"
 WHITE_LABEL_KEY_PATH = "../certs/whitelabel.keystore"
 WHITE_LABEL_STORE_PASSWORD = "654321"
 WHITE_LABEL_KEY_ALIAS = "whitelabel"
