@@ -20,6 +20,7 @@ import android.text.style.ClickableSpan;
 import android.view.View;
 
 import com.chatwing.whitelabel.events.ViewVideoEvent;
+import com.chatwing.whitelabel.utils.LogUtils;
 import com.squareup.otto.Bus;
 
 import javax.inject.Inject;

@@ -27,11 +27,10 @@ import android.text.style.CharacterStyle;
 import android.text.style.ImageSpan;
 import android.text.style.StrikethroughSpan;
 
-import com.chatwing.whitelabel.R;
 import com.chatwing.whitelabel.modules.ForApplication;
 import com.chatwing.whitelabel.spans.ImageClickableSpan;
 import com.chatwing.whitelabel.spans.VideoClickableSpan;
-import com.chatwing.whitelabel.spans.VideoSpan;
+import com.chatwing.whitelabel.utils.LogUtils;
 import com.chatwing.whitelabel.utils.RichTextUtils;
 
 import org.xml.sax.XMLReader;
@@ -69,8 +68,6 @@ public class BBCodeTagHandler implements Html.TagHandler {
             String colorString = tag.replaceFirst(HTML_TAG_BG_COLOR, "#");
             int color = Color.parseColor(colorString);
             processBgColor(opening, output, color);
-        } else if (tag.equalsIgnoreCase(HTML_TAG_VIDEO)) {
-            processVideo(opening, output);
         } else if (tag.equalsIgnoreCase(HTML_TAG_IMAGE)) {
             processImage(opening, output);
         }
@@ -84,13 +81,6 @@ public class BBCodeTagHandler implements Html.TagHandler {
         process(opening, output, new BackgroundColorSpan(color));
     }
 
-    private void processVideo(boolean opening, Editable output) {
-        process(opening,
-                output,
-                new VideoSpan(mContext, R.drawable.ic_film),
-                mVideoClickableSpanProvider.get());
-    }
-
     private void processImage(boolean opening, Editable output) {
         Object[] spans = output.getSpans(0, output.length(), ImageSpan.class);
         if (spans.length == 0) {
@@ -99,6 +89,18 @@ public class BBCodeTagHandler implements Html.TagHandler {
 
         ImageSpan imageSpan = (ImageSpan) spans[0];
         String imageUrl = imageSpan.getSource();
+
+        //Handle image video thumbnail clicked
+        if (imageUrl.startsWith(BBCodeParser.VIDEO_URL_PREFIX)){
+            VideoClickableSpan clickableSpan = mVideoClickableSpanProvider.get();
+            clickableSpan.setVideoUrl(imageUrl.substring(
+                    BBCodeParser.VIDEO_URL_PREFIX.length()));
+            output.setSpan(clickableSpan, output.getSpanStart(imageSpan), output.length(),
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            return;
+        }
+
+        //Not Image Video Thumbnail, This is normal image
         if (TextUtils.isEmpty(imageUrl)
                 || !RichTextUtils.isUrl(imageUrl)) {
             return;

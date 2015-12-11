@@ -27,9 +27,10 @@ import java.util.Map;
  * Created by nguyenthanhhuy on 12/17/13.
  */
 public interface BBCodeParser {
-    public static final String RESOURCE_ID_PREFIX = "resId://";
-    public static final String CONFIG_FILE_FULL = "bbcode_full.xsl";
-    public static final String CONFIG_FILE_TEXT_FORMATTING = "bbcode_text_formatting.xsl";
+    String RESOURCE_ID_PREFIX = "resId://";
+    String VIDEO_URL_PREFIX = "videoUrl://";
+    String CONFIG_FILE_FULL = "bbcode_full.xsl";
+    String CONFIG_FILE_TEXT_FORMATTING = "bbcode_text_formatting.xsl";
 
     public enum BBCode implements Serializable {
         BOLD {

@@ -2,6 +2,8 @@ package com.chatwing.whitelabel.views;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -26,6 +28,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Author: Huy Nguyen
@@ -44,6 +48,9 @@ public class ImageTagTextView extends TextView implements Html.ImageGetter {
     private List<String> mFilters;
     private VolleyManager mVolleyManager;
     private BBCodeParser mBBCodeParser;
+    private Pattern youtubePattern =
+            Pattern.compile("https?://(?:[0-9A-Z-]+.)?(?:youtu.be/|youtube(?:-nocookie)?.com\\S*[^\\w\\s-])([\\w-]{11})(?=[^\\w-]|$)(?![?=&+%\\w.-]*(?:[\'\"][^<>]*>| </a>))[?=&+%\\w.-]*",
+                    Pattern.CASE_INSENSITIVE);
 
     public ImageTagTextView(Context context) {
         super(context);
@@ -140,8 +147,8 @@ public class ImageTagTextView extends TextView implements Html.ImageGetter {
 
     @Override
     public Drawable getDrawable(String source) {
-        final String url = source.trim();
-
+        String url = source.trim();
+        boolean isVideo = false;
         if (TextUtils.isEmpty(url)) {
             // Nothing to load.
             return getDefaultDrawable();
@@ -157,9 +164,16 @@ public class ImageTagTextView extends TextView implements Html.ImageGetter {
                 LogUtils.e("Failed to load img tag with source: " + source);
                 return null;
             }
+        } else if (url.startsWith(BBCodeParser.VIDEO_URL_PREFIX)) {
+            String youtubeID = extractYoutubeId(url.substring(BBCodeParser.VIDEO_URL_PREFIX.length()));
+            if (youtubeID != null) {
+                isVideo = true;
+                url = "http://img.youtube.com/vi/" + youtubeID + "/mqdefault.jpg";
+            }
         }
+        final String remoteUrl = url;
 
-        if (Uri.parse(url).getHost() == null) {
+        if (Uri.parse(remoteUrl).getHost() == null) {
             // Looks like the url is malformed. Can't load anything from
             // network, so let's stop here with the default image.
             // If we continue, Volley will assume that the url is valid and
@@ -167,7 +181,7 @@ public class ImageTagTextView extends TextView implements Html.ImageGetter {
             return getDefaultDrawable();
         }
 
-        if (mContainers.containsKey(url)) {
+        if (mContainers.containsKey(remoteUrl)) {
             // A request is running. We should wait for it instead of
             // creating a new one.
             //
@@ -179,7 +193,7 @@ public class ImageTagTextView extends TextView implements Html.ImageGetter {
         }
 
         ImageLoader imageLoader = mVolleyManager.getImageLoader();
-        ImageLoader.ImageContainer imageContainer = imageLoader.get(url,
+        ImageLoader.ImageContainer imageContainer = imageLoader.get(remoteUrl,
                 new ImageLoader.ImageListener() {
                     @Override
                     public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
@@ -192,14 +206,14 @@ public class ImageTagTextView extends TextView implements Html.ImageGetter {
                         // will trigger another request but it will be returned
                         // immediately with a cached bitmap.
                         if (!isImmediate) {
-                            mContainers.remove(url);
+                            mContainers.remove(remoteUrl);
                             loadBBCode();
                         }
                     }
 
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        mContainers.remove(url);
+                        mContainers.remove(remoteUrl);
                         LogUtils.e(error);
                     }
                 },
@@ -210,6 +224,9 @@ public class ImageTagTextView extends TextView implements Html.ImageGetter {
         if (bitmap != null) {
             // There is a cached bitmap, so this image container is returned
             // immediately. Use it then.
+            if (isVideo) {
+                bitmap = createVideoBitmap(bitmap);
+            }
             Drawable drawable = new BitmapDrawable(getResources(), bitmap);
             drawable.setBounds(0, 0, bitmap.getWidth(), bitmap.getHeight());
             return drawable;
@@ -217,9 +234,28 @@ public class ImageTagTextView extends TextView implements Html.ImageGetter {
 
         // There is no running request nor cached bitmap for this url. Let's
         // wait for the new request to finish.
-        mContainers.put(url, imageContainer);
+        mContainers.put(remoteUrl, imageContainer);
         // Meanwhile, show default loading image
         return getDefaultDrawable();
+    }
+
+    private Bitmap createVideoBitmap(Bitmap bitmap) {
+        Bitmap playBitmap = BitmapFactory.decodeResource(getResources(),
+                R.drawable.ic_media_embed_play);
+        Canvas canvas = new Canvas(bitmap);
+        canvas.drawBitmap(playBitmap,
+                (bitmap.getWidth() - playBitmap.getWidth()) / 2.0f,
+                (bitmap.getHeight() - playBitmap.getHeight()) / 2.0f,
+                null);
+        return bitmap;
+    }
+
+    private String extractYoutubeId(String url) {
+        Matcher matcher = youtubePattern.matcher(url);
+        if (matcher.matches()) {
+            return matcher.group(1);
+        }
+        return null;
     }
 
     private Drawable getDefaultDrawable() {

@@ -112,6 +112,10 @@ public class BBCodeParserImpl implements BBCodeParser {
                           Html.ImageGetter imageGetter,
                           Map<String, String> emoticons)
             throws IOException {
+        //We replace all video tag to img tag so that they can be load as preview photos
+        if (source.contains(BBCode.VIDEO.toString())){
+            source = source.replaceAll("\\[video\\](.+?)\\[/video\\]", "[img]"+VIDEO_URL_PREFIX+"$1[/img]");
+        }
 
         // Replace emoticons in the text with [img] BBCode tags so that they
         // will be loaded as images later.
