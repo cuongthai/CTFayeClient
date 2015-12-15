@@ -311,5 +311,6 @@
     <string name="error_faye_closed">Failed to connect to messaging server</string>
 
     <string name="error_youtube_error">There was an error while opening your video</string>
+    <string name="load_more">Load More</string>
 
 </resources>

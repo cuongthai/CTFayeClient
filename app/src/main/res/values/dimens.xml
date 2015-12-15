@@ -16,6 +16,7 @@
     <dimen name="drawer_width">240dp</dimen>
 
     <dimen name="authenticate_button_text_size">16sp</dimen>
+    <dimen name="load_more_button_text_size">10sp</dimen>
 
     <dimen name="drawer_avatar_width">64dp</dimen>
     <dimen name="drawer_avatar_height">@dimen/drawer_avatar_width</dimen>

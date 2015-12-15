@@ -58,6 +58,11 @@
         <item name="android:textColor">@color/text_on_primary</item>
     </style>
 
+    <style name="ButtonLoadMore" parent="android:Widget.Button">
+        <item name="android:background">@drawable/button_load_more_selector</item>
+        <item name="android:textColor">@color/text_on_primary</item>
+    </style>
+
     <style name="Theme.ChatWing.DrawerItemNavTitle" parent="Theme.ChatWing.DrawerItemTitle">
         <item name="android:background">@color/primary</item>
         <item name="android:textColor">@color/text_on_primary</item>

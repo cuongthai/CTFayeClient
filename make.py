@@ -142,6 +142,7 @@ def write_color_theme():
         f.writelines("<color name=\"%s\">%s</color>\n" % ("primary", color_primary.hex))
         f.writelines("<color name=\"%s\">%s</color>\n" % ("primary_dark", color_primary_dark.hex))
         f.writelines("<color name=\"%s\">%s</color>\n" % ("accent", color_accent.hex))
+        f.writelines("<color name=\"%s\">#88%s</color>\n" % ("trans_accent", color_accent.hex[1:]))
         f.writelines("<color name=\"%s\">#D9%s</color>\n" % ("primary_text", color_primary_text.hex[1:]))
         f.writelines("<color name=\"%s\">#D9%s</color>\n" % ("secondary_text", color_secondary_text.hex[1:]))
         f.writelines("<color name=\"%s\">%s</color>\n" % ("icons_on_primary", color_icon_on_primary.hex))

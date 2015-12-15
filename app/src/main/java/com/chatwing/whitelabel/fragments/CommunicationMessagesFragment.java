@@ -112,6 +112,7 @@ public abstract class CommunicationMessagesFragment extends BaseFragment {
     private TabPageIndicator indicator;
     private RecyclerView mRecyclerView;
     private LinearLayoutManager mLayoutManager;
+    private View mLoadMoreBtn;
     private boolean mSyncingBBCodeControls;
     private boolean showingBottomContainer;
 
@@ -267,8 +268,10 @@ public abstract class CommunicationMessagesFragment extends BaseFragment {
         }
         if (mIsNoMoreMessages = messagesFromServer.size() == 0) {
             isLoadingMore = false;
+            mLoadMoreBtn.setVisibility(View.GONE);
             return;
         }
+        mLoadMoreBtn.setVisibility(View.VISIBLE);
 
         if (event.isLoadMore()) {
             mAdapter.addAllDataToTail(messagesFromServer);
@@ -382,6 +385,7 @@ public abstract class CommunicationMessagesFragment extends BaseFragment {
         emoticonsPager = (ViewPager) view.findViewById(R.id.pager);
         emoticonsPager.setAdapter(new EmoticonPackagesAdapter(getActivity().getSupportFragmentManager(),
                 new HashMap<String, Emoticon[]>()));
+        mLoadMoreBtn = view.findViewById(R.id.loadMoreBtn);
         indicator = (TabPageIndicator) view.findViewById(R.id.indicator);
         indicator.setViewPager(emoticonsPager);
 
@@ -480,6 +484,15 @@ public abstract class CommunicationMessagesFragment extends BaseFragment {
             @Override
             public void onClick(View view) {
                 sendMessage();
+            }
+        });
+
+        mLoadMoreBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mLoadMoreBtn.setVisibility(View.GONE);
+                isLoadingMore = true;
+                loadMessagesFromServer(false);
             }
         });
     }
@@ -788,15 +801,32 @@ public abstract class CommunicationMessagesFragment extends BaseFragment {
             int pastVisiblesItems, visibleItemCount, totalItemCount;
 
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (newState == RecyclerView.SCROLL_STATE_SETTLING
+                        || newState == RecyclerView.SCROLL_STATE_DRAGGING) {
+                    mLoadMoreBtn.setVisibility(View.GONE);
+                }
 
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    if (mIsNoMoreMessages) {
+                        mLoadMoreBtn.setVisibility(View.GONE);
+                    } else {
+                        mLoadMoreBtn.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 visibleItemCount = mLayoutManager.getChildCount();
-                totalItemCount = mLayoutManager.getItemCount();
                 pastVisiblesItems = mLayoutManager.findFirstVisibleItemPosition();
+                totalItemCount = mLayoutManager.getItemCount();
 
                 if (!isLoadingMore) {
                     if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
                         LogUtils.v("Last Item Wow !");
+                        mLoadMoreBtn.setVisibility(View.GONE);
                         isLoadingMore = true;
                         loadMessagesFromServer(false);
                     }

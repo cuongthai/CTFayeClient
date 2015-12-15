@@ -15,125 +15,140 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/message_list"
-        android:scrollbars="vertical"
-        android:layout_weight="1"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"/>
-
-    <!-- Compose view -->
-    <LinearLayout
-        android:id="@+id/chat_box_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:background="@android:color/transparent"
         android:orientation="vertical">
-        <!-- Row with new content btn, chat box and send btn-->
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/message_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/white"
+            android:scrollbars="vertical" />
+
+        <!-- Compose view -->
         <LinearLayout
+            android:id="@+id/chat_box_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/bg_color"
-            android:descendantFocusability="beforeDescendants"
-            android:focusableInTouchMode="true"
-            android:gravity="center">
-
-            <ImageButton
-                android:id="@+id/btn_new_content"
-                android:layout_width="wrap_content"
-                android:layout_weight="0"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_menu_attachment"
-                style="@style/Theme.ChatWing.Button"
-                android:background="@drawable/item_selector"
-                android:padding="@dimen/compose_button_padding"
-                android:contentDescription="@string/description_attach"
-                android:minWidth="0dp"
-                android:minHeight="0dp" />
-
-            <ImageButton
-                android:id="@+id/btn_emo"
-                android:layout_width="wrap_content"
-                android:layout_weight="0"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_menu_emoticons"
-                style="@style/Theme.ChatWing.Button"
-                android:background="@drawable/item_selector"
-                android:padding="@dimen/compose_button_padding"
-                android:contentDescription="@string/description_emo"
-                android:minWidth="0dp"
-                android:minHeight="0dp" />
-
-            <com.chatwing.whitelabel.views.BBCodeEditText
-                android:id="@+id/chat_box"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:maxLines="2"
-                android:inputType="textMultiLine|textAutoComplete" />
-
-            <ImageButton
-                android:id="@+id/btn_send"
-                android:layout_width="wrap_content"
-                android:layout_weight="0"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_action_send_now_light"
-                style="@style/Theme.ChatWing.Button"
-                android:background="@drawable/item_selector"
-                android:contentDescription="@string/description_send"
-                android:padding="@dimen/compose_button_padding"
-                android:minWidth="0dp"
-                android:minHeight="0dp" />
-        </LinearLayout>
-
-        <include layout="@layout/view_bbcode_controls" />
-
-        <LinearLayout
-            android:id="@+id/emoticons_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/bg_color"
+            android:layout_weight="0"
+            android:background="@android:color/transparent"
             android:orientation="vertical">
-
-            <android.support.v4.view.ViewPager
-                android:id="@+id/pager"
+            <!-- Row with new content btn, chat box and send btn-->
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/emoticon_picker_height" />
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_toLeftOf="@+id/cancel_stickers"
-                    android:orientation="vertical">
-
-                    <com.viewpagerindicator.TabPageIndicator
-                        android:id="@+id/indicator"
-                        android:layout_height="wrap_content"
-                        android:layout_width="wrap_content" />
-                </LinearLayout>
+                android:layout_height="wrap_content"
+                android:background="@color/bg_color"
+                android:descendantFocusability="beforeDescendants"
+                android:focusableInTouchMode="true"
+                android:gravity="center">
 
                 <ImageButton
-                    android:id="@+id/cancel_stickers"
+                    android:id="@+id/btn_new_content"
+                    style="@style/Theme.ChatWing.Button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    style="@style/Theme.ChatWing.Button.Toggle"
-                    android:src="@drawable/ic_action_cancel_light"
-                    android:contentDescription="@string/description_cancel"
-                    android:layout_alignParentRight="true" />
-            </RelativeLayout>
+                    android:layout_weight="0"
+                    android:background="@drawable/item_selector"
+                    android:contentDescription="@string/description_attach"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp"
+                    android:padding="@dimen/compose_button_padding"
+                    android:src="@drawable/ic_menu_attachment" />
 
+                <ImageButton
+                    android:id="@+id/btn_emo"
+                    style="@style/Theme.ChatWing.Button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0"
+                    android:background="@drawable/item_selector"
+                    android:contentDescription="@string/description_emo"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp"
+                    android:padding="@dimen/compose_button_padding"
+                    android:src="@drawable/ic_menu_emoticons" />
+
+                <com.chatwing.whitelabel.views.BBCodeEditText
+                    android:id="@+id/chat_box"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:inputType="textMultiLine|textAutoComplete"
+                    android:maxLines="2" />
+
+                <ImageButton
+                    android:id="@+id/btn_send"
+                    style="@style/Theme.ChatWing.Button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0"
+                    android:background="@drawable/item_selector"
+                    android:contentDescription="@string/description_send"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp"
+                    android:padding="@dimen/compose_button_padding"
+                    android:src="@drawable/ic_action_send_now_light" />
+            </LinearLayout>
+
+            <include layout="@layout/view_bbcode_controls" />
+
+            <LinearLayout
+                android:id="@+id/emoticons_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/bg_color"
+                android:orientation="vertical">
+
+                <android.support.v4.view.ViewPager
+                    android:id="@+id/pager"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/emoticon_picker_height" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_toLeftOf="@+id/cancel_stickers"
+                        android:orientation="vertical">
+
+                        <com.viewpagerindicator.TabPageIndicator
+                            android:id="@+id/indicator"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                    <ImageButton
+                        android:id="@+id/cancel_stickers"
+                        style="@style/Theme.ChatWing.Button.Toggle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:contentDescription="@string/description_cancel"
+                        android:src="@drawable/ic_action_cancel_light" />
+                </RelativeLayout>
+
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/load_more"
+        android:id="@+id/loadMoreBtn"
+        style="@style/ButtonLoadMore"
+        android:padding="5dp"
+        android:layout_marginTop="3dp"
+        android:minHeight="0dp" android:minWidth="0dp"
+        android:textSize="@dimen/load_more_button_text_size"
+        android:layout_gravity="center_horizontal"/>
+</FrameLayout>
