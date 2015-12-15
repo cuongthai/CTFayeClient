@@ -40,7 +40,6 @@ import com.chatwing.whitelabel.fragments.NotificationFragment;
 import com.chatwing.whitelabel.fragments.OnlineUsersFragment;
 import com.chatwing.whitelabel.fragments.PasswordDialogFragment;
 import com.chatwing.whitelabel.fragments.PhotoPickerDialogFragment;
-import com.chatwing.whitelabel.fragments.ProfileFragment;
 import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.managers.BuildManager;
 import com.chatwing.whitelabel.managers.ChatboxModeManager;
@@ -72,7 +71,6 @@ import dagger.Provides;
 @Module(
         injects = {
                 BBCodeEditText.class,
-                ProfileFragment.class,
                 ChatMessagesFragment.class,
                 ConversationMessagesFragment.class,
                 ConversationsFragment.class,

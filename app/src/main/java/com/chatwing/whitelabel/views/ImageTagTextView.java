@@ -48,9 +48,6 @@ public class ImageTagTextView extends TextView implements Html.ImageGetter {
     private List<String> mFilters;
     private VolleyManager mVolleyManager;
     private BBCodeParser mBBCodeParser;
-    private Pattern youtubePattern =
-            Pattern.compile("https?://(?:[0-9A-Z-]+.)?(?:youtu.be/|youtube(?:-nocookie)?.com\\S*[^\\w\\s-])([\\w-]{11})(?=[^\\w-]|$)(?![?=&+%\\w.-]*(?:[\'\"][^<>]*>| </a>))[?=&+%\\w.-]*",
-                    Pattern.CASE_INSENSITIVE);
 
     public ImageTagTextView(Context context) {
         super(context);
@@ -165,7 +162,7 @@ public class ImageTagTextView extends TextView implements Html.ImageGetter {
                 return null;
             }
         } else if (url.startsWith(BBCodeParser.VIDEO_URL_PREFIX)) {
-            String youtubeID = extractYoutubeId(url.substring(BBCodeParser.VIDEO_URL_PREFIX.length()));
+            String youtubeID = StringUtils.extractYoutubeId(url.substring(BBCodeParser.VIDEO_URL_PREFIX.length()));
             if (youtubeID != null) {
                 isVideo = true;
                 url = "http://img.youtube.com/vi/" + youtubeID + "/mqdefault.jpg";
@@ -248,14 +245,6 @@ public class ImageTagTextView extends TextView implements Html.ImageGetter {
                 (bitmap.getHeight() - playBitmap.getHeight()) / 2.0f,
                 null);
         return bitmap;
-    }
-
-    private String extractYoutubeId(String url) {
-        Matcher matcher = youtubePattern.matcher(url);
-        if (matcher.matches()) {
-            return matcher.group(1);
-        }
-        return null;
     }
 
     private Drawable getDefaultDrawable() {

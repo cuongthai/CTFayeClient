@@ -90,7 +90,6 @@ import com.chatwing.whitelabel.fragments.NewContentFragment;
 import com.chatwing.whitelabel.fragments.OnlineUsersFragment;
 import com.chatwing.whitelabel.fragments.PasswordDialogFragment;
 import com.chatwing.whitelabel.fragments.PhotoPickerDialogFragment;
-import com.chatwing.whitelabel.fragments.ProfileFragment;
 import com.chatwing.whitelabel.interfaces.MediaControlInterface;
 import com.chatwing.whitelabel.managers.ApiManager;
 import com.chatwing.whitelabel.managers.BuildManager;
@@ -133,6 +132,7 @@ import com.chatwing.whitelabel.services.UpdateAvatarIntentService;
 import com.chatwing.whitelabel.services.UpdateGcmIntentService;
 import com.chatwing.whitelabel.tables.MessageTable;
 import com.chatwing.whitelabel.utils.LogUtils;
+import com.chatwing.whitelabel.utils.StringUtils;
 import com.chatwing.whitelabel.views.BBCodeEditText;
 import com.flurry.android.FlurryAgent;
 import com.google.android.gms.ads.AdRequest;
@@ -173,7 +173,6 @@ public class CommunicationActivity
         CommunicationDrawerFragment.Listener,
         OnlineUsersFragment.OnlineUsersFragmentDelegate,
         NavigatableFragmentListener,
-        ProfileFragment.Listener,
         MediaControlInterface {
     public static final String AVATAR_PICKER_DIALOG_FRAGMENT_TAG = "AvatarPickerDialogFragment";
     public static final String BLOCK_USER_DIALOG_FRAGMENT_TAG = "BlockUserDialogFragment";
@@ -1230,7 +1229,16 @@ public class CommunicationActivity
 
     @Subscribe
     public void onViewVideoEvent(ViewVideoEvent event) {
-        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(event.getVideoUrl())));
+        String youtubeID = StringUtils
+                .extractYoutubeId(event.getVideoUrl());
+        if (youtubeID != null) {
+            Intent i = new Intent(this, PlayerViewActivity.class);
+            i.putExtra(PlayerViewActivity.YOUTUBE_VIDEO_ID, youtubeID);
+            startActivity(i);
+        } else {
+            mErrorMessageView.show(R.string.error_youtube_error);
+            LogUtils.e("Error while opening youtube " + event.getVideoUrl());
+        }
     }
 
     private void processEvent(Event event) {

@@ -14,6 +14,7 @@
     <string name="error_failed_to_update_user_profile">"Failed to update user profile."</string>
     <string name="error_cant_handle_email">"Your Email application can't handle this email. Did you set it up?"</string>
     <string name="error_invalid_name_length">"Name must be a string from 3 to 32 characters"</string>
+    <string name="error_player">There was an error initializing the YouTubePlayer (%1$s)</string>
 
     <string name="message_or">or</string>
     <string name="fragment_tag_settings">"settings-fragment"</string>
@@ -308,5 +309,7 @@
     <string name="message_ignored_content">Ignored content</string>
     <string name="error_faye_fail_event">There was an error while contacting messaging server</string>
     <string name="error_faye_closed">Failed to connect to messaging server</string>
+
+    <string name="error_youtube_error">There was an error while opening your video</string>
 
 </resources>

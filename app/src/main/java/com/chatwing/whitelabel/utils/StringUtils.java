@@ -6,6 +6,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -14,6 +15,9 @@ import java.util.regex.Pattern;
  * Time: 5:50 PM
  */
 public class StringUtils {
+    private static Pattern youtubePattern =
+            Pattern.compile("https?://(?:[0-9A-Z-]+.)?(?:youtu.be/|youtube(?:-nocookie)?.com\\S*[^\\w\\s-])([\\w-]{11})(?=[^\\w-]|$)(?![?=&+%\\w.-]*(?:[\'\"][^<>]*>| </a>))[?=&+%\\w.-]*",
+                    Pattern.CASE_INSENSITIVE);
 
     /**
      * Generates md5 hash from input string.
@@ -64,5 +68,13 @@ public class StringUtils {
             }
         }
         return src;
+    }
+
+    public static String extractYoutubeId(String url) {
+        Matcher matcher = youtubePattern.matcher(url);
+        if (matcher.matches()) {
+            return matcher.group(1);
+        }
+        return null;
     }
 }

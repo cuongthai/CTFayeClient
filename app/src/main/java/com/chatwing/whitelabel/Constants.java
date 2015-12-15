@@ -58,4 +58,5 @@ public interface Constants {
             .add("Android Central", "http://www.mobilenations.com/rss/mb.xml")
             .add("Wildcat", "http://wildcatsociety.com/category/kentucky-wildcats/feed/")
             .build();
+    String YOUTUBE_DEVELOPER_KEY = "341431874860-i09qq280hqvr7lg0qjjo0h6tj57ptldg.apps.googleusercontent.com";
 }

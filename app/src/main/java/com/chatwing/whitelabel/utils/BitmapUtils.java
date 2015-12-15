@@ -27,11 +27,6 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.media.ExifInterface;
-import android.support.v8.renderscript.Allocation;
-import android.support.v8.renderscript.Element;
-import android.support.v8.renderscript.RenderScript;
-import android.support.v8.renderscript.ScriptIntrinsicBlur;
-import android.widget.ImageView;
 
 import com.chatwing.whitelabel.Constants;
 
@@ -71,61 +66,6 @@ public class BitmapUtils {
         canvas.drawBitmap(source, null, targetRect, null);
 
         return dest;
-    }
-
-    public static Bitmap dotBitmap(Context context, Bitmap bitmap, ImageView imageView) {
-        RenderScript rs = RenderScript.create(context);
-        //Scale up to fit imageView
-        bitmap = BitmapUtils.scaleCenterCrop(bitmap, imageView.getMeasuredHeight(), imageView.getMeasuredWidth());
-
-        //this will blur the bitmap with a radius of 8 and save it back to bitmap
-        final Allocation input = Allocation.createFromBitmap(rs, bitmap); //use this constructor for best performance, because it uses USAGE_SHARED mode which reuses memory
-        final Allocation outputAlloc = Allocation.createTyped(rs, input.getType());
-        final ScriptIntrinsicBlur script = ScriptIntrinsicBlur.create(rs, Element.U8_4(rs));
-        script.setRadius(8f);
-        script.setInput(input);
-        script.forEach(outputAlloc);
-        outputAlloc.copyTo(bitmap);
-
-        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(),
-                Bitmap.Config.ARGB_8888);
-
-        Canvas canvas = new Canvas(output);
-
-        final Paint paint = new Paint();
-        paint.setFilterBitmap(false);
-        paint.setAntiAlias(true);
-        paint.setDither(true);
-
-        //Draw black background
-        paint.setColor(0xFF080808);
-        paint.setStyle(Paint.Style.FILL);
-        canvas.drawRect(0, 0, bitmap.getWidth(), bitmap.getHeight(), paint);
-
-        int sc = canvas.saveLayer(0, 0, bitmap.getWidth(), bitmap.getHeight(), null,
-                Canvas.MATRIX_SAVE_FLAG |
-                        Canvas.CLIP_SAVE_FLAG |
-                        Canvas.HAS_ALPHA_LAYER_SAVE_FLAG |
-                        Canvas.FULL_COLOR_LAYER_SAVE_FLAG |
-                        Canvas.CLIP_TO_LAYER_SAVE_FLAG
-        );
-        //Draw tiny circles
-        float circleRadius = 8;
-        float padding = 2;
-        float centerDiff = 2 * circleRadius + padding;
-        float stepW = bitmap.getWidth() / centerDiff;
-        float stepH = bitmap.getHeight() / centerDiff;
-        for (float i = 0; i <= stepW + 1; i++) {
-            for (float j = 0; j <= stepH + 1; j++) {
-                canvas.drawCircle(i * centerDiff, j * centerDiff, circleRadius, paint);
-            }
-        }
-
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(bitmap, new Matrix(), paint);
-        paint.setXfermode(null);
-        canvas.restoreToCount(sc);
-        return output;
     }
 
     /**
