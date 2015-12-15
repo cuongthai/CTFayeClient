@@ -829,7 +829,7 @@ public class ApiManagerImpl implements ApiManager {
 
     @Override
     public UnreadCountResponse getUnreadCountForChatbox(User user,
-                                        Integer chatboxId)
+                                                        Integer chatboxId)
             throws ApiException,
             HttpRequest.HttpRequestException,
             UserUnauthenticatedException,
@@ -1241,7 +1241,7 @@ public class ApiManagerImpl implements ApiManager {
     }
 
     @Override
-    public LoadOnlineUsersResponse loadOnlineUsers(int chatBoxId)
+    public LoadOnlineUsersResponse loadOnlineUsers(User user, int chatBoxId)
             throws ApiException,
             HttpRequest.HttpRequestException,
             ChatBoxIdValidator.InvalidIdException,
@@ -1253,6 +1253,15 @@ public class ApiManagerImpl implements ApiManager {
         OnlineUserParams params = new OnlineUserParams(chatBoxId);
 
         HttpRequest request = HttpRequest.get(CHAT_BOX_USER_LIST_URL + appendParams(params));
+
+        try {
+            validate(user);
+            setUpRequest(request, user);
+        } catch (UserUnauthenticatedException e) {
+            e.printStackTrace();
+            setUpRequest(request);
+        }
+
         String responseString = null;
 
         try {

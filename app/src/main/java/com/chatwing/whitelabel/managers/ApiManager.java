@@ -197,7 +197,8 @@ public interface ApiManager {
             InvalidAccessTokenException,
             NotVerifiedEmailException, OtherApplicationException;
 
-    LoadOnlineUsersResponse loadOnlineUsers(int chatBoxId)
+    LoadOnlineUsersResponse loadOnlineUsers(User user,
+                                            int chatBoxId)
             throws ApiException,
             HttpRequest.HttpRequestException,
             ChatBoxIdValidator.InvalidIdException,
