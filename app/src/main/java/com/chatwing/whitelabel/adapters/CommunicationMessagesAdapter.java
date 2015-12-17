@@ -94,7 +94,6 @@ public class CommunicationMessagesAdapter extends RecyclerView.Adapter<Communica
                 .showImageForEmptyUri(R.drawable.default_avatar)
                 .showImageOnFail(R.drawable.default_avatar)
                 .cacheInMemory(true)
-                .cacheOnDisk(true)
                 .considerExifParams(true)
                 .displayer(new SimpleBitmapDisplayer())
                 .resetViewBeforeLoading(true)

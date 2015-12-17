@@ -51,7 +51,6 @@ public class OnlineUsersAdapter extends CompatArrayAdapter<OnlineUser> {
                 .showImageForEmptyUri(R.drawable.default_avatar)
                 .showImageOnFail(R.drawable.default_avatar)
                 .cacheInMemory(true)
-                .cacheOnDisk(true)
                 .considerExifParams(true)
                 .displayer(new SimpleBitmapDisplayer())
                 .build();

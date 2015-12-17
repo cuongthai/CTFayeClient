@@ -63,7 +63,6 @@ public class EmoticonsPageAdapter extends BaseAdapter {
         defaultOptions =
                 new DisplayImageOptions.Builder()
                         .cacheInMemory(true)
-                        .cacheOnDisk(true)
                         .build();
     }
 
